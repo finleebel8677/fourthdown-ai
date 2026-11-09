@@ -1,6 +1,10 @@
 name: Refresh NFL statistics
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "public/data/**"
   workflow_dispatch:
   schedule:
     - cron: "30 12 * * *"
