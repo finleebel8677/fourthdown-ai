@@ -480,6 +480,31 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 #page-livingfield .lf-tracking-panel{border-radius:14px}
 @media(max-width:600px){#page-livingfield .lf-field-wrap{border-radius:12px}#page-livingfield .lf-actions .btn{font-size:10px;padding:9px 7px}}
 
+
+/* Expanded Living Field studio */
+.lf-field-wrap.lf-stadium-3d{perspective:1100px;background:radial-gradient(ellipse at 50% 20%,#1a3c4a,#07131d 70%);padding:16px}
+.lf-field-wrap.lf-stadium-3d #lf-field{transform:rotateX(24deg) scale(.94);transform-origin:50% 45%;filter:drop-shadow(0 28px 20px #0009);transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.lf-field-wrap.lf-stadium-3d:before{content:"STADIUM VIEW · PERSPECTIVE MODE";display:block;text-align:center;color:#8eeaff;font-size:9px;letter-spacing:2px;padding:4px 0 15px}
+.lf-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.lf-feature-card{background:linear-gradient(145deg,#111d2d,#09131f);border:1px solid #2a4058;border-radius:14px;padding:15px;min-width:0}
+.lf-feature-card h3{font-size:15px;margin:0 0 7px}
+.lf-feature-card p{font-size:11px;line-height:1.55;color:#91a2b9}
+.lf-feature-controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.lf-feature-controls select,.lf-feature-controls button{flex:1;min-width:120px}
+.lf-feature-output{margin-top:10px}
+.lf-profile-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #344b65;background:#101f30;padding:7px 9px;border-radius:7px;font-size:10px;margin:3px}
+.lf-power-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:12px}
+.lf-power-tile{border:1px solid #2c4057;background:#0c1827;padding:9px 6px;border-radius:8px;text-align:center;min-width:0}
+.lf-power-tile strong{display:block;font-size:11px;color:#dbeafe}
+.lf-power-tile span{display:block;font-size:10px;color:#00e5ff;margin-top:5px;font-variant-numeric:tabular-nums}
+.lf-step-track{display:flex;gap:5px;margin:12px 0}
+.lf-step-track span{height:5px;flex:1;border-radius:8px;background:#26364a}
+.lf-step-track span.active{background:#00e5ff;box-shadow:0 0 10px #00e5ff77}
+.lf-step-copy{padding:12px;background:#0a1725;border-left:3px solid #00e5ff;line-height:1.6;font-size:12px;color:#d2e2f2}
+.lf-trail-status{border:1px solid #725b30;background:#241e12;color:#f4d69a;border-radius:8px;padding:10px;font-size:11px;line-height:1.5}
+.lf-trail-status.ready{border-color:#2d7653;background:#0e241b;color:#a7f3c5}
+@media(max-width:650px){.lf-feature-grid{grid-template-columns:1fr}.lf-power-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.lf-field-wrap.lf-stadium-3d{padding:8px}.lf-field-wrap.lf-stadium-3d #lf-field{transform:rotateX(16deg) scale(.98)}}
+
 </style>
 </head>
 
@@ -743,6 +768,18 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <div class="lf-layout"><div><div class="lf-field-wrap"><svg id="lf-field" viewBox="0 0 1000 500" role="img" aria-label="Interactive tactical football field"></svg></div><div class="lf-actions"><button class="btn" id="lf-animate">ANIMATE ROUTES</button><button class="btn secondary" id="lf-clear-routes">CLEAR ROUTES</button><button class="btn secondary" id="lf-save">SAVE LAYOUT</button><button class="btn secondary" id="lf-load">LOAD LAYOUT</button></div><p id="lf-status" class="muted small">Drag markers to customize the tactical illustration. Select Draw route to create a route.</p></div>
 <div><div class="card" id="lf-player-card"><div class="lf-section-kicker">PLAYER INTELLIGENCE</div><p class="muted small">Select a team and player to inspect verified season totals and a visual production profile.</p></div><div class="card" id="lf-ngs-panel" style="margin-top:12px"><div class="lf-section-kicker">NEXT GEN STATS METRICS</div><p class="muted small">Select a player to inspect available published tracking-derived metrics. Raw coordinates are not included.</p></div></div></div>
 <div class="lf-two-charts" style="margin-top:14px"><div class="card"><div class="lf-section-kicker">TEAM PRODUCTION PROFILE</div><h2 id="lf-team-title" style="font-size:17px;margin:0 0 8px">Team player production</h2><div id="lf-team-chart"></div><p id="lf-team-note" class="muted small"></p></div><div class="card"><div class="lf-section-kicker">PREDICTIVE FIELD · DATA INSIGHTS</div><h2 style="font-size:17px;margin:0 0 8px">Offensive production profile</h2><div id="lf-predict-chart"></div><p id="lf-predict-note" class="muted small"></p></div></div>
+<div class="lf-feature-grid">
+ <div class="lf-feature-card"><div class="lf-section-kicker">FIELD EXPERIENCE</div><h3>3D Stadium Mode</h3><p>Switch between the tactical overhead view and a perspective stadium-style field.</p><button class="btn secondary" id="lf-3d-toggle">ENTER 3D STADIUM</button></div>
+ <div class="lf-feature-card"><div class="lf-section-kicker">REAL TRACKING ONLY</div><h3>Player Movement Trails</h3><p>Historical trails are loaded only from a verified coordinate dataset. No estimated or invented player locations are drawn.</p><div id="lf-trail-status" class="lf-trail-status">Checking for a verified tracking-trail dataset…</div><div id="lf-trail-controls" class="lf-feature-controls"></div></div>
+ <div class="lf-feature-card"><div class="lf-section-kicker">ALIGNMENT INTELLIGENCE</div><h3>Formation Recognition</h3><p>Classifies the offensive alignment from the player markers currently placed on your field.</p><div id="lf-formation-result" class="lf-feature-output"></div><button class="btn secondary" id="lf-formation-refresh">ANALYZE FORMATION</button></div>
+ <div class="lf-feature-card"><div class="lf-section-kicker">DEFENSIVE SHELL LAB</div><h3>Coverage Visualizer</h3><p>Explore common coverage shells as shaded field zones. These are coaching illustrations, not observed NFL coverage calls.</p><div class="lf-feature-controls"><select id="lf-coverage"><option value="cover0">Cover 0 · Zero</option><option value="cover1">Cover 1 · Man-free</option><option value="cover2" selected>Cover 2 · Two-high</option><option value="cover3">Cover 3 · Three-deep</option><option value="cover4">Cover 4 · Quarters</option><option value="cover6">Cover 6 · Quarter-quarter-half</option></select><button class="btn secondary" id="lf-coverage-toggle">HIDE ZONES</button></div><div id="lf-coverage-note" class="muted small">Cover 2 zone shell displayed on the field.</div></div>
+ <div class="lf-feature-card"><div class="lf-section-kicker">COACHING WALKTHROUGH</div><h3>Play Breakdown Mode</h3><p>Step through the routes you draw, from pre-snap alignment to route development and finish.</p><div class="lf-step-track" id="lf-breakdown-track"><span class="active"></span><span></span><span></span><span></span></div><div class="lf-step-copy" id="lf-breakdown-copy">Step 1 · Pre-snap alignment. Build a formation and draw one or more routes to begin.</div><div class="lf-feature-controls"><button class="btn secondary" id="lf-breakdown-prev">BACK</button><button class="btn" id="lf-breakdown-next">NEXT STEP</button></div></div>
+</div>
+<div class="lf-feature-grid">
+ <div class="lf-feature-card"><div class="lf-section-kicker">PLAYER COMPARISON LAB · IDEA 6</div><h3>Head-to-Head Player Comparison</h3><p>Compare two players using the loaded season totals. Charts normalize the selected metrics for a fair visual comparison.</p><div class="lf-feature-controls"><select id="lf-compare-a" aria-label="First player"></select><select id="lf-compare-b" aria-label="Second player"></select></div><div id="lf-compare-result" class="lf-feature-output"></div></div>
+ <div class="lf-feature-card"><div class="lf-section-kicker">TEAM IDENTITY · IDEA 8</div><h3>Team Identity Profiles</h3><p>Build a descriptive team fingerprint from player production totals, including pass/run balance and top production groups.</p><div id="lf-identity-result" class="lf-feature-output"></div></div>
+</div>
+<div class="lf-feature-card" style="margin-top:14px"><div class="lf-section-kicker">32-TEAM LEAGUE POWER MAP · IDEA 10</div><h3>Interactive League Power Map</h3><p>Explore all 32 teams ranked by aggregated player production. These are player-stat rollups, not official team offense/defense rankings or standings.</p><div class="lf-feature-controls"><select id="lf-power-metric"><option value="total">Combined yards</option><option value="passing">Passing yards</option><option value="rushing">Rushing yards</option><option value="receiving">Receiving yards</option><option value="touchdowns">Touchdowns</option></select><select id="lf-power-sort"><option value="high">Highest first</option><option value="low">Lowest first</option></select></div><div id="lf-power-map" class="lf-power-grid"></div><p id="lf-power-note" class="muted small"></p></div>
 <div class="lf-tracking-panel" id="lf-tracking-status" style="margin-top:14px"><strong>PLAYER TRACKING STATUS</strong><p>Checking tracking data availability…</p></div><p class="muted small" style="margin-top:12px">Saved tactical layouts are stored locally. Animations are illustrative. Real player tracking and matchup probabilities require verified coordinate and defensive datasets.</p></section>
 <footer>GRIDIRON IQ · NFL ANALYTICS CENTER · 2026</footer>
 </main>
