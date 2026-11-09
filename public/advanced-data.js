@@ -68,6 +68,8 @@ function renderPrediction(){
 }
 async function load(){
  try{const r=await fetch("/data/nfl-ngs-metrics.json?refresh="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);ngsData=await r.json();}catch(e){ngsData={error:e.message,metrics:[]};}
+ const tracking=$("lf-tracking-status");
+ if(tracking){tracking.innerHTML=ngsData&&!ngsData.error&&ngsData.recordCount?'<strong>PUBLISHED NGS METRICS CONNECTED · RAW COORDINATES UNAVAILABLE</strong><p>'+Number(ngsData.recordCount).toLocaleString()+' published player metric records · season '+esc(ngsData.season||"latest available")+'. Player speed, separation, cushion, air-yard and efficiency metrics appear when published by the source. Actual x/y player positions and frame-by-frame tracking are not included.</p><div class="lf-data-tag">METRICS AVAILABLE · NO RAW PLAYER LOCATIONS</div>':'<strong>NGS METRIC FEED UNAVAILABLE · RAW COORDINATES UNAVAILABLE</strong><p>No published player metric file is currently available. The app will not substitute simulated locations.</p>';}
  try{const r=await fetch("/data/nfl-matchup-predictions.json?refresh="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);predictionData=await r.json();}catch(e){predictionData={error:e.message,predictions:[]};}
  renderPrediction();if(currentPlayer)renderNgs(currentPlayer);
 }
