@@ -446,7 +446,7 @@ footer {
   .chat-controls { flex-direction:column; }
 }
 
-.advanced-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.advanced-metrics .card{padding:12px}.metric-value{font-size:22px;font-weight:900;margin-top:8px}.lesson-block{padding:13px 0;border-bottom:1px solid var(--border)}.lesson-block:last-child{border:0}.lesson-block h3{font-size:14px;margin:0 0 7px}.lesson-block p{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.pick-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center}.pick-row button{padding:7px 10px}@media(max-width:650px){.advanced-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav button{min-width:67px}}</style>
+.advanced-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.advanced-metrics .card{padding:12px}.metric-value{font-size:22px;font-weight:900;margin-top:8px}.lesson-block{padding:13px 0;border-bottom:1px solid var(--border)}.lesson-block:last-child{border:0}.lesson-block h3{font-size:14px;margin:0 0 7px}.lesson-block p{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.pick-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center}.pick-row button{padding:7px 10px}@media(max-width:650px){.advanced-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav button{min-width:67px}}.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.dash-toggles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dash-toggles label{display:flex;gap:7px;align-items:center;font-size:12px}.dash-toggles input{width:auto}.trend-bar{height:10px;background:#243750;border-radius:9px;overflow:hidden;margin:7px 0}.trend-bar span{display:block;height:100%;background:#38bdf8}.week-heat{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:12px 0}.week-heat span{padding:9px 2px;text-align:center;border-radius:7px;background:#14243a;font-size:10px}.week-heat .played{background:#155e75;border:1px solid #38bdf8}@media(max-width:650px){.dashboard-grid,.dash-toggles{grid-template-columns:1fr}}</style>
 </head>
 
 <body>
@@ -475,7 +475,7 @@ footer {
   <button class="nav-btn" data-page="gameplan"><span class="nav-icon">📋</span>Game Planning</button>
   <button class="nav-btn" data-page="advanced"><span class="nav-icon">📊</span>Advanced Analytics</button>
   <button class="nav-btn" data-page="filmroom"><span class="nav-icon">🎥</span>Film Room</button>
-  <button class="nav-btn" data-page="picks"><span class="nav-icon">🎯</span>Predictions & Picks</button>
+  <button class="nav-btn" data-page="picks"><span class="nav-icon">🎯</span>Predictions & Picks</button><button class="nav-btn" data-page="scoreboard"><span class="nav-icon">🏟</span>Scores</button><button class="nav-btn" data-page="tendencies"><span class="nav-icon">🔥</span>Tendencies</button><button class="nav-btn" data-page="dashboard"><span class="nav-icon">⭐</span>My Dashboard</button>
   <button class="nav-btn" data-page="news"><span class="nav-icon">▣</span>NFL News</button>
 </aside>
 
@@ -665,7 +665,7 @@ footer {
  <div class="card"><div class="panel-title">Record a Game Pick</div><div class="three-col"><div><div class="stat-label">Team 1</div><select id="pick-team-a"></select></div><div><div class="stat-label">Team 2</div><select id="pick-team-b"></select></div><div><div class="stat-label">Your pick</div><select id="pick-winner"></select></div></div><input id="pick-note" placeholder="Optional note (e.g. matchup reason)" style="margin-top:12px"><button class="btn" onclick="saveGamePick()" style="margin-top:12px">SAVE PICK</button></div>
  <div class="card" style="margin-top:14px"><div class="panel-title">Your Pick History</div><div id="pick-history" class="muted small">No picks recorded yet.</div></div>
 </section>
-<footer>GRIDIRON IQ · NFL ANALYTICS CENTER · 2026</footer>
+<section class="page" id="page-scoreboard"><div class="page-heading"><div><div class="eyebrow">AROUND THE NFL</div><h1>Live Scores & Schedule</h1><div class="subtitle">Current games and weekly matchups from ESPN.</div></div><button class="btn secondary" onclick="loadScoreboard()">REFRESH</button></div><div class="notice" id="score-status">Connecting to scoreboard…</div><div class="card"><div class="panel-title">Current Scoreboard</div><div id="live-scoreboard">Loading games…</div></div><div class="card" style="margin-top:14px"><div class="panel-title">Weekly Schedule</div><div class="search-row"><select id="schedule-season"><option>2026</option><option>2025</option><option>2024</option></select><select id="schedule-type"><option value="2">Regular season</option><option value="1">Preseason</option><option value="3">Postseason</option></select><select id="schedule-week"></select><button class="btn" onclick="loadWeeklySchedule()">LOAD WEEK</button></div><div id="weekly-schedule">Choose a week.</div></div><p class="muted small">Uses the public ESPN scoreboard feed, not an official NFL API.</p></section><section class="page" id="page-tendencies"><div class="page-heading"><div><div class="eyebrow">PLAYER PRODUCTION PROFILE</div><h1>Player Tendencies & Heat Maps</h1><div class="subtitle">Season production and game participation.</div></div></div><div class="notice">The current player feed contains season totals and weeks played, not route coordinates or target locations. These visuals are production profiles, not field-location tracking.</div><div class="card"><div class="search-row"><select id="tendency-position" onchange="populateTendencyPlayers()"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select><select id="tendency-player" onchange="renderTendencyProfile()"></select></div><div id="tendency-profile">Choose a player.</div></div></section><section class="page" id="page-dashboard"><div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL HQ</div><h1>My Dashboard</h1><div class="subtitle">Choose a favorite team, player, and dashboard widgets.</div></div></div><div class="card"><div class="panel-title">Customize</div><div class="two-col"><div><div class="stat-label">Favorite team</div><select id="dash-team"></select></div><div><div class="stat-label">Favorite player</div><select id="dash-player"></select></div></div><div class="section-title">Widgets</div><div class="dash-toggles"><label><input type="checkbox" id="dash-show-player" checked> Favorite player</label><label><input type="checkbox" id="dash-show-team" checked> Favorite team</label><label><input type="checkbox" id="dash-show-leaders" checked> Statistical leaders</label><label><input type="checkbox" id="dash-show-picks" checked> Pick record</label></div><button class="btn" onclick="saveDashboardSettings()" style="margin-top:15px">SAVE DASHBOARD</button><span id="dash-save-status" class="muted small"></span></div><div id="personal-dashboard" class="dashboard-grid" style="margin-top:15px">Save preferences to build your dashboard.</div></section><footer>GRIDIRON IQ · NFL ANALYTICS CENTER · 2026</footer>
 </main>
 </div>
 
@@ -679,11 +679,12 @@ footer {
   <button data-page="gameplan"><span>📋</span>Plan</button>
   <button data-page="advanced"><span>📊</span>Stats</button>
   <button data-page="filmroom"><span>🎥</span>Film</button>
-  <button data-page="picks"><span>🎯</span>Picks</button>
+  <button data-page="picks"><span>🎯</span>Picks</button><button data-page="scoreboard"><span>🏟</span>Scores</button><button data-page="tendencies"><span>🔥</span>Trends</button><button data-page="dashboard"><span>⭐</span>My</button>
 </nav>
 
 </div>
 
+<script src="/extra-features.js"></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
@@ -755,6 +756,8 @@ async function loadPlayers() {
     document.getElementById("data-detail").textContent=
       "Connected to nflverse · refreshed " + new Date(data.retrievedAt).toLocaleString() + ".";
     renderPlayers(loadedPlayerRows);
+    populateTendencyPlayers();
+    setupDashboard();
     populateAdvancedPlayers();
     populatePlanTeams();
     populatePickTeams();
@@ -1028,6 +1031,8 @@ function animatePlay(){document.querySelectorAll("#play-diagram .route-path,#pla
 populatePlayChoices();
 populatePlanTeams();
 populatePickTeams();
+setupSchedule();
+loadScoreboard();
 loadPlayers();
 </script>
 
