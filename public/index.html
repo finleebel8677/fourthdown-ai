@@ -446,7 +446,8 @@ footer {
   .chat-controls { flex-direction:column; }
 }
 
-.advanced-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.advanced-metrics .card{padding:12px}.metric-value{font-size:22px;font-weight:900;margin-top:8px}.lesson-block{padding:13px 0;border-bottom:1px solid var(--border)}.lesson-block:last-child{border:0}.lesson-block h3{font-size:14px;margin:0 0 7px}.lesson-block p{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.pick-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center}.pick-row button{padding:7px 10px}@media(max-width:650px){.advanced-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav button{min-width:67px}}.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.dash-toggles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dash-toggles label{display:flex;gap:7px;align-items:center;font-size:12px}.dash-toggles input{width:auto}.trend-bar{height:10px;background:#243750;border-radius:9px;overflow:hidden;margin:7px 0}.trend-bar span{display:block;height:100%;background:#38bdf8}.week-heat{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:12px 0}.week-heat span{padding:9px 2px;text-align:center;border-radius:7px;background:#14243a;font-size:10px}.week-heat .played{background:#155e75;border:1px solid #38bdf8}@media(max-width:650px){.dashboard-grid,.dash-toggles{grid-template-columns:1fr}}</style>
+.advanced-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.advanced-metrics .card{padding:12px}.metric-value{font-size:22px;font-weight:900;margin-top:8px}.lesson-block{padding:13px 0;border-bottom:1px solid var(--border)}.lesson-block:last-child{border:0}.lesson-block h3{font-size:14px;margin:0 0 7px}.lesson-block p{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.pick-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center}.pick-row button{padding:7px 10px}@media(max-width:650px){.advanced-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav button{min-width:67px}}.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.dash-toggles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dash-toggles label{display:flex;gap:7px;align-items:center;font-size:12px}.dash-toggles input{width:auto}.trend-bar{height:10px;background:#243750;border-radius:9px;overflow:hidden;margin:7px 0}.trend-bar span{display:block;height:100%;background:#38bdf8}.week-heat{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:12px 0}.week-heat span{padding:9px 2px;text-align:center;border-radius:7px;background:#14243a;font-size:10px}.week-heat .played{background:#155e75;border:1px solid #38bdf8}@media(max-width:650px){.dashboard-grid,.dash-toggles{grid-template-columns:1fr}}.designer-controls,.notebook-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.notebook-form{grid-template-columns:2fr 1fr}.designer-field-wrap{width:100%;overflow:hidden;border:2px solid #568d70;border-radius:12px;background:#14513d;touch-action:pan-y}#designer-field{display:block;width:100%;height:auto;min-height:220px;touch-action:pan-y;cursor:crosshair}.designer-dot{cursor:grab;touch-action:none}.designer-dot:active{cursor:grabbing}.designer-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.designer-actions .muted{flex:1;min-width:180px}.saved-play{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}.saved-play:last-child{border:0}.note-item{margin-bottom:10px}.note-item h3{font-size:15px;margin:10px 0}.note-item p{font-size:12px;line-height:1.6;color:#c0cede;overflow-wrap:anywhere}.note-top,.note-actions{display:flex;align-items:center;gap:8px;justify-content:space-between}.note-actions{justify-content:flex-start}.note-actions .btn{padding:7px 10px}@media(max-width:800px){.designer-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.designer-controls,.notebook-form{grid-template-columns:1fr}.designer-actions{align-items:stretch}.designer-actions .btn{flex:1}.saved-play{align-items:flex-start;flex-direction:column}.mobile-nav button{min-width:68px}}
+</style>
 </head>
 
 <body>
@@ -477,6 +478,8 @@ footer {
   <button class="nav-btn" data-page="filmroom"><span class="nav-icon">🎥</span>Film Room</button>
   <button class="nav-btn" data-page="picks"><span class="nav-icon">🎯</span>Predictions & Picks</button><button class="nav-btn" data-page="scoreboard"><span class="nav-icon">🏟</span>Scores</button><button class="nav-btn" data-page="tendencies"><span class="nav-icon">🔥</span>Tendencies</button><button class="nav-btn" data-page="dashboard"><span class="nav-icon">⭐</span>My Dashboard</button>
   <button class="nav-btn" data-page="news"><span class="nav-icon">▣</span>NFL News</button>
+  <button class="nav-btn" data-page="designer"><span class="nav-icon">✏️</span>Play Designer</button>
+  <button class="nav-btn" data-page="notebook"><span class="nav-icon">📓</span>My NFL Notebook</button>
 </aside>
 
 <main>
@@ -610,6 +613,32 @@ footer {
   </div>
 </section>
 
+<!-- CUSTOM PLAY DESIGNER -->
+<section class="page" id="page-designer">
+ <div class="page-heading"><div><div class="eyebrow">BUILD YOUR OWN PLAYBOOK</div><h1>Play Designer</h1><div class="subtitle">Place players, draw routes, and save your custom football concepts.</div></div></div>
+ <div class="notice">Interactive playbook canvas. These are user-created diagrams, not official NFL play calls or tracking data. Your saved plays stay on this device/browser.</div>
+ <div class="card"><div class="designer-controls">
+ <div><label class="stat-label" for="play-name">PLAY NAME</label><input id="play-name" placeholder="e.g. Trips Flood Right" maxlength="60"></div>
+ <div><label class="stat-label" for="play-formation">FORMATION</label><select id="play-formation"><option>Shotgun 2x2</option><option>Shotgun Trips</option><option>Singleback</option><option>I-Formation</option><option>Pistol</option><option>Custom</option></select></div>
+ <div><label class="stat-label" for="designer-tool">FIELD TOOL</label><select id="designer-tool"><option value="offense">Place offense</option><option value="defense">Place defense</option><option value="route">Draw route / run</option></select></div>
+ <div><label class="stat-label" for="route-kind">ROUTE TYPE</label><select id="route-kind"><option>Pass</option><option>Run</option><option>Motion</option><option>Block</option></select></div></div>
+ <div class="designer-field-wrap"><svg id="designer-field" viewBox="0 0 1000 500" role="img" aria-label="Interactive football field"></svg></div>
+ <div class="designer-actions"><button class="btn" id="play-save">SAVE PLAY</button><button class="btn secondary" id="play-clear">CLEAR FIELD</button><span class="muted small" id="designer-status">Tap the field to place players. Drag markers to reposition them.</span></div></div>
+ <div class="card" style="margin-top:16px"><div class="panel-title">My Saved Plays</div><div id="designer-play-list"></div></div>
+</section>
+<!-- MY NFL NOTEBOOK -->
+<section class="page" id="page-notebook">
+ <div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL LIBRARY</div><h1>My NFL Notebook</h1><div class="subtitle">Save scouting reports, player observations, ideas, and custom football notes.</div></div></div>
+ <div class="notice">Notes and saved plays are stored locally in this browser on this device. They are not synced across devices or backed up to an online account.</div>
+ <div class="card"><div class="panel-title">Create a Notebook Entry</div><input id="note-id" type="hidden">
+ <div class="notebook-form"><div><label class="stat-label" for="note-title">TITLE</label><input id="note-title" placeholder="e.g. Rookie WR scouting report" maxlength="100"></div>
+ <div><label class="stat-label" for="note-category">CATEGORY</label><select id="note-category"><option>Player Scouting</option><option>Team Notes</option><option>Game Analysis</option><option>Draft Prospects</option><option>Strategy</option><option>General</option></select></div></div>
+ <textarea id="note-body" rows="6" placeholder="Write your observations, stats to revisit, scouting thoughts, or football ideas..." style="width:100%;margin-top:12px;background:#0a1423;color:white;border:1px solid var(--border);border-radius:8px;padding:12px;font:inherit"></textarea>
+ <div class="designer-actions"><button class="btn" id="note-save">SAVE NOTE</button><button class="btn secondary" id="note-clear">NEW NOTE</button><span class="muted small" id="note-status">Your notes save on this device.</span></div></div>
+ <div class="search-row" style="margin-top:18px"><input id="note-search" placeholder="Search your notebook..."><select id="note-filter" style="max-width:220px"><option>All</option><option>Player Scouting</option><option>Team Notes</option><option>Game Analysis</option><option>Draft Prospects</option><option>Strategy</option><option>General</option></select></div>
+ <div id="note-list" class="notebook-list"></div><div class="card" style="margin-top:16px"><div class="panel-title">Saved Playbooks</div><p class="muted small">Every play you save in Play Designer is kept in your local playbook, ready to reopen and edit.</p><button class="btn secondary" onclick="showPage('designer')">OPEN PLAY DESIGNER</button></div>
+</section>
+
 <!-- NEWS -->
 <section class="page" id="page-news">
   <div class="page-heading">
@@ -685,6 +714,7 @@ footer {
 </div>
 
 <script src="/extra-features.js"></script>
+<script src="/notebook-designer.js"></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
