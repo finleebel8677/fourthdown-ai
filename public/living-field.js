@@ -22,11 +22,10 @@ function renderField(){
  svg.onclick=e=>{if(e.target.closest("[data-dot]"))return;const tool=$("lf-tool").value;if(tool!=="route"||routeStart===null)return;const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*1000,y=(e.clientY-r.top)/r.height*500,a=dots[routeStart];routes.push({x1:a.x,y1:a.y,x2:x,y2:y,kind:$("lf-route-kind").value,color:$("lf-route-kind").value==="Run"?"#39ff88":"#00e5ff"});routeStart=null;renderField();$("lf-status").textContent="Route added to tactical illustration."};
 }
 function metricChart(title,labels,values,color="#00e5ff"){
- const w=560,h=220,p=34,max=Math.max(1,...values),step=(w-p*2)/Math.max(1,values.length);let s='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(title)+' chart" class="lf-chart">';
- for(let i=0;i<4;i++){const y=p+i*(h-p*2)/3;s+='<line x1="'+p+'" y1="'+y+'" x2="'+(w-p)+'" y2="'+y+'" stroke="#26394d" stroke-dasharray="3 5"/>';}
- const pts=values.map((v,i)=>[p+step*(i+.5),h-p-(v/max)*(h-p*2)]);if(pts.length>1)s+='<polyline points="'+pts.map(x=>x.join(",")).join(" ")+'" fill="none" stroke="'+color+'" stroke-width="3" stroke-linejoin="round"/>';
- pts.forEach((pt,i)=>{s+='<circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="5" fill="'+color+'" stroke="#e8fbff" stroke-width="1"><title>'+esc(labels[i])+': '+Number(values[i]).toLocaleString()+'</title></circle>';s+='<text x="'+pt[0]+'" y="'+(h-9)+'" fill="#91a2b9" font-size="10" text-anchor="middle">'+esc(labels[i])+'</text>';});
- return s+"</svg>";
+ const w=560,h=220,p=34,max=Math.max(1,...values),n=Math.max(1,values.length),slot=(w-p*2)/n,bw=Math.min(34,slot*.58);let out='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(title)+' bar chart" class="lf-chart">';
+ for(let i=0;i<4;i++){const y=p+i*(h-p*2)/3;out+='<line x1="'+p+'" y1="'+y+'" x2="'+(w-p)+'" y2="'+y+'" stroke="#26394d" stroke-dasharray="3 5"/>';}
+ values.forEach((v,i)=>{const bh=(Math.max(0,v)/max)*(h-p*2),x=p+slot*i+(slot-bw)/2,y=h-p-bh;out+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" fill="'+color+'" opacity=".88"><title>'+esc(labels[i])+': '+Number(v).toLocaleString()+'</title></rect><text x="'+(x+bw/2)+'" y="'+(h-9)+'" fill="#91a2b9" font-size="10" text-anchor="middle">'+esc(labels[i])+'</text>';});
+ return out+"</svg>";
 }
 function renderPlayer(){
  const id=$("lf-player").value,p=rows().find(x=>x.id===id),box=$("lf-player-card");if(!p){box.innerHTML='<div class="muted">Select a player to inspect verified season statistics.</div>';return;}
@@ -74,7 +73,13 @@ function setup(){
  $("lf-tool").addEventListener("change",()=>{$("lf-status").textContent=$("lf-tool").value==="route"?"Select a player, then tap a destination to draw a route.":"Drag player markers to customize the tactical illustration."});
  $("lf-reset").onclick=()=>{defaultDots();renderField();$("lf-status").textContent="Tactical field reset."};
  $("lf-clear-routes").onclick=()=>{routes=[];renderField();$("lf-status").textContent="Routes cleared."};
- $("lf-animate").onclick=()=>{const svg=$("lf-field");svg.querySelectorAll("path").forEach(p=>{if(!p.getAttribute("d"))return;try{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1400,fill:"forwards",easing:"ease-out"})}catch(e){}});$("lf-status").textContent="Animating user-created tactical routes. This is not an actual game replay."};
+ $("lf-animate").onclick=()=>{
+  const svg=$("lf-field"),paths=[...svg.querySelectorAll("path")];
+  paths.forEach((p,i)=>{try{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1300,delay:i*100,fill:"forwards",easing:"ease-out"})}catch(e){}});
+  const groups=[...svg.querySelectorAll("[data-dot]")];
+  routes.forEach(route=>{const idx=dots.findIndex(d=>Math.hypot(d.x-route.x1,d.y-route.y1)<35);if(idx<0)return;const node=groups.find(g=>Number(g.dataset.dot)===idx);if(!node)return;node.animate([{transform:"translate("+route.x1+"px, "+route.y1+"px)"},{transform:"translate("+route.x2+"px, "+route.y2+"px)"}],{duration:1700,fill:"forwards",easing:"ease-in-out"});});
+  $("lf-status").textContent="Playing a user-created tactical simulation. Player movements are illustrative, not actual NFL game tracking or recorded outcomes.";
+ };
  $("lf-save").onclick=()=>{const payload={team:$("lf-team").value,dots,routes,updated:Date.now()};localStorage.setItem("gridironIQLivingField",JSON.stringify(payload));$("lf-status").textContent="Field layout saved on this device."};
  $("lf-load").onclick=()=>{try{const p=JSON.parse(localStorage.getItem("gridironIQLivingField")||"null");if(!p)throw Error();dots=p.dots||[];routes=p.routes||[];if(p.team)$("lf-team").value=p.team;renderField();$("lf-status").textContent="Saved field layout restored."}catch(e){$("lf-status").textContent="No saved field layout found on this device."}};
  defaultDots();playerOptions();renderField();renderTeamCharts();renderPredictive();trackingStatus();if(rows().length){renderPlayer();addCoreVisuals()}window.addEventListener("gridiron:players-loaded",()=>{playerOptions();renderPlayer();renderTeamCharts();renderPredictive();addCoreVisuals()});
