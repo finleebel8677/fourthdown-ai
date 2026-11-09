@@ -1026,6 +1026,8 @@ function drawPlay(){
 function toggleDefense(){showPlayDefense=!showPlayDefense;drawPlay()}
 function animatePlay(){document.querySelectorAll("#play-diagram .route-path,#play-diagram .run-path").forEach((p,i)=>{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1200,delay:i*100,fill:"forwards",easing:"ease-out"})})}
 populatePlayChoices();
+populatePlanTeams();
+populatePickTeams();
 loadPlayers();
 </script>
 
