@@ -690,23 +690,23 @@ function renderPlayers(list) {
     table.appendChild(row);
   });
 }
-async function loadPlayers(search="") {
+async function loadPlayers() {
   const table=document.getElementById("player-table");
   table.innerHTML='<tr><td colspan="7">Loading verified player statistics…</td></tr>';
   try {
-    const response=await fetch("/api/nfl/players" + (search ? "?search=" + encodeURIComponent(search) : ""));
+    const response=await fetch("/data/nfl-players.json?refresh=" + Date.now(), {cache:"no-store"});
+    if(!response.ok) throw new Error("Prepared NFL statistics file is not available yet");
     const data=await response.json();
-    if(!response.ok) throw new Error(data.error || "NFL statistics unavailable");
     loadedPlayerRows=data.players || [];
     document.getElementById("player-season").textContent=
       "Regular-season player statistics · " + data.season +
       (data.isCurrentSeason ? " · current season" : " · latest available completed season");
-    document.getElementById("player-count").textContent=loadedPlayerRows.length.toLocaleString();
+    document.getElementById("player-count").textContent=Number(data.totalPlayers || loadedPlayerRows.length).toLocaleString();
     document.getElementById("data-status").textContent=
       "NFL statistics connected · " + data.season + " season · " +
-      Number(data.totalPlayers || loadedPlayerRows.length).toLocaleString() + " player records in the dataset.";
+      Number(data.totalPlayers || loadedPlayerRows.length).toLocaleString() + " real player records.";
     document.getElementById("data-detail").textContent=
-      "Connected to nflverse · season " + data.season + ".";
+      "Connected to nflverse · refreshed " + new Date(data.retrievedAt).toLocaleString() + ".";
     renderPlayers(loadedPlayerRows);
   } catch(error) {
     table.innerHTML="";
@@ -715,21 +715,19 @@ async function loadPlayers(search="") {
     cell.textContent="Verified player statistics are temporarily unavailable. " + error.message;
     row.appendChild(cell); table.appendChild(row);
     document.getElementById("data-status").textContent=
-      "NFL statistics currently unavailable. The app will not substitute invented stats.";
-    document.getElementById("data-detail").textContent="Statistics feed unavailable. No sample numbers are being shown.";
+      "NFL statistics are waiting for the first successful GitHub Actions refresh. No sample statistics are shown.";
+    document.getElementById("data-detail").textContent="The automated data refresh has not completed yet.";
   }
 }
 function filterPlayers() {
-  const q=document.getElementById("player-search").value.trim();
+  const q=document.getElementById("player-search").value.trim().toLowerCase();
   const pos=document.getElementById("position-filter").value;
-  if (q) {
-    loadPlayers(q).then(()=>renderPlayers(loadedPlayerRows.filter(p=>!pos || p.position===pos)));
-  } else {
-    loadPlayers().then(()=>renderPlayers(loadedPlayerRows.filter(p=>!pos || p.position===pos)));
-  }
+  const filtered=loadedPlayerRows.filter(p=>{
+    const matchesText=!q || [p.name,p.position,...(p.teams||[])].some(v=>String(v||"").toLowerCase().includes(q));
+    return matchesText && (!pos || p.position===pos);
+  });
+  renderPlayers(filtered.slice(0,100));
 }
-loadPlayers();
-
 function renderTeams(list) {
   const grid=document.getElementById("team-grid");
   grid.innerHTML="";
