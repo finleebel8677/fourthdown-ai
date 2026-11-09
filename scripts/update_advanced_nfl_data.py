@@ -253,8 +253,12 @@ def build_predictions():
     validation.fit(np.array(training_x)[train_idx], np.array(training_y)[train_idx])
     test_prob = validation.predict_proba(np.array(training_x)[test_idx])[:,1]
     test_pred = (test_prob >= .5).astype(int)
-    accuracy = float(accuracy_score(np.array(training_y)[test_idx], test_pred))
-    brier = float(brier_score_loss(np.array(training_y)[test_idx], test_prob))
+    test_labels = np.array(training_y)[test_idx]
+    accuracy = float(accuracy_score(test_labels, test_pred))
+    brier = float(brier_score_loss(test_labels, test_prob))
+    home_win_rate = float(np.mean(test_labels))
+    baseline_accuracy = float(max(home_win_rate, 1-home_win_rate))
+    baseline_brier = float(brier_score_loss(test_labels, np.full(len(test_labels), home_win_rate)))
     final_model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000, C=0.7))
     final_model.fit(np.array(training_x), np.array(training_y))
 
@@ -296,6 +300,11 @@ def build_predictions():
                  "trainingSeasons":[min(years),max(years)],"holdoutSeason":int(holdout_year),
                  "holdoutGames":len(test_idx),"holdoutAccuracy":round(accuracy,4),
                  "holdoutBrierScore":round(brier,4),
+                 "baselineAccuracy":round(baseline_accuracy,4),
+                 "baselineBrierScore":round(baseline_brier,4),
+                 "homeWinRate":round(home_win_rate,4),
+                 "status":"experimental",
+                 "performanceNote":"Compare this model against the holdout baseline before treating probabilities as reliable. Predictions are exploratory estimates, not betting advice.",
                  "validationMethod":"Chronological season holdout; each game uses only team games played before that matchup.",
                  "features":FEATURE_KEYS + ["home_field_advantage"]},
         "predictionCount":len(predictions),"predictions":predictions,
