@@ -8,7 +8,12 @@ import {
 } from "hyparquet";
 
 const MODEL_ID = "@cf/meta/llama-3.1-8b-instruct-fp8";
-const CURRENT_YEAR = new Date().getUTCFullYear();
+const RUNTIME_YEAR = new Date().getUTCFullYear();
+
+const CURRENT_YEAR =
+    RUNTIME_YEAR >= 2020 && RUNTIME_YEAR <= 2100
+        ? RUNTIME_YEAR
+        : 2026;
 
 const SYSTEM_PROMPT = `
 You are FOURTHDOWN AI, an expert NFL football analyst.
