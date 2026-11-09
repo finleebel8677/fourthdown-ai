@@ -89,12 +89,95 @@ function addCoreVisuals(){
  }
 }
 function trackingStatus(){const s=$("lf-tracking-status");s.innerHTML='<strong>TRACKING FEED NOT CONNECTED</strong><p>Current NFLverse player records provide season statistics, not raw player coordinates for every play. Real movement trails and player-position replays remain disabled until a verified tracking feed is available.</p><div class="lf-data-tag">STATISTICS CONNECTED · COORDINATES UNAVAILABLE</div>';}
+
+let coverageVisible=true,coverageType="cover2",breakdownStep=0,trackingTrails=null,stadiumMode=false;
+const coverageCopy={cover0:"Cover 0: man coverage with no deep safety help; pressure can be aggressive but leaves isolated matchups.",cover1:"Cover 1: man coverage underneath with one deep middle safety.",cover2:"Cover 2: two deep safeties split the deep field; underneath defenders protect short zones.",cover3:"Cover 3: three deep defenders divide the field into thirds with underneath zones.",cover4:"Cover 4: four deep defenders divide the deep field into quarters and match vertical releases.",cover6:"Cover 6: one side plays quarters while the other side plays a Cover 2 half-field structure."};
+function drawCoverage(svg){
+ if(!coverageVisible)return;
+ const zones={
+ cover0:'<text x="510" y="65" fill="#fecaca" font-size="19" font-weight="900">ZERO DEEP SAFETIES · MAN</text>',
+ cover1:'<rect x="700" y="30" width="180" height="440" fill="#a855f7" fill-opacity=".12" stroke="#c4b5fd" stroke-dasharray="8 6"/><text x="790" y="55" fill="#ddd6fe" text-anchor="middle" font-size="15">POST SAFETY</text>',
+ cover2:'<rect x="610" y="25" width="155" height="450" fill="#60a5fa" fill-opacity=".13" stroke="#93c5fd" stroke-dasharray="7 6"/><rect x="765" y="25" width="155" height="450" fill="#60a5fa" fill-opacity=".13" stroke="#93c5fd" stroke-dasharray="7 6"/><text x="685" y="55" fill="#dbeafe" text-anchor="middle" font-size="15">DEEP HALF</text><text x="840" y="55" fill="#dbeafe" text-anchor="middle" font-size="15">DEEP HALF</text>',
+ cover3:'<rect x="570" y="25" width="115" height="450" fill="#38bdf8" fill-opacity=".12" stroke="#7dd3fc"/><rect x="685" y="25" width="115" height="450" fill="#38bdf8" fill-opacity=".12" stroke="#7dd3fc"/><rect x="800" y="25" width="115" height="450" fill="#38bdf8" fill-opacity=".12" stroke="#7dd3fc"/><text x="742" y="55" fill="#cffafe" text-anchor="middle" font-size="15">THREE DEEP ZONES</text>',
+ cover4:'<rect x="550" y="25" width="90" height="450" fill="#a78bfa" fill-opacity=".13" stroke="#c4b5fd"/><rect x="640" y="25" width="90" height="450" fill="#a78bfa" fill-opacity=".13" stroke="#c4b5fd"/><rect x="730" y="25" width="90" height="450" fill="#a78bfa" fill-opacity=".13" stroke="#c4b5fd"/><rect x="820" y="25" width="90" height="450" fill="#a78bfa" fill-opacity=".13" stroke="#c4b5fd"/><text x="730" y="55" fill="#ede9fe" text-anchor="middle" font-size="15">QUARTERS SHELL</text>',
+ cover6:'<rect x="570" y="25" width="170" height="450" fill="#38bdf8" fill-opacity=".13" stroke="#7dd3fc"/><rect x="740" y="25" width="180" height="225" fill="#a78bfa" fill-opacity=".15" stroke="#c4b5fd"/><rect x="740" y="250" width="180" height="225" fill="#a78bfa" fill-opacity=".15" stroke="#c4b5fd"/><text x="650" y="55" fill="#cffafe" text-anchor="middle" font-size="15">QUARTERS</text><text x="830" y="55" fill="#ede9fe" text-anchor="middle" font-size="15">COVER 2 HALF</text>'};
+ svg.append(svgEl("g",{id:"lf-coverage-zones"}));
+ const g=svg.querySelector("#lf-coverage-zones");g.innerHTML=zones[coverageType]||"";
+}
+function drawTrails(svg){
+ const player=$("lf-player")?.value;
+ if(!trackingTrails?.plays?.length||!player)return;
+ const matches=trackingTrails.plays.filter(p=>String(p.playerId)===String(player)&&Array.isArray(p.points)&&p.points.length>1);
+ matches.forEach(play=>{const pts=play.points.filter(p=>Number.isFinite(+p.x)&&Number.isFinite(+p.y));if(pts.length<2)return;const d=pts.map((p,i)=>(i?"L":"M")+(+p.x)+" "+(+p.y)).join(" ");svg.append(svgEl("path",{d,fill:"none",stroke:"#fbbf24","stroke-width":5,"stroke-linecap":"round","stroke-linejoin":"round","stroke-opacity":".9"}));const end=pts[pts.length-1];svg.append(svgEl("circle",{cx:end.x,cy:end.y,r:8,fill:"#fbbf24",stroke:"#fff","stroke-width":2}));});
+}
+function recognizeFormation(){
+ const off=dots.filter(d=>d.side==="O"),qb=off.find(d=>/QB/i.test(d.l)),receivers=off.filter(d=>/WR|TE/i.test(d.l)),left=receivers.filter(d=>d.y<250),right=receivers.filter(d=>d.y>250);
+ const trips=Math.max(left.length,right.length)>=3,bunch=receivers.some(a=>receivers.some(b=>a!==b&&Math.abs(a.x-b.x)<45&&Math.abs(a.y-b.y)<55));
+ const wide=receivers.filter(d=>Math.abs(d.y-250)>125).length>=2;
+ const backfield=off.filter(d=>/RB|FB/i.test(d.l)).length;
+ let name=trips?"Trips":bunch?"Bunch":wide?"Spread / wide alignment":receivers.length>=2?"Balanced 2x2 / multiple receiver": "Unbalanced / custom";
+ if(qb&&off.some(d=>/OL|LT|LG|C|RG|RT/i.test(d.l)&&d.x-qb.x>90))name+=" · shotgun-like";
+ else if(qb)name+=" · under-center / custom depth";
+ const detail=receivers.length+" eligible receiver markers · "+backfield+" backfield runner marker(s) · "+(trips?"three or more receivers aligned to one side":bunch?"receivers clustered tightly":wide?"receivers split wide":"custom spacing");
+ $("lf-formation-result").innerHTML='<div class="lf-profile-chip">DETECTED ALIGNMENT</div><h2 style="font-size:20px;margin:9px 0;color:#00e5ff">'+esc(name)+'</h2><p>'+esc(detail)+'</p><p class="muted small">Heuristic based only on your current marker positions; not a computer-vision read of an NFL play.</p>';
+}
+function breakdownRender(){
+ const stages=[["Pre-snap","Confirm personnel, formation, defensive shell, and player alignment."],["Release","Receivers begin their routes; identify leverage and the first defender affected."],["Development","Track route spacing, defensive rotation, and the quarterback's progression."],["Finish","Evaluate the route destination and the available throw or run lane."]];
+ const s=stages[breakdownStep];$("lf-breakdown-copy").innerHTML='<strong>'+s[0]+'</strong><br>'+s[1]+(routes.length?' <br><span class="muted">Your diagram currently contains '+routes.length+' user-drawn route(s).</span>':' <br><span class="muted">Draw routes on the field to make this walkthrough specific to your play.</span>');
+ $("lf-breakdown-track").innerHTML=stages.map((x,i)=>'<span class="'+(i<=breakdownStep?'active':'')+'"></span>').join("");
+ $("lf-breakdown-prev").disabled=breakdownStep===0;$("lf-breakdown-next").textContent=breakdownStep===3?"RESTART":"NEXT STEP";
+}
+function comparisonOptions(){
+ const list=rows().filter(p=>["QB","RB","WR","TE"].includes(p.position)).sort((a,b)=>a.name.localeCompare(b.name));
+ ["lf-compare-a","lf-compare-b"].forEach((id,i)=>{const s=$(id);if(!s)return;const old=s.value;s.innerHTML=list.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+' · '+esc(p.position)+'</option>').join("");if(list.some(p=>String(p.id)===old))s.value=old;else if(i===1&&list.length>1)s.selectedIndex=1;});
+ renderComparison();
+}
+function renderComparison(){
+ const a=rows().find(p=>String(p.id)===$("lf-compare-a")?.value),b=rows().find(p=>String(p.id)===$("lf-compare-b")?.value),box=$("lf-compare-result");if(!box)return;
+ if(!a||!b){box.innerHTML='<p class="muted small">Player comparison requires two available player records.</p>';return;}
+ const fields=[["Passing yards","passing_yards"],["Rushing yards","rushing_yards"],["Receiving yards","receiving_yards"],["Passing TD","passing_tds"],["Rushing TD","rushing_tds"],["Receiving TD","receiving_tds"]];
+ const vals=fields.map(([label,key])=>({label,a:+a[key]||0,b:+b[key]||0}));
+ const max=Math.max(1,...vals.flatMap(x=>[x.a,x.b]));
+ box.innerHTML='<div class="lf-profile-chip">'+esc(a.position)+' · '+esc((a.teams||[]).join("/"))+'</div><div class="lf-profile-chip">'+esc(b.position)+' · '+esc((b.teams||[]).join("/"))+'</div>'+vals.map(x=>'<div style="margin:9px 0"><div style="display:flex;justify-content:space-between;font-size:10px"><span>'+x.label+'</span><b>'+x.a.toLocaleString()+' / '+x.b.toLocaleString()+'</b></div><div style="display:flex;height:8px;background:#26364a;margin-top:5px;border-radius:8px;overflow:hidden"><span style="width:'+(x.a/max*100)+'%;background:#00e5ff"></span><span style="width:'+(x.b/max*100)+'%;background:#a78bfa"></span></div></div>').join("")+'<p class="muted small">Cyan: '+esc(a.name)+' · Purple: '+esc(b.name)+' · loaded season totals.</p>';
+}
+function teamIdentity(){
+ const ps=teamRows(),pass=ps.reduce((a,p)=>a+(+p.passing_yards||0),0),rush=ps.reduce((a,p)=>a+(+p.rushing_yards||0),0),rec=ps.reduce((a,p)=>a+(+p.receiving_yards||0),0),td=ps.reduce((a,p)=>a+(+p.passing_tds||0)+(+p.rushing_tds||0)+(+p.receiving_tds||0),0),sum=pass+rush;
+ const balance=sum?pass/sum:0,style=!sum?"Insufficient production data":balance>.68?"Pass-production leaning":balance<.42?"Rush-production leaning":"Balanced pass/run production";
+ const leaders=ps.filter(p=>["QB","RB","WR","TE"].includes(p.position)).sort((a,b)=>(+b.passing_yards||0)+(+b.rushing_yards||0)+(+b.receiving_yards||0)-((+a.passing_yards||0)+(+a.rushing_yards||0)+(+a.receiving_yards||0))).slice(0,3);
+ $("lf-identity-result").innerHTML='<h2 style="font-size:19px;color:#00e5ff;margin:5px 0">'+esc(teamNames[$("lf-team").value]||$("lf-team").value)+'</h2><div class="lf-profile-chip">'+style+'</div><div class="lf-metric-grid"><div class="lf-metric"><small>Pass yards</small><strong>'+pass.toLocaleString()+'</strong></div><div class="lf-metric"><small>Rush yards</small><strong>'+rush.toLocaleString()+'</strong></div><div class="lf-metric"><small>Receiving yards</small><strong>'+rec.toLocaleString()+'</strong></div><div class="lf-metric"><small>Player TD total</small><strong>'+td.toLocaleString()+'</strong></div></div><p class="muted small">Top production contributors: '+(leaders.length?leaders.map(p=>esc(p.name)).join(", "):"Not available")+'. Derived from loaded player totals, not official team play-calling rates or standings.</p>';
+}
+function renderPowerMap(){
+ const key=$("lf-power-metric")?.value||"total",desc={total:"combined yards",passing:"passing yards",rushing:"rushing yards",receiving:"receiving yards",touchdowns:"combined touchdowns"}[key];
+ const arr=teams.map(t=>{const ps=rows().filter(p=>(p.teams||[]).includes(t));const val=ps.reduce((a,p)=>a+(key==="total"?(+p.passing_yards||0)+(+p.rushing_yards||0)+(+p.receiving_yards||0):key==="touchdowns"?(+p.passing_tds||0)+(+p.rushing_tds||0)+(+p.receiving_tds||0):(+p[key+"_yards"]||0)),0);return {team:t,val};}).sort((a,b)=>$("lf-power-sort")?.value==="low"?a.val-b.val:b.val-a.val);
+ $("lf-power-map").innerHTML=arr.map((x,i)=>'<div class="lf-power-tile" title="'+esc(teamNames[x.team])+' · '+x.val.toLocaleString()+' '+desc+'"><strong>#'+(i+1)+' '+x.team+'</strong><span>'+x.val.toLocaleString()+'</span></div>').join("");
+ $("lf-power-note").textContent="Sorted by "+desc+". Values are sums of available individual player records; teams can have incomplete or duplicated player attribution after transactions, and this is not an official team ranking.";
+}
+async function loadVerifiedTrails(){
+ const status=$("lf-trail-status");try{
+  const res=await fetch("/data/nfl-tracking-trails.json?refresh="+Date.now(),{cache:"no-store"});if(!res.ok)throw Error("No published tracking-trail file was found.");
+  const data=await res.json();if(!Array.isArray(data.plays))throw Error("Tracking dataset schema is not valid.");
+  trackingTrails=data;status.className="lf-trail-status ready";status.textContent="Verified coordinate dataset connected · "+data.plays.length+" play records · "+(data.source||"source metadata not supplied")+". Trails will render only for matching player records.";
+ }catch(e){trackingTrails=null;status.className="lf-trail-status";status.textContent="Unavailable: "+e.message+" · No coordinates or movement paths have been invented.";}
+ renderField();
+}
+function initializeFeatureStudio(){
+ $("lf-3d-toggle").onclick=()=>{stadiumMode=!stadiumMode;$("lf-field").parentElement.classList.toggle("lf-stadium-3d",stadiumMode);$("lf-3d-toggle").textContent=stadiumMode?"RETURN TO TACTICAL VIEW":"ENTER 3D STADIUM";};
+ $("lf-coverage").onchange=()=>{coverageType=$("lf-coverage").value;$("lf-coverage-note").textContent=coverageCopy[coverageType];renderField();};
+ $("lf-coverage-toggle").onclick=()=>{coverageVisible=!coverageVisible;$("lf-coverage-toggle").textContent=coverageVisible?"HIDE ZONES":"SHOW ZONES";renderField();};
+ $("lf-formation-refresh").onclick=recognizeFormation;
+ $("lf-breakdown-prev").onclick=()=>{breakdownStep=Math.max(0,breakdownStep-1);breakdownRender();};
+ $("lf-breakdown-next").onclick=()=>{breakdownStep=breakdownStep===3?0:breakdownStep+1;breakdownRender();};
+ ["lf-compare-a","lf-compare-b"].forEach(id=>$(id).onchange=renderComparison);
+ ["lf-power-metric","lf-power-sort"].forEach(id=>$(id).onchange=renderPowerMap);
+ breakdownRender();recognizeFormation();teamIdentity();renderPowerMap();comparisonOptions();loadVerifiedTrails();
+}
+
 function setup(){
  if(!$("page-livingfield"))return;
  $("lf-team").innerHTML=teams.map(t=>'<option value="'+t+'">'+esc(teamNames[t])+'</option>').join("");
  const favorite=(()=>{try{return JSON.parse(localStorage.getItem("gridironIQDashboard")||"{}").team}catch(e){return ""}})();
  if(favorite&&teams.includes(favorite))$("lf-team").value=favorite;
- $("lf-team").addEventListener("change",()=>{playerOptions();renderTeamCharts();renderPredictive();renderPlayer()});
+ $("lf-team").addEventListener("change",()=>{playerOptions();renderTeamCharts();renderPredictive();renderPlayer();teamIdentity()});
  $("lf-player").addEventListener("change",renderPlayer);
  $("lf-tool").addEventListener("change",()=>{$("lf-status").textContent=$("lf-tool").value==="route"?"Select a player, then tap a destination to draw a route.":"Drag player markers to customize the tactical illustration."});
  $("lf-reset").onclick=()=>{defaultDots();renderField();$("lf-status").textContent="Tactical field reset."};
@@ -107,7 +190,7 @@ function setup(){
  };
  $("lf-save").onclick=()=>{const payload={team:$("lf-team").value,dots,routes,updated:Date.now()};localStorage.setItem("gridironIQLivingField",JSON.stringify(payload));$("lf-status").textContent="Field layout saved on this device."};
  $("lf-load").onclick=()=>{try{const p=JSON.parse(localStorage.getItem("gridironIQLivingField")||"null");if(!p)throw Error();dots=p.dots||[];routes=p.routes||[];if(p.team)$("lf-team").value=p.team;renderField();$("lf-status").textContent="Saved field layout restored."}catch(e){$("lf-status").textContent="No saved field layout found on this device."}};
- defaultDots();playerOptions();renderField();renderTeamCharts();renderPredictive();trackingStatus();if(rows().length){renderPlayer();addCoreVisuals()}window.addEventListener("gridiron:players-loaded",()=>{playerOptions();renderPlayer();renderTeamCharts();renderPredictive();addCoreVisuals()});
+ defaultDots();playerOptions();renderField();renderTeamCharts();renderPredictive();trackingStatus();initializeFeatureStudio();if(rows().length){renderPlayer();addCoreVisuals()}window.addEventListener("gridiron:players-loaded",()=>{playerOptions();renderPlayer();renderTeamCharts();renderPredictive();addCoreVisuals();comparisonOptions();teamIdentity();renderPowerMap()});
  const obs=new MutationObserver(()=>{if(rows().length){playerOptions();renderTeamCharts();renderPredictive();renderPlayer();obs.disconnect()}});obs.observe($("lf-player-card"),{childList:true,subtree:true});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
