@@ -31,7 +31,7 @@ function metricChart(title,labels,values,color="#00e5ff"){
 function renderPlayer(){
  const id=$("lf-player").value,p=rows().find(x=>x.id===id),box=$("lf-player-card");if(!p){box.innerHTML='<div class="muted">Select a player to inspect verified season statistics.</div>';return;}
  const stats=[["Passing yards",+p.passing_yards||0],["Rushing yards",+p.rushing_yards||0],["Receiving yards",+p.receiving_yards||0],["Touchdowns",(+p.passing_tds||0)+(+p.rushing_tds||0)+(+p.receiving_tds||0)]];
- box.innerHTML='<div class="lf-player-head"><div><div class="eyebrow">PLAYER INTELLIGENCE</div><h2>'+esc(p.name)+'</h2><span class="muted">'+esc(p.position)+' · '+esc((p.teams||[]).join("/"))+' · '+esc(p.games)+' games</span></div><span class="lf-live-dot">VERIFIED DATA</span></div><div class="lf-metric-grid">'+stats.map(x=>'<div class="lf-metric"><small>'+x[0]+'</small><strong>'+x[1].toLocaleString()+'</strong></div>').join("")+'</div><div class="lf-chart-wrap"><div class="panel-title">SEASON PRODUCTION PROFILE</div>'+metricChart("Production",stats.map(x=>x[0]),stats.map(x=>x[1]))+'</div><p class="muted small">Season totals from the app's NFL statistics dataset. These totals are not player tracking coordinates.</p>';
+ box.innerHTML='<div class="lf-player-head"><div><div class="eyebrow">PLAYER INTELLIGENCE</div><h2>'+esc(p.name)+'</h2><span class="muted">'+esc(p.position)+' · '+esc((p.teams||[]).join("/"))+' · '+esc(p.games)+' games</span></div><span class="lf-live-dot">VERIFIED DATA</span></div><div class="lf-metric-grid">'+stats.map(x=>'<div class="lf-metric"><small>'+x[0]+'</small><strong>'+x[1].toLocaleString()+'</strong></div>').join("")+'</div><div class="lf-chart-wrap"><div class="panel-title">SEASON PRODUCTION PROFILE</div>'+metricChart("Production",stats.map(x=>x[0]),stats.map(x=>x[1]))+'</div><p class="muted small">Season totals from the NFL statistics dataset. These totals are not player tracking coordinates.</p>';
 }
 function renderTeamCharts(){
  const t=$("lf-team").value,ps=teamRows(),totals=[["Passing yards",ps.reduce((a,p)=>a+(+p.passing_yards||0),0)],["Rushing yards",ps.reduce((a,p)=>a+(+p.rushing_yards||0),0)],["Receiving yards",ps.reduce((a,p)=>a+(+p.receiving_yards||0),0)]];
@@ -55,7 +55,7 @@ function addCoreVisuals(){
   wrap.innerHTML='<div class="lf-section-kicker">LEAGUE PRODUCTION LEADERS</div><div class="muted small">Combined passing, rushing and receiving yards · loaded season</div>'+metricChart("League production",leaders.map(x=>x.name.split(" ").slice(-1)[0]),leaders.map(x=>x.yards),"#00e5ff");
   pHost.after(wrap);
  }
- const tHost=$("team-grid")?.parentElement;
+ const tHost=$("team-detail");
  if(tHost&&!$("core-team-chart")){
   const wrap=document.createElement("div");wrap.className="card";wrap.id="core-team-chart";wrap.style.marginTop="14px";
   const teamTotals=teams.map(t=>({t,y:ps.filter(p=>(p.teams||[]).includes(t)).reduce((a,p)=>a+(+p.passing_yards||0)+(+p.rushing_yards||0)+(+p.receiving_yards||0),0)})).sort((a,b)=>b.y-a.y).slice(0,10);
