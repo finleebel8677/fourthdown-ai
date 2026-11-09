@@ -1,5 +1,5 @@
 
-import { Env, ChatMessage } from "./types";
+import { Env } from "./types";
 import {
   asyncBufferFromUrl,
   parquetMetadataAsync,
@@ -7,30 +7,12 @@ import {
   parquetReadObjects
 } from "hyparquet";
 
-const MODEL_ID = "@cf/meta/llama-3.1-8b-instruct-fp8";
 const RUNTIME_YEAR = new Date().getUTCFullYear();
 
 const CURRENT_YEAR =
     RUNTIME_YEAR >= 2020 && RUNTIME_YEAR <= 2100
         ? RUNTIME_YEAR
         : 2026;
-
-const SYSTEM_PROMPT = `
-You are FOURTHDOWN AI, an expert NFL football analyst.
-
-Analyze NFL players, teams, statistics, schemes, matchups and strategy.
-
-STATISTICS RULES:
-- Use verified NFL DATA CONTEXT supplied with the request.
-- Never invent player statistics, rankings, records, injuries or results.
-- Identify the season associated with every statistic.
-- Never describe previous-season statistics as current-season statistics.
-- If verified data is unavailable, say so clearly.
-- Distinguish actual statistics from predictions and opinions.
-- Identify nflverse as the source of supplied statistics.
-- Do not pretend to have live tracking data or live game information.
-- You may still answer general football strategy questions.
-`;
 
 type StatKey =
   | "passing_yards"
@@ -326,95 +308,6 @@ function publicPlayer(player: PlayerStats) {
   };
 }
 
-function buildNFLContext(
-  data: LoadedStats,
-  question: string
-): string {
-  const normalizedQuestion = normalize(question);
-
-  const selected = new Set<PlayerStats>();
-
-  const matched = data.players.filter(player =>
-    normalizedQuestion.includes(normalize(player.name))
-  );
-
-  matched.slice(0, 10).forEach(player => selected.add(player));
-
-  for (const category of STAT_CATEGORIES) {
-    const leaders = [...data.players]
-      .filter(player => player[category.key] > 0)
-      .sort(
-        (a, b) =>
-          b[category.key] - a[category.key]
-      )
-      .slice(0, 5);
-
-    leaders.forEach(player => selected.add(player));
-  }
-
-  const formatPlayer = (player: PlayerStats) => [
-    `${player.name} (${player.position || "Position unavailable"})`,
-    `Teams: ${player.teams.join(", ") || "Unavailable"}`,
-    `Weeks recorded: ${player.weeks.length}`,
-    `Passing: ${player.passing_yards} yards, ${player.passing_tds} TD, ${player.interceptions} INT`,
-    `Rushing: ${player.rushing_yards} yards, ${player.rushing_tds} TD, ${player.carries} carries`,
-    `Receiving: ${player.receptions} receptions, ${player.receiving_yards} yards, ${player.receiving_tds} TD, ${player.targets} targets`
-  ].join(" | ");
-
-  const leaderboards = STAT_CATEGORIES.map(category => {
-    const leaders = [...data.players]
-      .filter(player => player[category.key] > 0)
-      .sort(
-        (a, b) =>
-          b[category.key] - a[category.key]
-      )
-      .slice(0, 5);
-
-    return (
-      category.label +
-      ": " +
-      leaders
-        .map(
-          (player, index) =>
-            `${index + 1}. ${player.name} (${player[category.key]})`
-        )
-        .join("; ")
-    );
-  });
-
-  return `
-VERIFIED NFL DATA CONTEXT
-
-Source: nflverse
-Statistics season: ${data.season}
-Current calendar year: ${CURRENT_YEAR}
-Season type: Regular season
-Retrieved: ${data.retrievedAt}
-Source file: ${data.sourceUrl}
-
-${
-  data.isCurrentSeason
-    ? "Current-season statistics were successfully retrieved."
-    : "WARNING: These are previous-season statistics, NOT current-season statistics."
-}
-
-PLAYER RECORDS:
-
-${Array.from(selected).map(formatPlayer).join("\n")}
-
-LEADERBOARDS:
-
-${leaderboards.join("\n")}
-
-IMPORTANT:
-- Only use the supplied numbers as verified statistics.
-- Never call previous-season statistics current-season statistics.
-- These statistics come from weekly nflverse data.
-- The current season may be incomplete.
-- Do not invent statistics for players not listed.
-`;
-}
-
 export default {
   async fetch(
     request: Request,
@@ -428,16 +321,6 @@ export default {
       !url.pathname.startsWith("/api/")
     ) {
       return env.ASSETS.fetch(request);
-    }
-
-    if (url.pathname === "/api/chat") {
-      if (request.method !== "POST") {
-        return new Response("Method not allowed", {
-          status: 405
-        });
-      }
-
-      return handleChatRequest(request, env);
     }
 
     if (url.pathname === "/api/nfl/status") {
@@ -583,94 +466,3 @@ export default {
     });
   }
 } satisfies ExportedHandler<Env>;
-
-async function handleChatRequest(
-  request: Request,
-  env: Env
-): Promise<Response> {
-  try {
-    const body = (await request.json()) as {
-      messages?: ChatMessage[];
-    };
-
-    const messages: ChatMessage[] =
-      Array.isArray(body.messages)
-        ? body.messages
-        : [];
-
-    if (messages.length === 0) {
-      return Response.json(
-        { error: "Please send a message." },
-        { status: 400 }
-      );
-    }
-
-    const latestQuestion = [...messages]
-      .reverse()
-      .find(message => message.role === "user")
-      ?.content || "";
-
-    let nflContext = "";
-
-    try {
-      const data = await loadPlayerStats();
-
-      nflContext = buildNFLContext(
-        data,
-        latestQuestion
-      );
-    } catch (error) {
-      console.error("NFL statistics unavailable:", error);
-
-      nflContext = `
-NFL STATISTICS WARNING:
-
-Verified nflverse statistics could not be retrieved.
-
-Do not guess or invent current NFL statistics.
-Do not use outdated statistics as current statistics.
-Tell the user that verified statistics are temporarily unavailable.
-You may still answer general football strategy questions.
-`;
-    }
-
-    const conversationMessages = messages.filter(
-      message => message.role !== "system"
-    );
-
-    conversationMessages.unshift({
-      role: "system",
-      content: SYSTEM_PROMPT + "\n\n" + nflContext
-    });
-
-    const inputs = {
-      messages: conversationMessages,
-      max_tokens: 1800,
-      stream: true
-    } satisfies AiTextGenerationInput & {
-      stream: true
-    };
-
-    const stream = await env.AI.run<typeof MODEL_ID>(
-      MODEL_ID,
-      inputs
-    );
-
-    return new Response(stream, {
-      headers: {
-        "content-type": "text/event-stream; charset=utf-8",
-        "cache-control": "no-cache",
-        connection: "keep-alive"
-      }
-    });
-  } catch (error) {
-    console.error("Error processing chat request:", error);
-
-    return Response.json(
-      {
-        error: "Failed to process request"
-      },
-      { status: 500 }
-    );
-  }
-}
