@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080f1d">
-<title>FOURTHDOWN AI | Football Intelligence</title>
+<title>GRIDIRON IQ | NFL Analytics</title>
 
 <style>
 :root {
@@ -454,7 +454,7 @@ footer {
 <header>
   <div class="brand">
     <div class="brand-mark">🏈</div>
-    <div>FOURTHDOWN AI<small>FOOTBALL INTELLIGENCE</small></div>
+    <div>GRIDIRON IQ<small>NFL ANALYTICS</small></div>
   </div>
   <div class="header-right">NFL ANALYTICS CENTER &nbsp; | &nbsp; 2026 SEASON</div>
 </header>
@@ -467,11 +467,10 @@ footer {
   <button class="nav-btn" data-page="players"><span class="nav-icon">♟</span>Player Analytics</button>
   <button class="nav-btn" data-page="teams"><span class="nav-icon">🛡</span>Team Analytics</button>
   <button class="nav-btn" data-page="matchup"><span class="nav-icon">⚔</span>Matchup Center</button>
-  <div class="nav-label">FOOTBALL INTELLIGENCE</div>
+  <div class="nav-label">NFL ANALYTICS</div>
   <button class="nav-btn" data-page="playlab"><span class="nav-icon">▤</span>Play Lab</button>
   <button class="nav-btn" data-page="topplays"><span class="nav-icon">▶</span>Weekly Top Plays</button>
   <button class="nav-btn" data-page="news"><span class="nav-icon">▣</span>NFL News</button>
-  <button class="nav-btn" data-page="analyst"><span class="nav-icon">✦</span>AI Analyst</button>
 </aside>
 
 <main>
@@ -480,22 +479,20 @@ footer {
 <section class="page active" id="page-overview">
   <div class="page-heading">
     <div>
-      <div class="eyebrow">WELCOME TO FOURTHDOWN AI</div>
+      <div class="eyebrow">WELCOME TO GRIDIRON IQ</div>
       <h1>Football Intelligence Center</h1>
       <div class="subtitle">Your command center for NFL statistics, strategy, and analysis.</div>
     </div>
     <span class="pill">2026 SEASON</span>
   </div>
 
-  <div class="notice">
-    PREVIEW DATA: Dashboard statistics are demonstration values, not verified live NFL statistics. Live data integration is a planned next step.
-  </div>
+  <div class="notice" id="data-status">Connecting to the NFL statistics feed…</div>
 
   <div class="grid">
     <div class="card"><div class="stat-label">NFL Teams</div><div class="stat-number">32</div><div class="stat-note">Full league directory</div></div>
-    <div class="card"><div class="stat-label">Player Profiles</div><div class="stat-number">—</div><div class="stat-note">Live player database coming</div></div>
+    <div class="card"><div class="stat-label">Player Records</div><div class="stat-number" id="player-count">—</div><div class="stat-note">From nflverse season data</div></div>
     <div class="card"><div class="stat-label">Season</div><div class="stat-number">2026</div><div class="stat-note">Season workspace</div></div>
-    <div class="card"><div class="stat-label">AI Analyst</div><div class="stat-number">ON</div><div class="stat-note">Cloudflare AI connection</div></div>
+    <div class="card"><div class="stat-label">Data Source</div><div class="stat-number">NFL</div><div class="stat-note">nflverse statistics</div></div>
   </div>
 
   <div class="two-col">
@@ -506,25 +503,15 @@ footer {
       <div class="news-item"><strong>Matchup Center</strong><p>Break down the key battles that decide football games.</p></div>
       <div class="news-item"><strong>Play Lab</strong><p>Explore formations, routes, coverages, and play concepts.</p></div>
     </div>
-    <div class="card">
-      <div class="panel-title">AI Football Analyst</div>
-      <p class="muted" style="font-size:13px;line-height:1.7">Ask questions about NFL strategy, player performance, defensive schemes, offensive concepts, or upcoming matchups.</p>
-      <button class="btn" onclick="showPage('analyst')">OPEN AI ANALYST →</button>
-      <div class="section-title">Popular Topics</div>
-      <span class="pill">Quarterback play</span>
-      <span class="pill">Defensive schemes</span>
-      <span class="pill">Draft prospects</span>
-      <span class="pill">Matchup analysis</span>
-    </div>
   </div>
 </section>
 
 <!-- PLAYERS -->
 <section class="page" id="page-players">
   <div class="page-heading">
-    <div><div class="eyebrow">INDIVIDUAL PERFORMANCE</div><h1>Player Analytics</h1><div class="subtitle">Search and explore player profiles.</div></div>
+    <div><div class="eyebrow">INDIVIDUAL PERFORMANCE</div><h1>Player Analytics</h1><div class="subtitle" id="player-season">Search player statistics from the latest available season.</div></div>
   </div>
-  <div class="notice">Player entries below are examples. Verified player statistics will be connected later.</div>
+  <div class="notice">Player statistics load from the nflverse data feed. The season label is shown with the results.</div>
   <div class="search-row">
     <input id="player-search" placeholder="Search players by name..." oninput="filterPlayers()">
     <select id="position-filter" onchange="filterPlayers()" style="max-width:180px">
@@ -535,7 +522,7 @@ footer {
   <div class="card">
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Player</th><th>Position</th><th>Team</th><th>Status</th></tr></thead>
+        <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Pass Yds</th><th>Rush Yds</th><th>Rec Yds</th><th>Games</th></tr></thead>
         <tbody id="player-table"></tbody>
       </table>
     </div>
@@ -569,7 +556,7 @@ footer {
   </div>
   <div class="card" id="match-result" style="margin-top:16px">
     <div class="panel-title">Matchup Breakdown</div>
-    <p class="muted small">Choose two teams to create a matchup workspace. Real statistics will be added when the NFL data feed is connected.</p>
+    <p class="muted small">Choose two teams to create a matchup workspace. Team statistics will appear here once a verified team feed is connected.</p>
   </div>
 </section>
 
@@ -620,7 +607,7 @@ footer {
   <div class="page-heading">
     <div><div class="eyebrow">AROUND THE LEAGUE</div><h1>NFL News</h1><div class="subtitle">Your football news center.</div></div>
   </div>
-  <div class="notice">Live headlines are not connected yet. These are topic previews, not current news reports.</div>
+  <div class="notice">Live news headlines are not connected yet. This section currently identifies the news categories to be populated from verified sources.</div>
   <div class="card">
     <div class="news-item"><strong>League News & Transactions</strong><p>Player movement, roster changes, and league announcements.</p></div>
     <div class="news-item"><strong>Injury Reports</strong><p>Injury updates and player availability from verified sources.</p></div>
@@ -630,27 +617,7 @@ footer {
   </div>
 </section>
 
-<!-- AI ANALYST -->
-<section class="page" id="page-analyst">
-  <div class="page-heading">
-    <div><div class="eyebrow">YOUR FOOTBALL INTELLIGENCE ASSISTANT</div><h1>AI Football Analyst</h1><div class="subtitle">Ask questions about players, teams, schemes, matchups, and football strategy.</div></div>
-    <span class="pill">CLOUDFLARE AI</span>
-  </div>
-  <div class="card chat-box">
-    <div class="panel-title">FOURTHDOWN AI ANALYST</div>
-    <div id="chat-messages">
-      <div><strong style="color:var(--cyan)">FOURTHDOWN AI</strong><p>Welcome to FOURTHDOWN AI. Ask me about NFL players, teams, schemes, matchups or football strategy.</p></div>
-    </div>
-    <div id="typing-indicator" style="display:none">Analyst is thinking...</div>
-    <div class="chat-controls">
-      <input id="user-input" type="text" placeholder="Ask a football question..." autocomplete="off">
-      <button id="send-button" class="btn">SEND</button>
-    </div>
-    <p class="muted small">AI responses may need verification. The analyst is not yet connected to a live NFL statistics database.</p>
-  </div>
-</section>
-
-<footer>FOURTHDOWN AI · FOOTBALL INTELLIGENCE CENTER · 2026</footer>
+<footer>GRIDIRON IQ · NFL ANALYTICS CENTER · 2026</footer>
 </main>
 </div>
 
@@ -660,7 +627,6 @@ footer {
   <button data-page="teams"><span>🛡</span>Teams</button>
   <button data-page="matchup"><span>⚔</span>Matchup</button>
   <button data-page="playlab"><span>▤</span>Play Lab</button>
-  <button data-page="analyst"><span>✦</span>AI</button>
 </nav>
 
 </div>
@@ -677,24 +643,7 @@ const teams = [
 "Seattle Seahawks","Tampa Bay Buccaneers","Tennessee Titans","Washington Commanders"
 ];
 
-const players = [
-{name:"Patrick Mahomes",pos:"QB",team:"Kansas City Chiefs"},
-{name:"Josh Allen",pos:"QB",team:"Buffalo Bills"},
-{name:"Lamar Jackson",pos:"QB",team:"Baltimore Ravens"},
-{name:"Joe Burrow",pos:"QB",team:"Cincinnati Bengals"},
-{name:"Jalen Hurts",pos:"QB",team:"Philadelphia Eagles"},
-{name:"Christian McCaffrey",pos:"RB",team:"San Francisco 49ers"},
-{name:"Saquon Barkley",pos:"RB",team:"Philadelphia Eagles"},
-{name:"Derrick Henry",pos:"RB",team:"Baltimore Ravens"},
-{name:"Ja'Marr Chase",pos:"WR",team:"Cincinnati Bengals"},
-{name:"Justin Jefferson",pos:"WR",team:"Minnesota Vikings"},
-{name:"CeeDee Lamb",pos:"WR",team:"Dallas Cowboys"},
-{name:"Amon-Ra St. Brown",pos:"WR",team:"Detroit Lions"},
-{name:"Tyreek Hill",pos:"WR",team:"Miami Dolphins"},
-{name:"Travis Kelce",pos:"TE",team:"Kansas City Chiefs"},
-{name:"George Kittle",pos:"TE",team:"San Francisco 49ers"}
-];
-
+const players = [];
 function showPage(page) {
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   const target=document.getElementById("page-"+page);
@@ -709,28 +658,68 @@ document.querySelectorAll("[data-page]").forEach(button=>{
   button.addEventListener("click",()=>showPage(button.dataset.page));
 });
 
+let loadedPlayerRows = [];
+
 function renderPlayers(list) {
   const table=document.getElementById("player-table");
   table.innerHTML="";
+  if (!list.length) {
+    const row=document.createElement("tr");
+    const cell=document.createElement("td");
+    cell.colSpan=7;
+    cell.textContent="No matching player records are available.";
+    row.appendChild(cell); table.appendChild(row); return;
+  }
   list.forEach(p=>{
     const row=document.createElement("tr");
-    [p.name,p.pos,p.team,"Example profile"].forEach(value=>{
-      const cell=document.createElement("td");
-      cell.textContent=value;
-      row.appendChild(cell);
+    const team=(p.teams || []).join(", ") || "—";
+    [p.name,p.position || "—",team,
+     Number(p.passing_yards || 0).toLocaleString(),
+     Number(p.rushing_yards || 0).toLocaleString(),
+     Number(p.receiving_yards || 0).toLocaleString(),
+     p.games ?? (p.weeks || []).length
+    ].forEach(value=>{
+      const cell=document.createElement("td"); cell.textContent=value; row.appendChild(cell);
     });
     table.appendChild(row);
   });
 }
+async function loadPlayers() {
+  const table=document.getElementById("player-table");
+  table.innerHTML='<tr><td colspan="7">Loading verified player statistics…</td></tr>';
+  try {
+    const response=await fetch("/api/nfl/players");
+    const data=await response.json();
+    if(!response.ok) throw new Error(data.error || "NFL statistics unavailable");
+    loadedPlayerRows=data.players || [];
+    document.getElementById("player-season").textContent=
+      "Regular-season player statistics · " + data.season +
+      (data.isCurrentSeason ? " · current season" : " · latest available completed season");
+    document.getElementById("player-count").textContent=loadedPlayerRows.length.toLocaleString();
+    document.getElementById("data-status").textContent=
+      "NFL statistics connected · " + data.season + " season · " +
+      loadedPlayerRows.length.toLocaleString() + " player records loaded.";
+    renderPlayers(loadedPlayerRows);
+  } catch(error) {
+    table.innerHTML="";
+    const row=document.createElement("tr"); const cell=document.createElement("td");
+    cell.colSpan=7;
+    cell.textContent="Verified player statistics are temporarily unavailable. " + error.message;
+    row.appendChild(cell); table.appendChild(row);
+    document.getElementById("data-status").textContent=
+      "NFL statistics currently unavailable. The app will not substitute invented stats.";
+  }
+}
 function filterPlayers() {
-  const q=document.getElementById("player-search").value.toLowerCase();
+  const q=document.getElementById("player-search").value.toLowerCase().trim();
   const pos=document.getElementById("position-filter").value;
-  renderPlayers(players.filter(p=>
-    p.name.toLowerCase().includes(q) &&
-    (!pos || p.pos===pos)
+  renderPlayers(loadedPlayerRows.filter(p=>
+    (!q || p.name.toLowerCase().includes(q) ||
+      (p.teams || []).some(team=>team.toLowerCase().includes(q))) &&
+    (!pos || p.position===pos)
   ));
 }
-renderPlayers(players);
+loadPlayers();
 
 function renderTeams(list) {
   const grid=document.getElementById("team-grid");
@@ -781,7 +770,7 @@ function compareTeams() {
   result.innerHTML=
     '<div class="eyebrow">MATCHUP WORKSPACE</div>'+
     '<div class="panel-title">'+home+' vs. '+away+'</div>'+
-    '<p class="muted small">The matchup has been created. Once real NFL data is connected, this area will compare team efficiency, scoring, passing, rushing, defense, turnovers and recent performance.</p>'+
+    '<p class="muted small">The matchup workspace is ready. Team-level statistics are not yet connected, so no scores or predictions are being fabricated.</p>'+
     '<div class="three-col">'+
     '<div class="card"><div class="stat-label">Offense</div><div class="stat-number">—</div></div>'+
     '<div class="card"><div class="stat-label">Defense</div><div class="stat-number">—</div></div>'+
@@ -824,6 +813,5 @@ function animatePlay() {
 drawPlay();
 </script>
 
-<script src="chat.js"></script>
 </body>
 </html>
