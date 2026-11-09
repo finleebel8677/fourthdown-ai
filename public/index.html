@@ -1,236 +1,827 @@
-</div>
-</section>
 
-<section class="page" id="analyst">
-  <h1>FOURTHDOWN AI Analyst</h1>
-  <div class="subtitle">Your football strategy and analytics assistant.</div>
-  <div class="card">
-    <div class="chat-box" id="chat-messages">
-      <div class="chat-message bot">Welcome to FOURTHDOWN AI. Ask me about NFL players, teams, schemes, matchups or football strategy.</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080f1d">
+<title>FOURTHDOWN AI | Football Intelligence</title>
+
+<style>
+:root {
+  --bg:#080f1d;
+  --panel:#111d30;
+  --panel2:#16243a;
+  --border:#263750;
+  --text:#f2f6fc;
+  --muted:#91a2b9;
+  --blue:#3b82f6;
+  --cyan:#38bdf8;
+  --green:#22c55e;
+  --gold:#fbbf24;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+button,input,select { font:inherit; }
+button { cursor:pointer; }
+.app { min-height:100vh; }
+header {
+  height:66px;
+  padding:0 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#0b1424;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:900;
+  letter-spacing:1px;
+  font-size:18px;
+}
+.brand-mark {
+  width:36px;
+  height:36px;
+  border-radius:9px;
+  background:linear-gradient(135deg,#2563eb,#38bdf8);
+  display:grid;
+  place-items:center;
+  font-size:19px;
+}
+.brand small {
+  display:block;
+  color:var(--cyan);
+  font-size:9px;
+  letter-spacing:3px;
+  margin-top:3px;
+}
+.header-right {
+  color:var(--muted);
+  font-size:12px;
+}
+.layout {
+  display:flex;
+  min-height:calc(100vh - 66px);
+}
+.sidebar {
+  width:225px;
+  flex-shrink:0;
+  background:#0b1424;
+  border-right:1px solid var(--border);
+  padding:20px 12px;
+}
+.nav-label {
+  color:#61748e;
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:2px;
+  padding:12px 12px 8px;
+}
+.nav-btn {
+  width:100%;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#9aabc1;
+  padding:12px;
+  margin:3px 0;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+}
+.nav-btn:hover,.nav-btn.active {
+  color:white;
+  background:#1b3150;
+}
+.nav-btn.active {
+  box-shadow:inset 3px 0 var(--cyan);
+}
+.nav-icon {
+  width:19px;
+  text-align:center;
+  font-size:16px;
+}
+main {
+  flex:1;
+  min-width:0;
+  padding:28px;
+  max-width:1500px;
+  margin:0 auto;
+}
+.page { display:none; }
+.page.active { display:block; }
+.page-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:23px;
+}
+h1 {
+  font-size:27px;
+  margin:0 0 7px;
+  letter-spacing:-.6px;
+}
+.subtitle {
+  color:var(--muted);
+  font-size:13px;
+}
+.eyebrow {
+  color:var(--cyan);
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:2px;
+  margin-bottom:8px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:20px;
+}
+.card {
+  background:linear-gradient(145deg,var(--panel),#0e192a);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:18px;
+  min-width:0;
+}
+.stat-label {
+  color:var(--muted);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.stat-number {
+  font-size:29px;
+  font-weight:900;
+  margin:12px 0 5px;
+}
+.stat-note {
+  font-size:11px;
+  color:var(--green);
+}
+.section-title {
+  font-size:16px;
+  font-weight:bold;
+  margin:25px 0 13px;
+}
+.two-col {
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:16px;
+}
+.three-col {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.panel-title {
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+.muted { color:var(--muted); }
+.small { font-size:11px; }
+.table-wrap { overflow-x:auto; }
+table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  min-width:420px;
+}
+th {
+  text-align:left;
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  padding:11px 8px;
+  border-bottom:1px solid var(--border);
+}
+td {
+  padding:12px 8px;
+  border-bottom:1px solid #1e2b40;
+}
+tr:last-child td { border-bottom:0; }
+.pill {
+  display:inline-block;
+  background:#1c3554;
+  color:#8edcff;
+  border-radius:20px;
+  padding:5px 9px;
+  font-size:10px;
+}
+.tag {
+  display:inline-block;
+  color:var(--green);
+  background:#123426;
+  border-radius:5px;
+  padding:4px 7px;
+  font-size:10px;
+}
+.btn {
+  border:1px solid #3569a8;
+  background:#1d4d86;
+  color:white;
+  padding:10px 14px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:bold;
+}
+.btn:hover { background:#2563a9; }
+.btn.secondary {
+  background:#17263c;
+  border-color:var(--border);
+  color:#dce8f7;
+}
+input,select {
+  background:#0a1423;
+  color:white;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:11px 12px;
+  width:100%;
+  outline:none;
+}
+input:focus,select:focus { border-color:var(--cyan); }
+.search-row {
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+.team-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.team-tile {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px 10px;
+  color:white;
+  text-align:center;
+  font-size:12px;
+}
+.team-tile:hover { border-color:var(--cyan); }
+.team-tile span {
+  display:block;
+  font-size:23px;
+  margin-bottom:7px;
+}
+.news-item {
+  padding:15px 0;
+  border-bottom:1px solid var(--border);
+}
+.news-item:last-child { border:0; }
+.news-item strong {
+  display:block;
+  margin-bottom:7px;
+  font-size:13px;
+}
+.news-item p {
+  margin:0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+.field {
+  background:repeating-linear-gradient(
+    90deg,#123e32 0,#123e32 49px,#174a3a 50px,#174a3a 99px
+  );
+  border:2px solid #568d70;
+  border-radius:12px;
+  min-height:220px;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.field:before,.field:after {
+  content:"";
+  position:absolute;
+  top:0;bottom:0;
+  width:2px;
+  background:#b8dbc3;
+  opacity:.6;
+}
+.field:before { left:10%; }
+.field:after { right:10%; }
+.field-center {
+  position:absolute;
+  width:100px;
+  height:100px;
+  border:2px solid #b8dbc3;
+  border-radius:50%;
+  opacity:.6;
+}
+.player-dot {
+  position:absolute;
+  width:23px;
+  height:23px;
+  border-radius:50%;
+  background:#e8f5ff;
+  border:2px solid #2563eb;
+  z-index:2;
+}
+.player-dot.offense { background:#facc15; border-color:#fff0a0; }
+.field-label {
+  position:absolute;
+  bottom:8px;
+  color:#d3f5df;
+  font-size:10px;
+  letter-spacing:2px;
+}
+.chat-box {
+  display:flex;
+  flex-direction:column;
+  min-height:360px;
+}
+#chat-messages {
+  flex:1;
+  min-height:230px;
+  max-height:420px;
+  overflow-y:auto;
+  padding:12px;
+  background:#0a1423;
+  border:1px solid var(--border);
+  border-radius:9px;
+  font-size:13px;
+}
+#chat-messages > div { margin-bottom:12px; }
+.chat-controls {
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+#user-input { flex:1; min-width:0; }
+#typing-indicator {
+  color:var(--cyan);
+  font-size:11px;
+  padding:8px 0;
+}
+footer {
+  color:#64758b;
+  font-size:10px;
+  padding:25px 0 10px;
+  text-align:center;
+}
+.mobile-nav { display:none; }
+.notice {
+  padding:12px 14px;
+  border:1px solid #66532a;
+  background:#302713;
+  color:#f5d78d;
+  border-radius:9px;
+  font-size:11px;
+  line-height:1.5;
+  margin-bottom:17px;
+}
+@media(max-width:900px) {
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .team-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .two-col { grid-template-columns:1fr; }
+  main { padding:22px; }
+}
+@media(max-width:650px) {
+  header { height:58px; padding:0 14px; }
+  .brand { font-size:15px; }
+  .brand-mark { width:32px;height:32px; }
+  .header-right { display:none; }
+  .layout { display:block; min-height:calc(100vh - 58px); }
+  .sidebar { display:none; }
+  main { padding:19px 14px 95px; }
+  h1 { font-size:23px; }
+  .grid { gap:9px; }
+  .card { padding:14px; }
+  .stat-number { font-size:24px; }
+  .three-col { grid-template-columns:1fr; }
+  .team-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .page-heading { flex-direction:column; }
+  .mobile-nav {
+    display:flex;
+    position:fixed;
+    z-index:30;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#0b1424;
+    border-top:1px solid var(--border);
+    overflow-x:auto;
+    padding:7px 5px max(7px,env(safe-area-inset-bottom));
+    gap:3px;
+  }
+  .mobile-nav button {
+    flex:1;
+    min-width:62px;
+    border:0;
+    background:transparent;
+    color:#8fa2bb;
+    font-size:9px;
+    padding:6px 3px;
+  }
+  .mobile-nav button span {
+    display:block;
+    font-size:18px;
+    margin-bottom:3px;
+  }
+  .mobile-nav button.active { color:var(--cyan); }
+  .search-row { flex-direction:column; }
+  .chat-controls { flex-direction:column; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">🏈</div>
+    <div>FOURTHDOWN AI<small>FOOTBALL INTELLIGENCE</small></div>
+  </div>
+  <div class="header-right">NFL ANALYTICS CENTER &nbsp; | &nbsp; 2026 SEASON</div>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <div class="nav-label">MAIN MENU</div>
+  <button class="nav-btn active" data-page="overview"><span class="nav-icon">⌂</span>Overview</button>
+  <button class="nav-btn" data-page="players"><span class="nav-icon">♟</span>Player Analytics</button>
+  <button class="nav-btn" data-page="teams"><span class="nav-icon">🛡</span>Team Analytics</button>
+  <button class="nav-btn" data-page="matchup"><span class="nav-icon">⚔</span>Matchup Center</button>
+  <div class="nav-label">FOOTBALL INTELLIGENCE</div>
+  <button class="nav-btn" data-page="playlab"><span class="nav-icon">▤</span>Play Lab</button>
+  <button class="nav-btn" data-page="topplays"><span class="nav-icon">▶</span>Weekly Top Plays</button>
+  <button class="nav-btn" data-page="news"><span class="nav-icon">▣</span>NFL News</button>
+  <button class="nav-btn" data-page="analyst"><span class="nav-icon">✦</span>AI Analyst</button>
+</aside>
+
+<main>
+
+<!-- OVERVIEW -->
+<section class="page active" id="page-overview">
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">WELCOME TO FOURTHDOWN AI</div>
+      <h1>Football Intelligence Center</h1>
+      <div class="subtitle">Your command center for NFL statistics, strategy, and analysis.</div>
     </div>
-    <div id="typing-indicator">Analyst is thinking...</div>
-    <div class="chat-controls">
-      <input id="user-input" type="text" placeholder="Ask a football question..." autocomplete="off">
-      <button id="send-button" class="primary">Send</button>
+    <span class="pill">2026 SEASON</span>
+  </div>
+
+  <div class="notice">
+    PREVIEW DATA: Dashboard statistics are demonstration values, not verified live NFL statistics. Live data integration is a planned next step.
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="stat-label">NFL Teams</div><div class="stat-number">32</div><div class="stat-note">Full league directory</div></div>
+    <div class="card"><div class="stat-label">Player Profiles</div><div class="stat-number">—</div><div class="stat-note">Live player database coming</div></div>
+    <div class="card"><div class="stat-label">Season</div><div class="stat-number">2026</div><div class="stat-note">Season workspace</div></div>
+    <div class="card"><div class="stat-label">AI Analyst</div><div class="stat-number">ON</div><div class="stat-note">Cloudflare AI connection</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="panel-title">Explore Football Intelligence</div>
+      <div class="news-item"><strong>Player Analytics</strong><p>Explore player profiles, compare performance, and evaluate positions.</p></div>
+      <div class="news-item"><strong>Team Analytics</strong><p>Explore all 32 NFL franchises and compare team performance.</p></div>
+      <div class="news-item"><strong>Matchup Center</strong><p>Break down the key battles that decide football games.</p></div>
+      <div class="news-item"><strong>Play Lab</strong><p>Explore formations, routes, coverages, and play concepts.</p></div>
     </div>
-    <p class="small">AI responses may need verification. Do not treat sample dashboard data as live statistics.</p>
+    <div class="card">
+      <div class="panel-title">AI Football Analyst</div>
+      <p class="muted" style="font-size:13px;line-height:1.7">Ask questions about NFL strategy, player performance, defensive schemes, offensive concepts, or upcoming matchups.</p>
+      <button class="btn" onclick="showPage('analyst')">OPEN AI ANALYST →</button>
+      <div class="section-title">Popular Topics</div>
+      <span class="pill">Quarterback play</span>
+      <span class="pill">Defensive schemes</span>
+      <span class="pill">Draft prospects</span>
+      <span class="pill">Matchup analysis</span>
+    </div>
   </div>
 </section>
 
-<footer>FOURTHDOWN AI · FOOTBALL INTELLIGENCE CENTER</footer>
+<!-- PLAYERS -->
+<section class="page" id="page-players">
+  <div class="page-heading">
+    <div><div class="eyebrow">INDIVIDUAL PERFORMANCE</div><h1>Player Analytics</h1><div class="subtitle">Search and explore player profiles.</div></div>
+  </div>
+  <div class="notice">Player entries below are examples. Verified player statistics will be connected later.</div>
+  <div class="search-row">
+    <input id="player-search" placeholder="Search players by name..." oninput="filterPlayers()">
+    <select id="position-filter" onchange="filterPlayers()" style="max-width:180px">
+      <option value="">All Positions</option>
+      <option>QB</option><option>RB</option><option>WR</option><option>TE</option><option>DEF</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Player</th><th>Position</th><th>Team</th><th>Status</th></tr></thead>
+        <tbody id="player-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TEAMS -->
+<section class="page" id="page-teams">
+  <div class="page-heading">
+    <div><div class="eyebrow">THE NATIONAL FOOTBALL LEAGUE</div><h1>Team Analytics</h1><div class="subtitle">Explore all 32 NFL teams.</div></div>
+  </div>
+  <input id="team-search" placeholder="Find an NFL team..." oninput="filterTeams()" style="margin-bottom:15px">
+  <div class="team-grid" id="team-grid"></div>
+  <div class="card" id="team-detail" style="margin-top:18px">
+    <div class="panel-title">Team Information</div>
+    <p class="muted small">Select a team above to open its team workspace.</p>
+  </div>
+</section>
+
+<!-- MATCHUP -->
+<section class="page" id="page-matchup">
+  <div class="page-heading">
+    <div><div class="eyebrow">HEAD-TO-HEAD ANALYSIS</div><h1>Matchup Center</h1><div class="subtitle">Compare teams and evaluate the key battles.</div></div>
+  </div>
+  <div class="card">
+    <div class="two-col">
+      <div><div class="stat-label">HOME TEAM</div><select id="match-home"></select></div>
+      <div><div class="stat-label">AWAY TEAM</div><select id="match-away"></select></div>
+    </div>
+    <button class="btn" onclick="compareTeams()" style="margin-top:18px">COMPARE TEAMS</button>
+  </div>
+  <div class="card" id="match-result" style="margin-top:16px">
+    <div class="panel-title">Matchup Breakdown</div>
+    <p class="muted small">Choose two teams to create a matchup workspace. Real statistics will be added when the NFL data feed is connected.</p>
+  </div>
+</section>
+
+<!-- PLAY LAB -->
+<section class="page" id="page-playlab">
+  <div class="page-heading">
+    <div><div class="eyebrow">X'S AND O'S</div><h1>Play Lab</h1><div class="subtitle">Explore basic offensive formations and football concepts.</div></div>
+  </div>
+  <div class="card">
+    <div class="search-row">
+      <select id="formation" onchange="drawPlay()">
+        <option value="spread">Shotgun Spread</option>
+        <option value="trips">Trips Formation</option>
+        <option value="single">Single Back</option>
+      </select>
+      <select id="play-type" onchange="drawPlay()">
+        <option value="pass">Passing Concept</option>
+        <option value="run">Running Concept</option>
+      </select>
+    </div>
+    <div class="field" id="play-field">
+      <div class="field-center"></div>
+      <div class="field-label">OFFENSIVE PLAY CONCEPT</div>
+    </div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn" onclick="drawPlay()">RESET PLAY</button>
+      <button class="btn secondary" onclick="animatePlay()">ANIMATE PLAY</button>
+    </div>
+    <p class="muted small" style="margin-top:13px">Illustrative play diagram. This is not NFL tracking data or game film.</p>
+  </div>
+</section>
+
+<!-- TOP PLAYS -->
+<section class="page" id="page-topplays">
+  <div class="page-heading">
+    <div><div class="eyebrow">FILM ROOM</div><h1>Weekly Top Plays</h1><div class="subtitle">Football concepts and play breakdowns.</div></div>
+  </div>
+  <div class="notice">Verified weekly game plays and source links will appear here after a real NFL news and play-data feed is connected.</div>
+  <div class="three-col">
+    <div class="card"><div class="pill">OFFENSE</div><div class="panel-title" style="margin-top:13px">Play Action Pass</div><p class="muted small">A quarterback sells the run before attacking a passing window downfield.</p></div>
+    <div class="card"><div class="pill">DEFENSE</div><div class="panel-title" style="margin-top:13px">Cover 3 Rotation</div><p class="muted small">Three deep defenders divide the deep field while underneath defenders cover short zones.</p></div>
+    <div class="card"><div class="pill">SPECIAL TEAMS</div><div class="panel-title" style="margin-top:13px">Kick Return Lane</div><p class="muted small">Blocking assignments create a running lane for the returner.</p></div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="page" id="page-news">
+  <div class="page-heading">
+    <div><div class="eyebrow">AROUND THE LEAGUE</div><h1>NFL News</h1><div class="subtitle">Your football news center.</div></div>
+  </div>
+  <div class="notice">Live headlines are not connected yet. These are topic previews, not current news reports.</div>
+  <div class="card">
+    <div class="news-item"><strong>League News & Transactions</strong><p>Player movement, roster changes, and league announcements.</p></div>
+    <div class="news-item"><strong>Injury Reports</strong><p>Injury updates and player availability from verified sources.</p></div>
+    <div class="news-item"><strong>Game Analysis</strong><p>Game recaps, tactical breakdowns, and performance analysis.</p></div>
+    <div class="news-item"><strong>Draft & College Football</strong><p>Prospect evaluations, scouting, and draft developments.</p></div>
+    <p class="muted small">Planned news sources include official NFL reporting and established sports outlets.</p>
+  </div>
+</section>
+
+<!-- AI ANALYST -->
+<section class="page" id="page-analyst">
+  <div class="page-heading">
+    <div><div class="eyebrow">YOUR FOOTBALL INTELLIGENCE ASSISTANT</div><h1>AI Football Analyst</h1><div class="subtitle">Ask questions about players, teams, schemes, matchups, and football strategy.</div></div>
+    <span class="pill">CLOUDFLARE AI</span>
+  </div>
+  <div class="card chat-box">
+    <div class="panel-title">FOURTHDOWN AI ANALYST</div>
+    <div id="chat-messages">
+      <div><strong style="color:var(--cyan)">FOURTHDOWN AI</strong><p>Welcome to FOURTHDOWN AI. Ask me about NFL players, teams, schemes, matchups or football strategy.</p></div>
+    </div>
+    <div id="typing-indicator" style="display:none">Analyst is thinking...</div>
+    <div class="chat-controls">
+      <input id="user-input" type="text" placeholder="Ask a football question..." autocomplete="off">
+      <button id="send-button" class="btn">SEND</button>
+    </div>
+    <p class="muted small">AI responses may need verification. The analyst is not yet connected to a live NFL statistics database.</p>
+  </div>
+</section>
+
+<footer>FOURTHDOWN AI · FOOTBALL INTELLIGENCE CENTER · 2026</footer>
 </main>
+</div>
+
+<nav class="mobile-nav">
+  <button class="active" data-page="overview"><span>⌂</span>Home</button>
+  <button data-page="players"><span>♟</span>Players</button>
+  <button data-page="teams"><span>🛡</span>Teams</button>
+  <button data-page="matchup"><span>⚔</span>Matchup</button>
+  <button data-page="playlab"><span>▤</span>Play Lab</button>
+  <button data-page="analyst"><span>✦</span>AI</button>
+</nav>
+
 </div>
 
 <script>
 const teams = [
-["Arizona Cardinals","ARI"],["Atlanta Falcons","ATL"],
-["Baltimore Ravens","BAL"],["Buffalo Bills","BUF"],
-["Carolina Panthers","CAR"],["Chicago Bears","CHI"],
-["Cincinnati Bengals","CIN"],["Cleveland Browns","CLE"],
-["Dallas Cowboys","DAL"],["Denver Broncos","DEN"],
-["Detroit Lions","DET"],["Green Bay Packers","GB"],
-["Houston Texans","HOU"],["Indianapolis Colts","IND"],
-["Jacksonville Jaguars","JAX"],["Kansas City Chiefs","KC"],
-["Las Vegas Raiders","LV"],["Los Angeles Chargers","LAC"],
-["Los Angeles Rams","LAR"],["Miami Dolphins","MIA"],
-["Minnesota Vikings","MIN"],["New England Patriots","NE"],
-["New Orleans Saints","NO"],["New York Giants","NYG"],
-["New York Jets","NYJ"],["Philadelphia Eagles","PHI"],
-["Pittsburgh Steelers","PIT"],["San Francisco 49ers","SF"],
-["Seattle Seahawks","SEA"],["Tampa Bay Buccaneers","TB"],
-["Tennessee Titans","TEN"],["Washington Commanders","WAS"]
+"Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
+"Carolina Panthers","Chicago Bears","Cincinnati Bengals","Cleveland Browns",
+"Dallas Cowboys","Denver Broncos","Detroit Lions","Green Bay Packers",
+"Houston Texans","Indianapolis Colts","Jacksonville Jaguars","Kansas City Chiefs",
+"Las Vegas Raiders","Los Angeles Chargers","Los Angeles Rams","Miami Dolphins",
+"Minnesota Vikings","New England Patriots","New Orleans Saints","New York Giants",
+"New York Jets","Philadelphia Eagles","Pittsburgh Steelers","San Francisco 49ers",
+"Seattle Seahawks","Tampa Bay Buccaneers","Tennessee Titans","Washington Commanders"
 ];
 
 const players = [
-{name:"Patrick Mahomes",pos:"QB",team:"KC",note:"Quarterback profile"},
-{name:"Josh Allen",pos:"QB",team:"BUF",note:"Quarterback profile"},
-{name:"Lamar Jackson",pos:"QB",team:"BAL",note:"Quarterback profile"},
-{name:"Joe Burrow",pos:"QB",team:"CIN",note:"Quarterback profile"},
-{name:"Jalen Hurts",pos:"QB",team:"PHI",note:"Quarterback profile"},
-{name:"Bijan Robinson",pos:"RB",team:"ATL",note:"Running back profile"},
-{name:"Christian McCaffrey",pos:"RB",team:"SF",note:"Running back profile"},
-{name:"Derrick Henry",pos:"RB",team:"BAL",note:"Running back profile"},
-{name:"Saquon Barkley",pos:"RB",team:"PHI",note:"Running back profile"},
-{name:"Ja'Marr Chase",pos:"WR",team:"CIN",note:"Wide receiver profile"},
-{name:"Justin Jefferson",pos:"WR",team:"MIN",note:"Wide receiver profile"},
-{name:"CeeDee Lamb",pos:"WR",team:"DAL",note:"Wide receiver profile"},
-{name:"Tyreek Hill",pos:"WR",team:"MIA",note:"Wide receiver profile"},
-{name:"Amon-Ra St. Brown",pos:"WR",team:"DET",note:"Wide receiver profile"},
-{name:"Travis Kelce",pos:"TE",team:"KC",note:"Tight end profile"}
+{name:"Patrick Mahomes",pos:"QB",team:"Kansas City Chiefs"},
+{name:"Josh Allen",pos:"QB",team:"Buffalo Bills"},
+{name:"Lamar Jackson",pos:"QB",team:"Baltimore Ravens"},
+{name:"Joe Burrow",pos:"QB",team:"Cincinnati Bengals"},
+{name:"Jalen Hurts",pos:"QB",team:"Philadelphia Eagles"},
+{name:"Christian McCaffrey",pos:"RB",team:"San Francisco 49ers"},
+{name:"Saquon Barkley",pos:"RB",team:"Philadelphia Eagles"},
+{name:"Derrick Henry",pos:"RB",team:"Baltimore Ravens"},
+{name:"Ja'Marr Chase",pos:"WR",team:"Cincinnati Bengals"},
+{name:"Justin Jefferson",pos:"WR",team:"Minnesota Vikings"},
+{name:"CeeDee Lamb",pos:"WR",team:"Dallas Cowboys"},
+{name:"Amon-Ra St. Brown",pos:"WR",team:"Detroit Lions"},
+{name:"Tyreek Hill",pos:"WR",team:"Miami Dolphins"},
+{name:"Travis Kelce",pos:"TE",team:"Kansas City Chiefs"},
+{name:"George Kittle",pos:"TE",team:"San Francisco 49ers"}
 ];
 
 function showPage(page) {
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-  const section=document.getElementById(page);
-  if(section) section.classList.add("active");
-  const button=document.querySelector('[data-page="'+page+'"]');
-  if(button) button.classList.add("active");
-  window.scrollTo(0,0);
+  const target=document.getElementById("page-"+page);
+  if(target) target.classList.add("active");
+  document.querySelectorAll("[data-page]").forEach(b=>{
+    b.classList.toggle("active",b.dataset.page===page);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-document.querySelectorAll(".nav-btn").forEach(button=>{
+document.querySelectorAll("[data-page]").forEach(button=>{
   button.addEventListener("click",()=>showPage(button.dataset.page));
 });
 
-function renderPlayers(){
-  const search=(document.getElementById("player-search").value||"").toLowerCase();
-  const position=document.getElementById("player-position").value;
-  const filtered=players.filter(p=>
-    (p.name.toLowerCase().includes(search)||p.team.toLowerCase().includes(search)) &&
-    (position==="All"||p.pos===position)
-  );
-  const target=document.getElementById("player-results");
-  target.innerHTML=filtered.length ? filtered.map((p,i)=>`
-    <div class="news-item">
-      <div class="match-row">
-        <div><strong>${p.name}</strong><div class="small">${p.pos} · ${p.team}</div></div>
-        <button class="secondary" onclick="showPlayer('${p.name.replace(/'/g,"\\'")}')">View profile</button>
-      </div>
-    </div>`).join("") : '<p class="small">No matching players found.</p>';
+function renderPlayers(list) {
+  const table=document.getElementById("player-table");
+  table.innerHTML="";
+  list.forEach(p=>{
+    const row=document.createElement("tr");
+    [p.name,p.pos,p.team,"Example profile"].forEach(value=>{
+      const cell=document.createElement("td");
+      cell.textContent=value;
+      row.appendChild(cell);
+    });
+    table.appendChild(row);
+  });
 }
-
-function showPlayer(name){
-  const p=players.find(x=>x.name===name);
-  if(!p)return;
-  document.getElementById("player-profile").innerHTML=`
-    <span class="pill">${p.pos} · ${p.team}</span>
-    <h2 style="margin-top:12px">${p.name}</h2>
-    <p class="small">${p.note}</p>
-    <p class="small">This is a player directory entry, not a verified current-season statistical profile.</p>
-    <button class="secondary" onclick="askAbout('${p.name.replace(/'/g,"\\'")}')">Ask AI about this player</button>`;
+function filterPlayers() {
+  const q=document.getElementById("player-search").value.toLowerCase();
+  const pos=document.getElementById("position-filter").value;
+  renderPlayers(players.filter(p=>
+    p.name.toLowerCase().includes(q) &&
+    (!pos || p.pos===pos)
+  ));
 }
+renderPlayers(players);
 
-function askAbout(name){
-  showPage("analyst");
-  const input=document.getElementById("user-input");
-  input.value="Analyze "+name+"'s playing style, strengths and weaknesses.";
-  input.focus();
+function renderTeams(list) {
+  const grid=document.getElementById("team-grid");
+  grid.innerHTML="";
+  list.forEach((team,i)=>{
+    const button=document.createElement("button");
+    button.className="team-tile";
+    button.innerHTML="<span>🏈</span>"+team;
+    button.addEventListener("click",()=>selectTeam(team));
+    grid.appendChild(button);
+  });
 }
-
-function fillTeamSelect(id){
-  const el=document.getElementById(id);
-  el.innerHTML=teams.map(t=>`<option value="${t[1]}">${t[0]}</option>`).join("");
+function filterTeams() {
+  const q=document.getElementById("team-search").value.toLowerCase();
+  renderTeams(teams.filter(t=>t.toLowerCase().includes(q)));
 }
-
-function renderTeam(){
-  const code=document.getElementById("team-select").value;
-  const team=teams.find(t=>t[1]===code);
-  document.getElementById("team-profile").innerHTML=`
-    <div class="match-row" style="margin-top:15px">
-      <div><span class="team-logo">${team[1]}</span><strong>${team[0]}</strong></div>
-      <span class="pill">NFL TEAM</span>
-    </div>
-    <p class="small" style="margin-top:15px">Team profile selected. Live records, standings and statistical rankings have not yet been connected.</p>
-    <button class="secondary" onclick="askAbout('${team[0]}')">Ask AI about this team</button>`;
+function selectTeam(team) {
+  document.getElementById("team-detail").innerHTML=
+    '<div class="eyebrow">TEAM WORKSPACE</div>'+
+    '<div class="panel-title">'+team+'</div>'+
+    '<p class="muted small">Team workspace selected. Live standings, roster, depth chart, schedule, offense and defense statistics will be added with the NFL data connection.</p>'+
+    '<span class="pill">NFL TEAM</span>';
 }
+renderTeams(teams);
 
-function renderTeamList(){
-  document.getElementById("team-list").innerHTML=teams.map(t=>`
-    <div class="card" style="margin:0">
-      <div class="match-row">
-        <div><span class="team-logo">${t[1]}</span><strong style="font-size:12px">${t[0]}</strong></div>
-        <button class="secondary" onclick="selectTeam('${t[1]}')">View</button>
-      </div>
-    </div>`).join("");
+function fillTeamSelectors() {
+  ["match-home","match-away"].forEach(id=>{
+    const select=document.getElementById(id);
+    teams.forEach(team=>{
+      const option=document.createElement("option");
+      option.value=team;
+      option.textContent=team;
+      select.appendChild(option);
+    });
+  });
+  document.getElementById("match-away").selectedIndex=1;
 }
+fillTeamSelectors();
 
-function selectTeam(code){
-  document.getElementById("team-select").value=code;
-  renderTeam();
-  showPage("teams");
-}
-
-function compareTeams(){
-  const a=document.getElementById("team-a").value;
-  const b=document.getElementById("team-b").value;
-  const ta=teams.find(t=>t[1]===a);
-  const tb=teams.find(t=>t[1]===b);
-  const result=document.getElementById("matchup-result");
-  if(a===b){
-    result.innerHTML="<h2>Choose two different teams</h2><p class='small'>Select a different opponent to compare.</p>";
+function compareTeams() {
+  const home=document.getElementById("match-home").value;
+  const away=document.getElementById("match-away").value;
+  const result=document.getElementById("match-result");
+  if(home===away) {
+    result.innerHTML='<div class="panel-title">Choose two different teams</div>';
     return;
   }
-  result.innerHTML=`
-    <h2>${ta[0]} vs. ${tb[0]}</h2>
-    <div class="grid two">
-      <div class="card"><span class="team-logo">${ta[1]}</span><strong>${ta[0]}</strong></div>
-      <div class="card"><span class="team-logo">${tb[1]}</span><strong>${tb[0]}</strong></div>
-    </div>
-    <h3>Matchup breakdown</h3>
-    <p class="small">A full comparison requires current team statistics, injury information and confirmed rosters. Those data feeds are not connected yet.</p>
-    <button class="primary" onclick="askAbout('${ta[0]} vs ${tb[0]}')">Ask AI to analyze this matchup</button>`;
+  result.innerHTML=
+    '<div class="eyebrow">MATCHUP WORKSPACE</div>'+
+    '<div class="panel-title">'+home+' vs. '+away+'</div>'+
+    '<p class="muted small">The matchup has been created. Once real NFL data is connected, this area will compare team efficiency, scoring, passing, rushing, defense, turnovers and recent performance.</p>'+
+    '<div class="three-col">'+
+    '<div class="card"><div class="stat-label">Offense</div><div class="stat-number">—</div></div>'+
+    '<div class="card"><div class="stat-label">Defense</div><div class="stat-number">—</div></div>'+
+    '<div class="card"><div class="stat-label">Prediction</div><div class="stat-number">—</div></div>'+
+    '</div>';
 }
 
-function openPlay(type){
-  showPage("playlab");
-  document.getElementById("play-type").value=type;
-  drawPlay();
-}
-
-const formations={
-  mesh:[[20,35],[20,65],[38,20],[38,80],[48,35],[48,65]],
-  four:[[20,35],[20,65],[35,20],[35,80],[48,35],[48,65]],
-  screen:[[20,35],[20,65],[38,20],[38,80],[48,35],[48,65]],
-  slant:[[20,35],[20,65],[38,20],[38,80],[48,35],[48,65]]
-};
-
-function drawPlay(){
-  const field=document.getElementById("football-field");
+function drawPlay() {
+  const field=document.getElementById("play-field");
+  field.querySelectorAll(".player-dot").forEach(dot=>dot.remove());
+  const formation=document.getElementById("formation").value;
   const type=document.getElementById("play-type").value;
-  field.innerHTML="";
-  const positions=formations[type];
+  let positions;
+  if(formation==="trips") {
+    positions=[[22,23],[22,43],[22,63],[43,30],[43,55],[50,46],[66,23],[66,43],[66,63],[78,35],[78,57]];
+  } else if(formation==="single") {
+    positions=[[20,25],[20,43],[20,61],[40,33],[40,55],[49,44],[66,30],[66,57],[77,22],[77,44],[77,66]];
+  } else {
+    positions=[[18,22],[18,42],[18,62],[40,28],[40,56],[50,44],[70,20],[70,37],[70,55],[70,72],[83,44]];
+  }
   positions.forEach((pos,i)=>{
     const dot=document.createElement("div");
-    dot.className="player-dot";
-    dot.textContent=i===0?"QB":i;
+    dot.className="player-dot "+(i<6?"":"offense");
     dot.style.left=pos[0]+"%";
     dot.style.top=pos[1]+"%";
     field.appendChild(dot);
   });
-  const routes={
-    mesh:[[20,35,32,20],[20,65,32,80],[38,20,30,35],[38,80,30,65]],
-    four:[[20,35,62,20],[20,65,62,80],[35,20,60,20],[35,80,60,80]],
-    screen:[[20,35,30,35],[20,65,30,65],[38,20,25,40],[38,80,25,60]],
-    slant:[[20,35,30,25],[20,65,30,55],[38,20,25,35],[38,80,25,65]]
-  };
-  routes[type].forEach(r=>{
-    const line=document.createElement("div");
-    line.className="route-line";
-    const x1=r[0]/100*field.clientWidth;
-    const y1=r[1]/100*field.clientHeight;
-    const x2=r[2]/100*field.clientWidth;
-    const y2=r[3]/100*field.clientHeight;
-    const dx=x2-x1,dy=y2-y1;
-    line.style.left=x1+"px";
-    line.style.top=y1+"px";
-    line.style.width=Math.sqrt(dx*dx+dy*dy)+"px";
-    line.style.transform="rotate("+Math.atan2(dy,dx)+"rad)";
-    field.appendChild(line);
-  });
+  field.querySelector(".field-label").textContent=
+    (type==="pass"?"PASSING":"RUNNING")+" CONCEPT · "+formation.toUpperCase();
 }
-
-function animatePlay(){
-  const field=document.getElementById("football-field");
-  const dots=[...field.querySelectorAll(".player-dot")];
+function animatePlay() {
+  const dots=[...document.querySelectorAll(".player-dot")];
   dots.forEach((dot,i)=>{
     dot.animate([
       {transform:"translate(0,0)"},
-      {transform:`translate(${i%2===0?65:-45}px,${i%2===0?-35:35}px)`}
-    ],{duration:1200/(Number(document.getElementById("play-speed").value)||1),fill:"forwards"});
+      {transform:"translate("+(i%2===0?35:-25)+"px,"+(i%3===0?-28:20)+"px)"}
+    ],{duration:1000,iterations:1});
   });
 }
-
-function initApp(){
-  fillTeamSelect("team-select");
-  fillTeamSelect("team-a");
-  fillTeamSelect("team-b");
-  renderPlayers();
-  renderTeam();
-  renderTeamList();
-  drawPlay();
-}
-initApp();
+drawPlay();
 </script>
 
 <script src="chat.js"></script>
