@@ -17,8 +17,8 @@ function renderField(){
  const defs=svgEl("defs");const marker=svgEl("marker",{id:"lf-arrow",markerWidth:9,markerHeight:9,refX:7,refY:3,orient:"auto"});marker.append(svgEl("path",{d:"M0 0L0 6L8 3Z",fill:"#00e5ff"}));defs.append(marker);svg.prepend(defs);
  dots.forEach((d,i)=>{const g=svgEl("g",{transform:"translate("+d.x+" "+d.y+")","data-dot":i,class:"lf-dot",style:"cursor:grab"});g.append(svgEl("circle",{r:20,fill:d.side==="O"?"#00cfff":"#a855f7",stroke:"#eafcff","stroke-width":2}));const t=svgEl("text",{x:0,y:4,"text-anchor":"middle",fill:"#07111b","font-size":11,"font-weight":900});t.textContent=d.l;g.append(t);svg.append(g)});
  svg.querySelectorAll("[data-dot]").forEach(g=>g.addEventListener("pointerdown",e=>{if($("lf-tool").value==="route"){routeStart=Number(g.dataset.dot);$("lf-status").textContent="Player selected. Tap a destination on the field.";return;}drag=Number(g.dataset.dot);g.setPointerCapture?.(e.pointerId)}));
- svg.onpointermove=e=>{if(drag===null)return;const r=svg.getBoundingClientRect(),d=dots[drag];d.x=Math.max(25,Math.min(975,(e.clientX-r.left)/r.width*1000));d.y=Math.max(25,Math.min(475,(e.clientY-r.top)/r.height*500));renderField()};
- svg.onpointerup=()=>{if(drag!==null){drag=null;$("lf-status").textContent="Player position adjusted. This is a user-created tactical layout, not NFL tracking."}};
+ svg.onpointermove=e=>{if(drag===null)return;const r=svg.getBoundingClientRect(),d=dots[drag];d.x=Math.max(25,Math.min(975,(e.clientX-r.left)/r.width*1000));d.y=Math.max(25,Math.min(475,(e.clientY-r.top)/r.height*500));const node=svg.querySelector('[data-dot="'+drag+'"]');if(node)node.setAttribute("transform","translate("+d.x+" "+d.y+")")};
+ svg.onpointerup=()=>{if(drag!==null){drag=null;renderField();$("lf-status").textContent="Player position adjusted. This is a user-created tactical layout, not NFL tracking."}};
  svg.onclick=e=>{if(e.target.closest("[data-dot]"))return;const tool=$("lf-tool").value;if(tool!=="route"||routeStart===null)return;const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*1000,y=(e.clientY-r.top)/r.height*500,a=dots[routeStart];routes.push({x1:a.x,y1:a.y,x2:x,y2:y,kind:$("lf-route-kind").value,color:$("lf-route-kind").value==="Run"?"#39ff88":"#00e5ff"});routeStart=null;renderField();$("lf-status").textContent="Route added to tactical illustration."};
 }
 function metricChart(title,labels,values,color="#00e5ff"){
@@ -74,11 +74,10 @@ function setup(){
  $("lf-reset").onclick=()=>{defaultDots();renderField();$("lf-status").textContent="Tactical field reset."};
  $("lf-clear-routes").onclick=()=>{routes=[];renderField();$("lf-status").textContent="Routes cleared."};
  $("lf-animate").onclick=()=>{
-  const svg=$("lf-field"),paths=[...svg.querySelectorAll("path")];
-  paths.forEach((p,i)=>{try{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1300,delay:i*100,fill:"forwards",easing:"ease-out"})}catch(e){}});
-  const groups=[...svg.querySelectorAll("[data-dot]")];
-  routes.forEach(route=>{const idx=dots.findIndex(d=>Math.hypot(d.x-route.x1,d.y-route.y1)<35);if(idx<0)return;const node=groups.find(g=>Number(g.dataset.dot)===idx);if(!node)return;node.animate([{transform:"translate("+route.x1+"px, "+route.y1+"px)"},{transform:"translate("+route.x2+"px, "+route.y2+"px)"}],{duration:1700,fill:"forwards",easing:"ease-in-out"});});
-  $("lf-status").textContent="Playing a user-created tactical simulation. Player movements are illustrative, not actual NFL game tracking or recorded outcomes.";
+  const svg=$("lf-field");
+  svg.querySelectorAll("path").forEach((p,i)=>{try{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1300,delay:i*100,fill:"forwards",easing:"ease-out"})}catch(e){}});
+  routes.forEach(route=>{const idx=dots.findIndex(d=>Math.hypot(d.x-route.x1,d.y-route.y1)<35);if(idx<0)return;const node=svg.querySelector('[data-dot="'+idx+'"]');if(!node)return;const motion=svgEl("animateTransform",{attributeName:"transform",type:"translate",from:route.x1+" "+route.y1,to:route.x2+" "+route.y2,dur:"1.7s",fill:"freeze"});node.append(motion);if(motion.beginElement)motion.beginElement();});
+  $("lf-status").textContent="Playing a user-created tactical simulation. Player movements are illustrative, not actual NFL tracking or recorded outcomes.";
  };
  $("lf-save").onclick=()=>{const payload={team:$("lf-team").value,dots,routes,updated:Date.now()};localStorage.setItem("gridironIQLivingField",JSON.stringify(payload));$("lf-status").textContent="Field layout saved on this device."};
  $("lf-load").onclick=()=>{try{const p=JSON.parse(localStorage.getItem("gridironIQLivingField")||"null");if(!p)throw Error();dots=p.dots||[];routes=p.routes||[];if(p.team)$("lf-team").value=p.team;renderField();$("lf-status").textContent="Saved field layout restored."}catch(e){$("lf-status").textContent="No saved field layout found on this device."}};
