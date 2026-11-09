@@ -497,11 +497,17 @@ footer {
 
   <div class="two-col">
     <div class="card">
-      <div class="panel-title">Explore Football Intelligence</div>
-      <div class="news-item"><strong>Player Analytics</strong><p>Explore player profiles, compare performance, and evaluate positions.</p></div>
-      <div class="news-item"><strong>Team Analytics</strong><p>Explore all 32 NFL franchises and compare team performance.</p></div>
-      <div class="news-item"><strong>Matchup Center</strong><p>Break down the key battles that decide football games.</p></div>
+      <div class="panel-title">Explore Football Analytics</div>
+      <div class="news-item"><strong>Player Analytics</strong><p>Explore player profiles, compare production, and evaluate positions.</p></div>
+      <div class="news-item"><strong>Team Analytics</strong><p>Explore all 32 NFL franchises and their available data.</p></div>
+      <div class="news-item"><strong>Matchup Center</strong><p>Compare teams and evaluate key battles without invented predictions.</p></div>
       <div class="news-item"><strong>Play Lab</strong><p>Explore formations, routes, coverages, and play concepts.</p></div>
+    </div>
+    <div class="card">
+      <div class="panel-title">Data Standards</div>
+      <p class="muted small" style="line-height:1.7">Player statistics are sourced from nflverse and labeled by season. If the source is unavailable, the app shows an error instead of filling the screen with made-up numbers.</p>
+      <div class="news-item"><strong>Live data status</strong><p id="data-detail">Checking the NFL statistics feed…</p></div>
+      <div class="news-item"><strong>What is not connected yet</strong><p>Official team-level defense metrics, live scores, live headlines, and schedules are still being built.</p></div>
     </div>
   </div>
 </section>
@@ -684,11 +690,11 @@ function renderPlayers(list) {
     table.appendChild(row);
   });
 }
-async function loadPlayers() {
+async function loadPlayers(search="") {
   const table=document.getElementById("player-table");
   table.innerHTML='<tr><td colspan="7">Loading verified player statistics…</td></tr>';
   try {
-    const response=await fetch("/api/nfl/players");
+    const response=await fetch("/api/nfl/players" + (search ? "?search=" + encodeURIComponent(search) : ""));
     const data=await response.json();
     if(!response.ok) throw new Error(data.error || "NFL statistics unavailable");
     loadedPlayerRows=data.players || [];
@@ -698,7 +704,9 @@ async function loadPlayers() {
     document.getElementById("player-count").textContent=loadedPlayerRows.length.toLocaleString();
     document.getElementById("data-status").textContent=
       "NFL statistics connected · " + data.season + " season · " +
-      loadedPlayerRows.length.toLocaleString() + " player records loaded.";
+      Number(data.totalPlayers || loadedPlayerRows.length).toLocaleString() + " player records in the dataset.";
+    document.getElementById("data-detail").textContent=
+      "Connected to nflverse · season " + data.season + ".";
     renderPlayers(loadedPlayerRows);
   } catch(error) {
     table.innerHTML="";
@@ -708,16 +716,17 @@ async function loadPlayers() {
     row.appendChild(cell); table.appendChild(row);
     document.getElementById("data-status").textContent=
       "NFL statistics currently unavailable. The app will not substitute invented stats.";
+    document.getElementById("data-detail").textContent="Statistics feed unavailable. No sample numbers are being shown.";
   }
 }
 function filterPlayers() {
-  const q=document.getElementById("player-search").value.toLowerCase().trim();
+  const q=document.getElementById("player-search").value.trim();
   const pos=document.getElementById("position-filter").value;
-  renderPlayers(loadedPlayerRows.filter(p=>
-    (!q || p.name.toLowerCase().includes(q) ||
-      (p.teams || []).some(team=>team.toLowerCase().includes(q))) &&
-    (!pos || p.position===pos)
-  ));
+  if (q) {
+    loadPlayers(q).then(()=>renderPlayers(loadedPlayerRows.filter(p=>!pos || p.position===pos)));
+  } else {
+    loadPlayers().then(()=>renderPlayers(loadedPlayerRows.filter(p=>!pos || p.position===pos)));
+  }
 }
 loadPlayers();
 
