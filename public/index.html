@@ -445,7 +445,8 @@ footer {
   .search-row { flex-direction:column; }
   .chat-controls { flex-direction:column; }
 }
-</style>
+
+.advanced-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.advanced-metrics .card{padding:12px}.metric-value{font-size:22px;font-weight:900;margin-top:8px}.lesson-block{padding:13px 0;border-bottom:1px solid var(--border)}.lesson-block:last-child{border:0}.lesson-block h3{font-size:14px;margin:0 0 7px}.lesson-block p{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.pick-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center}.pick-row button{padding:7px 10px}@media(max-width:650px){.advanced-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav button{min-width:67px}}</style>
 </head>
 
 <body>
@@ -470,6 +471,11 @@ footer {
   <div class="nav-label">NFL ANALYTICS</div>
   <button class="nav-btn" data-page="playlab"><span class="nav-icon">▤</span>Play Lab</button>
   <button class="nav-btn" data-page="topplays"><span class="nav-icon">▶</span>Weekly Top Plays</button>
+  <button class="nav-btn" data-page="simulator"><span class="nav-icon">🎮</span>Game Simulator</button>
+  <button class="nav-btn" data-page="gameplan"><span class="nav-icon">📋</span>Game Planning</button>
+  <button class="nav-btn" data-page="advanced"><span class="nav-icon">📊</span>Advanced Analytics</button>
+  <button class="nav-btn" data-page="filmroom"><span class="nav-icon">🎥</span>Film Room</button>
+  <button class="nav-btn" data-page="picks"><span class="nav-icon">🎯</span>Predictions & Picks</button>
   <button class="nav-btn" data-page="news"><span class="nav-icon">▣</span>NFL News</button>
 </aside>
 
@@ -619,6 +625,46 @@ footer {
   </div>
 </section>
 
+
+<!-- GAME SIMULATOR -->
+<section class="page" id="page-simulator">
+ <div class="page-heading"><div><div class="eyebrow">INTERACTIVE COACHING SANDBOX</div><h1>Game Simulator</h1><div class="subtitle">Call an offensive concept against a defensive look and explore a clearly labeled illustrative result.</div></div></div>
+ <div class="notice">This is a football teaching simulation, not a predictive engine, real game simulation, or NFL tracking feed. Outcomes are illustrative and do not represent measured player ability.</div>
+ <div class="card"><div class="three-col">
+  <div><div class="stat-label">Offensive concept</div><select id="sim-play"><option value="Mesh">Mesh</option><option value="Smash">Smash</option><option value="Four Verticals">Four Verticals</option><option value="Flood / Sail">Flood / Sail</option><option value="Levels">Levels</option><option value="Dagger">Dagger</option><option value="Stick">Stick</option><option value="Inside Zone">Inside Zone</option><option value="Power">Power</option><option value="Counter">Counter</option><option value="Outside Zone">Outside Zone</option></select></div>
+  <div><div class="stat-label">Defensive coverage</div><select id="sim-coverage"><option>Cover 0</option><option>Cover 1</option><option selected>Cover 2</option><option>Cover 3</option><option>Cover 4 / Quarters</option></select></div>
+  <div><div class="stat-label">Pressure package</div><select id="sim-pressure"><option>No blitz</option><option>Mike blitz</option><option>Edge pressure</option><option>Double A-gap</option><option>Zone blitz</option></select></div>
+ </div><button class="btn" onclick="runPlaySimulation()" style="margin-top:16px">SIMULATE THE SNAP</button></div>
+ <div class="card" id="sim-result" style="margin-top:14px"><div class="panel-title">Snap Result</div><p class="muted small">Choose a play and defensive look to run the teaching simulation.</p></div>
+</section>
+<!-- GAME PLANNING -->
+<section class="page" id="page-gameplan">
+ <div class="page-heading"><div><div class="eyebrow">WEEKLY COACHING WORKSPACE</div><h1>Game Planning Center</h1><div class="subtitle">Build a matchup-specific plan using available team/player data and football concepts.</div></div></div>
+ <div class="notice">Team-level opponent tendencies and official injury reports are not currently connected. Recommendations below are strategic templates, not claims about current team tendencies.</div>
+ <div class="card"><div class="two-col"><div><div class="stat-label">Your team</div><select id="plan-team"></select></div><div><div class="stat-label">Opponent</div><select id="plan-opponent"></select></div></div><div class="three-col" style="margin-top:14px"><div><div class="stat-label">Offensive identity</div><select id="plan-identity"><option>Balanced</option><option>Pass-heavy</option><option>Run-heavy</option><option>Play-action focused</option></select></div><div><div class="stat-label">Defensive approach</div><select id="plan-defense"><option>Multiple / adaptable</option><option>Pressure-focused</option><option>Coverage-first</option><option>Run-stopping</option></select></div><div><div class="stat-label">Game situation</div><select id="plan-situation"><option>Opening script</option><option>Early downs</option><option>Third down</option><option>Red zone</option><option>Two-minute offense</option><option>Protecting a lead</option></select></div></div><button class="btn" onclick="buildGamePlan()" style="margin-top:16px">BUILD GAME PLAN</button></div>
+ <div class="card" id="plan-result" style="margin-top:14px"><div class="panel-title">Your Game Plan</div><p class="muted small">Select your teams and coaching approach to generate a plan.</p></div>
+</section>
+<!-- ADVANCED ANALYTICS -->
+<section class="page" id="page-advanced">
+ <div class="page-heading"><div><div class="eyebrow">PLAYER PERFORMANCE LAB</div><h1>Advanced Player Analytics</h1><div class="subtitle">Calculated efficiency indicators using the available nflverse player totals.</div></div></div>
+ <div class="notice">Metrics are calculated from the currently loaded season totals. EPA, route participation, pressure rate, target share, and other unavailable fields are intentionally not fabricated.</div>
+ <div class="card"><div class="search-row"><select id="adv-position" onchange="populateAdvancedPlayers()"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select><select id="adv-player" onchange="renderAdvancedPlayer()"></select></div><div id="advanced-player-result"><p class="muted small">Load player data to explore calculated efficiency metrics.</p></div></div>
+ <div class="card" style="margin-top:14px"><div class="panel-title">Player vs. Player Comparison</div><div class="two-col"><select id="adv-compare-a"></select><select id="adv-compare-b"></select></div><button class="btn" onclick="comparePlayersAdvanced()" style="margin-top:14px">COMPARE PLAYERS</button><div id="adv-compare-result" style="margin-top:14px"></div></div>
+</section>
+<!-- FILM ROOM -->
+<section class="page" id="page-filmroom">
+ <div class="page-heading"><div><div class="eyebrow">FOOTBALL CONCEPT LIBRARY</div><h1>NFL Film Room</h1><div class="subtitle">Learn formations, coverages, route concepts, and situational football.</div></div></div>
+ <div class="notice">This is an interactive coaching lesson library, not licensed NFL game footage or actual team film.</div>
+ <div class="card"><div class="search-row"><select id="film-category" onchange="populateFilmLessons()"><option value="concepts">Offensive concepts</option><option value="coverage">Defensive coverages</option><option value="fronts">Defensive fronts</option><option value="situations">Situational football</option></select><select id="film-lesson" onchange="renderFilmLesson()"></select></div><div id="film-content"></div></div>
+</section>
+<!-- PREDICTIONS & PICKS -->
+<section class="page" id="page-picks">
+ <div class="page-heading"><div><div class="eyebrow">PICK TRACKER</div><h1>Weekly Predictions & Picks</h1><div class="subtitle">Make your own picks, save them on this device, and track your accuracy.</div></div></div>
+ <div class="notice">No live betting lines or official schedules are connected. This tracker records your selections; it does not claim to predict actual game results. Picks are stored locally in this browser.</div>
+ <div class="grid"><div class="card"><div class="stat-label">Picks recorded</div><div class="stat-number" id="pick-count">0</div></div><div class="card"><div class="stat-label">Correct</div><div class="stat-number" id="pick-correct">0</div></div><div class="card"><div class="stat-label">Incorrect</div><div class="stat-number" id="pick-incorrect">0</div></div><div class="card"><div class="stat-label">Accuracy</div><div class="stat-number" id="pick-accuracy">—</div></div></div>
+ <div class="card"><div class="panel-title">Record a Game Pick</div><div class="three-col"><div><div class="stat-label">Team 1</div><select id="pick-team-a"></select></div><div><div class="stat-label">Team 2</div><select id="pick-team-b"></select></div><div><div class="stat-label">Your pick</div><select id="pick-winner"></select></div></div><input id="pick-note" placeholder="Optional note (e.g. matchup reason)" style="margin-top:12px"><button class="btn" onclick="saveGamePick()" style="margin-top:12px">SAVE PICK</button></div>
+ <div class="card" style="margin-top:14px"><div class="panel-title">Your Pick History</div><div id="pick-history" class="muted small">No picks recorded yet.</div></div>
+</section>
 <footer>GRIDIRON IQ · NFL ANALYTICS CENTER · 2026</footer>
 </main>
 </div>
@@ -629,6 +675,11 @@ footer {
   <button data-page="teams"><span>🛡</span>Teams</button>
   <button data-page="matchup"><span>⚔</span>Matchup</button>
   <button data-page="playlab"><span>▤</span>Play Lab</button>
+  <button data-page="simulator"><span>🎮</span>Sim</button>
+  <button data-page="gameplan"><span>📋</span>Plan</button>
+  <button data-page="advanced"><span>📊</span>Stats</button>
+  <button data-page="filmroom"><span>🎥</span>Film</button>
+  <button data-page="picks"><span>🎯</span>Picks</button>
 </nav>
 
 </div>
@@ -704,6 +755,9 @@ async function loadPlayers() {
     document.getElementById("data-detail").textContent=
       "Connected to nflverse · refreshed " + new Date(data.retrievedAt).toLocaleString() + ".";
     renderPlayers(loadedPlayerRows);
+    populateAdvancedPlayers();
+    populatePlanTeams();
+    populatePickTeams();
   } catch(error) {
     table.innerHTML="";
     const row=document.createElement("tr"); const cell=document.createElement("td");
@@ -762,6 +816,118 @@ function fillTeamSelectors() {
 }
 fillTeamSelectors();
 
+
+function fillOptions(id,items,labelFn){const el=document.getElementById(id);if(!el)return;el.innerHTML="";items.forEach((item,i)=>{const o=document.createElement("option");o.value=typeof item==="string"?item:(item.id||item.name||String(i));o.textContent=labelFn?labelFn(item):typeof item==="string"?item:item.name;el.appendChild(o)})}
+function populatePlanTeams(){["plan-team","plan-opponent"].forEach((id,i)=>fillOptions(id,teams));const a=document.getElementById("plan-team"),b=document.getElementById("plan-opponent");if(a&&b)b.selectedIndex=1}
+function buildGamePlan(){
+ const team=document.getElementById("plan-team").value,opp=document.getElementById("plan-opponent").value,identity=document.getElementById("plan-identity").value,def=document.getElementById("plan-defense").value,sit=document.getElementById("plan-situation").value;
+ if(team===opp){document.getElementById("plan-result").innerHTML="<p>Choose two different teams.</p>";return}
+ const offense=identity==="Run-heavy"?"Feature inside zone, duo, and counter; use play action after establishing downhill runs.":identity==="Pass-heavy"?"Use quick-game spacing early, then layer in mesh, levels, and dagger concepts.":identity==="Play-action focused"?"Show consistent run looks, then attack intermediate windows with boot, flood, and crossers.":"Mix inside zone and duo with quick-game, play action, and intermediate route combinations.";
+ const defense=def==="Pressure-focused"?"Change pressure presentation, attack protection rules selectively, and disguise the post-snap coverage.":def==="Coverage-first"?"Vary shells, disguise rotations, tackle short completions, and force the offense to sustain drives.":def==="Run-stopping"?"Set firm edges, maintain interior gap integrity, and make the offense win through the air.":"Alternate fronts and coverage structures while keeping leverage and tackling assignments sound.";
+ const context=sit==="Third down"?"Prioritize protection identification, route spacing beyond the sticks, and a defined hot answer.":sit==="Red zone"?"Condense formations, anticipate tighter windows, and pair run threats with rub-free picks and play action.":sit==="Two-minute offense"?"Preserve sideline access, use efficient tempo, and communicate clock / timeout decisions.":sit==="Protecting a lead"?"Value possession, avoid unnecessary negative plays, keep run fits sound, and make the opponent use clock.":sit==="Opening script"?"Script complementary runs, quick throws, motion looks, and one change-up shot play.":"Win early-down efficiency, stay ahead of the chains, and create manageable third downs.";
+ document.getElementById("plan-result").innerHTML='<div class="eyebrow">'+team+' · GAME PLAN · '+opp+'</div><div class="lesson-block"><h3>Offensive plan · '+identity+'</h3><p>'+offense+'</p></div><div class="lesson-block"><h3>Defensive plan · '+def+'</h3><p>'+defense+'</p></div><div class="lesson-block"><h3>Situational emphasis · '+sit+'</h3><p>'+context+'</p></div><p class="muted small">Coaching template only. Add verified opponent data and injury context before treating this as a team-specific scouting report.</p>';
+}
+function populateAdvancedPlayers(){
+ const pos=document.getElementById("adv-position")?.value||"ALL",list=loadedPlayerRows.filter(p=>["QB","RB","WR","TE"].includes(p.position)&&(pos==="ALL"||p.position===pos)).sort((a,b)=>a.name.localeCompare(b.name));
+ ["adv-player","adv-compare-a","adv-compare-b"].forEach(id=>fillOptions(id,list,p=>p.name+" · "+p.position+" · "+(p.teams||[]).join("/")));
+ if(list.length>1){document.getElementById("adv-compare-b").selectedIndex=1}
+ renderAdvancedPlayer();document.getElementById("adv-compare-result").innerHTML="";
+}
+function selectedAdvancedPlayer(id){return loadedPlayerRows.find(p=>p.id===document.getElementById(id)?.value)}
+function metricCard(label,value,note){return '<div class="card"><div class="stat-label">'+label+'</div><div class="metric-value">'+value+'</div><div class="muted small">'+note+'</div></div>'}
+function advancedMetrics(p){
+ const games=Number(p.games||0),targets=Number(p.targets||0),rec=Number(p.receptions||0),carries=Number(p.carries||0),passAtt=Number(p.passing_attempts||0),passComp=Number(p.completions||0);
+ return [
+ ["Receiving yards / target",targets?(Number(p.receiving_yards||0)/targets).toFixed(2):"—","Receiving yards ÷ targets"],
+ ["Catch rate",targets?(100*rec/targets).toFixed(1)+"%":"—","Receptions ÷ targets"],
+ ["Yards / reception",rec?(Number(p.receiving_yards||0)/rec).toFixed(1):"—","Receiving yards ÷ receptions"],
+ ["Rushing yards / carry",carries?(Number(p.rushing_yards||0)/carries).toFixed(2):"—","Rushing yards ÷ carries"],
+ ["Receiving yards / game",games?(Number(p.receiving_yards||0)/games).toFixed(1):"—","Receiving yards ÷ games"],
+ ["Rushing yards / game",games?(Number(p.rushing_yards||0)/games).toFixed(1):"—","Rushing yards ÷ games"],
+ ["Passing yards / game",games?(Number(p.passing_yards||0)/games).toFixed(1):"—","Passing yards ÷ games"],
+ ["Pass TD / INT",Number(p.passing_tds||0)+" / "+Number(p.interceptions||0),"Passing touchdowns / interceptions"],
+ ["Total TD",Number(p.passing_tds||0)+Number(p.rushing_tds||0)+Number(p.receiving_tds||0),"Passing + rushing + receiving TDs"]
+ ];
+}
+function renderAdvancedPlayer(){
+ const p=selectedAdvancedPlayer("adv-player"),box=document.getElementById("advanced-player-result");if(!box)return;
+ if(!p){box.innerHTML='<p class="muted small">No player records available for this selection.</p>';return}
+ box.innerHTML='<div class="eyebrow">'+p.name+' · '+p.position+' · '+(p.teams||[]).join(", ")+'</div><div class="advanced-metrics">'+advancedMetrics(p).map(m=>metricCard(m[0],m[1],m[2])).join("")+'</div><p class="muted small" style="margin-top:12px">Season totals · '+(p.games||0)+' games · weeks '+(p.weeks||[]).join(", ")+'</p>';
+}
+function comparePlayersAdvanced(){
+ const a=selectedAdvancedPlayer("adv-compare-a"),b=selectedAdvancedPlayer("adv-compare-b"),box=document.getElementById("adv-compare-result");
+ if(!a||!b){box.textContent="Player data is not available yet.";return}
+ const fields=[["Passing yards","passing_yards"],["Passing TD","passing_tds"],["Interceptions","interceptions"],["Rushing yards","rushing_yards"],["Rushing TD","rushing_tds"],["Carries","carries"],["Receiving yards","receiving_yards"],["Receptions","receptions"],["Targets","targets"],["Receiving TD","receiving_tds"],["Games","games"]];
+ box.innerHTML='<div class="table-wrap"><table><thead><tr><th>Metric</th><th>'+a.name+'</th><th>'+b.name+'</th></tr></thead><tbody>'+fields.map(([label,key])=>'<tr><td>'+label+'</td><td>'+Number(a[key]||0).toLocaleString()+'</td><td>'+Number(b[key]||0).toLocaleString()+'</td></tr>').join("")+'</tbody></table></div>';
+}
+function runPlaySimulation(){
+ const play=document.getElementById("sim-play").value,cov=document.getElementById("sim-coverage").value,pressure=document.getElementById("sim-pressure").value;
+ const isRun=/Zone|Power|Counter|Duo|Toss|Sweep/i.test(play);
+ let result,detail,lesson;
+ if(isRun){
+  const tough=pressure==="No blitz"&&["Cover 2","Cover 3","Cover 4 / Quarters"].includes(cov);
+  result=tough?"Run fit meets the ball near the line":"Potential crease develops for the runner";
+  detail=tough?"The front fits the run quickly in this illustrative outcome; the back must press the track and make one decisive cut.":"The offense creates a possible crease by influencing the second level; the back presses the landmark before getting vertical.";
+  lesson="Coaching point: track the first down lineman, stay square, and read the leverage of the edge defender.";
+ }else{
+  const pressureOn=pressure!=="No blitz",coverMan=["Cover 0","Cover 1"].includes(cov);
+  result=pressureOn?"Quick decision required":"Route concept creates a potential window";
+  detail=pressureOn?"Pressure compresses the pocket. The quarterback must identify the free rusher, confirm the hot answer, and avoid holding the ball.":coverMan?"Man coverage puts the emphasis on leverage, releases, and separation at the break point.":"Zone spacing creates a potential high-low or seam window depending on route distribution and underneath defender depth.";
+  lesson="Coaching point: confirm the coverage shell after the snap, move through the progression, and take the checkdown if the designed window closes.";
+ }
+ document.getElementById("sim-result").innerHTML='<div class="eyebrow">ILLUSTRATIVE SNAP · NOT A REAL GAME RESULT</div><div class="panel-title">'+result+'</div><p class="play-copy">'+detail+'</p><div class="lesson-block"><h3>Selected call</h3><p>'+play+' against '+cov+' with '+pressure+'.</p></div><div class="lesson-block"><h3>Coaching takeaway</h3><p>'+lesson+'</p></div><p class="muted small">No yards, completion probability, player ratings, or score were generated because the app does not have validated play-level simulation inputs.</p>';
+}
+const filmLessons={
+ concepts:[
+ ["Mesh","Two shallow crossing routes create horizontal traffic and can stress man coverage. Read leverage, avoid illegal picks, and give the crossers slightly different depths.","Best teaching focus: quarterback eye discipline and receiver spacing."],
+ ["Smash","A hitch and corner route stretch the flat defender vertically. The quarterback reads the corner's leverage to choose the high or low route.","Best teaching focus: high-low reads against two-high structures."],
+ ["Flood / Sail","Three routes attack one side at different depths: flat, intermediate out, and deep clear-out.","Best teaching focus: stretch zone defenders and understand sideline spacing."],
+ ["Dagger","A vertical clear-out creates room for a deep dig route behind linebackers.","Best teaching focus: timing, pocket depth, and middle-of-field reads."],
+ ["Inside Zone","Offensive linemen use combination blocks and work to the second level while the back presses an interior track.","Best teaching focus: patience, landmark discipline, and linebacker reads."]
+ ],
+ coverage:[
+ ["Cover 0","Zero deep safeties with man coverage across eligible receivers. It creates pressure potential but leaves isolated matchups.","Offensive answer: quick throws, motion, and clear protection identification."],
+ ["Cover 1","Man coverage underneath with one deep middle safety. The post safety can overlap vertical routes.","Offensive answer: crossing routes, motion, and leverage-based isolation."],
+ ["Cover 2","Two deep safeties split the deep field; corners and underneath defenders handle short areas.","Offensive answer: attack the hole between safeties and stretch the flat defender."],
+ ["Cover 3","Three deep defenders divide the deep field into thirds with underneath zone responsibilities.","Offensive answer: seams, flood concepts, curls, and high-low reads."],
+ ["Cover 4 / Quarters","Four deep defenders divide the field into quarters and often match vertical releases.","Offensive answer: stress safeties with run action, underneath spacing, and route conflicts."]
+ ],
+ fronts:[
+ ["Nickel 4-2-5","Four defensive linemen, two linebackers, and five defensive backs. A common personnel grouping for spread offenses.","Coaching focus: box count, nickel run fits, and perimeter tackling."],
+ ["4-3 Over","Four linemen with three linebackers, with the front shifted toward the strength of the formation.","Coaching focus: gap fits, edge setting, and linebacker alignment."],
+ ["3-4","Three down linemen with four linebackers, allowing multiple pressure presentations and edge roles.","Coaching focus: identify stand-up rushers and protection responsibilities."],
+ ["Dime 4-1-6","Four rushers, one linebacker, and six defensive backs, often used in obvious passing situations.","Coaching focus: coverage matchups, rush lanes, and tackling in space."]
+ ],
+ situations:[
+ ["Third-and-long","Offenses need routes beyond the line to gain while protecting against pressure. Defenses can vary rush lanes and coverage disguise.","Offensive checklist: protection count, route spacing, sticks awareness, and checkdown discipline."],
+ ["Red zone","Compressed space changes route timing and reduces deep-field room. Run threats and play-action conflicts become important.","Offensive checklist: condensed formations, leverage releases, and ball security."],
+ ["Two-minute drill","Tempo, sideline access, clock awareness, and communication become critical.","Offensive checklist: know the clock, get lined up quickly, and understand timeout / spike decisions."],
+ ["Goal-line defense","Short field limits explosive passes but increases power-run and play-action threats.","Defensive checklist: maintain gap integrity, set edges, and communicate eligible receivers."],
+ ["Protecting a lead","Possession, field position, tackling, and avoiding explosive plays become priorities.","Coaching checklist: balance aggression with clock management and situational awareness."]
+ ]
+};
+function populateFilmLessons(){const cat=document.getElementById("film-category").value;fillOptions("film-lesson",filmLessons[cat],x=>x[0]);renderFilmLesson()}
+function renderFilmLesson(){const cat=document.getElementById("film-category").value,lesson=filmLessons[cat].find(x=>x[0]===document.getElementById("film-lesson").value)||filmLessons[cat][0];if(!lesson)return;document.getElementById("film-content").innerHTML='<div class="lesson-block"><h3>'+lesson[0]+'</h3><p>'+lesson[1]+'</p></div><div class="lesson-block"><h3>Coaching points</h3><p>'+lesson[2]+'</p></div><p class="muted small">Use Play Lab to diagram this concept and test it against different defensive looks.</p>'}
+function populatePickTeams(){["pick-team-a","pick-team-b"].forEach(id=>fillOptions(id,teams));document.getElementById("pick-team-b").selectedIndex=1;updatePickWinnerOptions();renderPickHistory()}
+function updatePickWinnerOptions(){const a=document.getElementById("pick-team-a").value,b=document.getElementById("pick-team-b").value;fillOptions("pick-winner",[a,b])}
+document.getElementById("pick-team-a").addEventListener("change",updatePickWinnerOptions);
+document.getElementById("pick-team-b").addEventListener("change",updatePickWinnerOptions);
+function getSavedPicks(){try{return JSON.parse(localStorage.getItem("gridironIQPicks")||"[]")}catch(e){return []}}
+function saveGamePick(){
+ const a=document.getElementById("pick-team-a").value,b=document.getElementById("pick-team-b").value,w=document.getElementById("pick-winner").value,n=document.getElementById("pick-note").value.trim();
+ if(a===b){alert("Choose two different teams.");return}
+ const picks=getSavedPicks();picks.unshift({id:Date.now(),a,b,w,n,status:"pending",date:new Date().toLocaleDateString()});
+ localStorage.setItem("gridironIQPicks",JSON.stringify(picks));document.getElementById("pick-note").value="";renderPickHistory();
+}
+function updatePickStatus(id,status){const picks=getSavedPicks().map(p=>p.id===id?{...p,status}:p);localStorage.setItem("gridironIQPicks",JSON.stringify(picks));renderPickHistory()}
+function deletePick(id){localStorage.setItem("gridironIQPicks",JSON.stringify(getSavedPicks().filter(p=>p.id!==id)));renderPickHistory()}
+function renderPickHistory(){
+ const picks=getSavedPicks(),done=picks.filter(p=>p.status!=="pending"),correct=done.filter(p=>p.status==="correct").length,incorrect=done.length-correct;
+ document.getElementById("pick-count").textContent=picks.length;document.getElementById("pick-correct").textContent=correct;document.getElementById("pick-incorrect").textContent=incorrect;document.getElementById("pick-accuracy").textContent=done.length?(100*correct/done.length).toFixed(1)+"%":"—";
+ const box=document.getElementById("pick-history");if(!picks.length){box.textContent="No picks recorded yet.";return}
+ box.innerHTML=picks.map(p=>'<div class="pick-row"><div><strong>'+p.a+' vs '+p.b+'</strong><div class="muted small">Pick: '+p.w+' · '+p.date+(p.n?' · '+p.n:'')+'</div><div class="muted small">Status: '+p.status+'</div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn secondary" onclick="updatePickStatus('+p.id+',\'correct\')">Correct</button><button class="btn secondary" onclick="updatePickStatus('+p.id+',\'incorrect\')">Wrong</button><button class="btn secondary" onclick="deletePick('+p.id+')">Delete</button></div></div>').join("");
+}
+populateFilmLessons();
 function compareTeams() {
   const home=document.getElementById("match-home").value;
   const away=document.getElementById("match-away").value;
