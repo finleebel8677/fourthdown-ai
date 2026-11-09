@@ -1,183 +1,238 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>LLM Chat App</title>
-		<style>
-			:root {
-				--primary-color: #f6821f;
-				--primary-hover: #e67e22;
-				--light-bg: #f9fafb;
-				--border-color: #e5e7eb;
-				--text-color: #1f2937;
-				--text-light: #6b7280;
-				--user-msg-bg: #fff2e6;
-				--assistant-msg-bg: #f3f4f6;
-			}
+</div>
+</section>
 
-			* {
-				box-sizing: border-box;
-				margin: 0;
-				padding: 0;
-			}
+<section class="page" id="analyst">
+  <h1>FOURTHDOWN AI Analyst</h1>
+  <div class="subtitle">Your football strategy and analytics assistant.</div>
+  <div class="card">
+    <div class="chat-box" id="chat-messages">
+      <div class="chat-message bot">Welcome to FOURTHDOWN AI. Ask me about NFL players, teams, schemes, matchups or football strategy.</div>
+    </div>
+    <div id="typing-indicator">Analyst is thinking...</div>
+    <div class="chat-controls">
+      <input id="user-input" type="text" placeholder="Ask a football question..." autocomplete="off">
+      <button id="send-button" class="primary">Send</button>
+    </div>
+    <p class="small">AI responses may need verification. Do not treat sample dashboard data as live statistics.</p>
+  </div>
+</section>
 
-			body {
-				font-family:
-					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-					Cantarell, sans-serif;
-				line-height: 1.6;
-				color: var(--text-color);
-				max-width: 800px;
-				margin: 0 auto;
-				padding: 1rem;
-			}
+<footer>FOURTHDOWN AI · FOOTBALL INTELLIGENCE CENTER</footer>
+</main>
+</div>
 
-			header {
-				text-align: center;
-				margin-bottom: 2rem;
-				padding: 1rem 0;
-				border-bottom: 1px solid var(--border-color);
-			}
+<script>
+const teams = [
+["Arizona Cardinals","ARI"],["Atlanta Falcons","ATL"],
+["Baltimore Ravens","BAL"],["Buffalo Bills","BUF"],
+["Carolina Panthers","CAR"],["Chicago Bears","CHI"],
+["Cincinnati Bengals","CIN"],["Cleveland Browns","CLE"],
+["Dallas Cowboys","DAL"],["Denver Broncos","DEN"],
+["Detroit Lions","DET"],["Green Bay Packers","GB"],
+["Houston Texans","HOU"],["Indianapolis Colts","IND"],
+["Jacksonville Jaguars","JAX"],["Kansas City Chiefs","KC"],
+["Las Vegas Raiders","LV"],["Los Angeles Chargers","LAC"],
+["Los Angeles Rams","LAR"],["Miami Dolphins","MIA"],
+["Minnesota Vikings","MIN"],["New England Patriots","NE"],
+["New Orleans Saints","NO"],["New York Giants","NYG"],
+["New York Jets","NYJ"],["Philadelphia Eagles","PHI"],
+["Pittsburgh Steelers","PIT"],["San Francisco 49ers","SF"],
+["Seattle Seahawks","SEA"],["Tampa Bay Buccaneers","TB"],
+["Tennessee Titans","TEN"],["Washington Commanders","WAS"]
+];
 
-			h1 {
-				font-size: 1.5rem;
-				color: var(--primary-color);
-			}
+const players = [
+{name:"Patrick Mahomes",pos:"QB",team:"KC",note:"Quarterback profile"},
+{name:"Josh Allen",pos:"QB",team:"BUF",note:"Quarterback profile"},
+{name:"Lamar Jackson",pos:"QB",team:"BAL",note:"Quarterback profile"},
+{name:"Joe Burrow",pos:"QB",team:"CIN",note:"Quarterback profile"},
+{name:"Jalen Hurts",pos:"QB",team:"PHI",note:"Quarterback profile"},
+{name:"Bijan Robinson",pos:"RB",team:"ATL",note:"Running back profile"},
+{name:"Christian McCaffrey",pos:"RB",team:"SF",note:"Running back profile"},
+{name:"Derrick Henry",pos:"RB",team:"BAL",note:"Running back profile"},
+{name:"Saquon Barkley",pos:"RB",team:"PHI",note:"Running back profile"},
+{name:"Ja'Marr Chase",pos:"WR",team:"CIN",note:"Wide receiver profile"},
+{name:"Justin Jefferson",pos:"WR",team:"MIN",note:"Wide receiver profile"},
+{name:"CeeDee Lamb",pos:"WR",team:"DAL",note:"Wide receiver profile"},
+{name:"Tyreek Hill",pos:"WR",team:"MIA",note:"Wide receiver profile"},
+{name:"Amon-Ra St. Brown",pos:"WR",team:"DET",note:"Wide receiver profile"},
+{name:"Travis Kelce",pos:"TE",team:"KC",note:"Tight end profile"}
+];
 
-			.chat-container {
-				display: flex;
-				flex-direction: column;
-				height: calc(100vh - 200px);
-				min-height: 400px;
-				border: 1px solid var(--border-color);
-				border-radius: 8px;
-				overflow: hidden;
-			}
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  const section=document.getElementById(page);
+  if(section) section.classList.add("active");
+  const button=document.querySelector('[data-page="'+page+'"]');
+  if(button) button.classList.add("active");
+  window.scrollTo(0,0);
+}
 
-			.chat-messages {
-				flex: 1;
-				overflow-y: auto;
-				padding: 1rem;
-				background-color: var(--light-bg);
-			}
+document.querySelectorAll(".nav-btn").forEach(button=>{
+  button.addEventListener("click",()=>showPage(button.dataset.page));
+});
 
-			.message {
-				margin-bottom: 1rem;
-				padding: 0.75rem;
-				border-radius: 8px;
-				max-width: 80%;
-			}
+function renderPlayers(){
+  const search=(document.getElementById("player-search").value||"").toLowerCase();
+  const position=document.getElementById("player-position").value;
+  const filtered=players.filter(p=>
+    (p.name.toLowerCase().includes(search)||p.team.toLowerCase().includes(search)) &&
+    (position==="All"||p.pos===position)
+  );
+  const target=document.getElementById("player-results");
+  target.innerHTML=filtered.length ? filtered.map((p,i)=>`
+    <div class="news-item">
+      <div class="match-row">
+        <div><strong>${p.name}</strong><div class="small">${p.pos} · ${p.team}</div></div>
+        <button class="secondary" onclick="showPlayer('${p.name.replace(/'/g,"\\'")}')">View profile</button>
+      </div>
+    </div>`).join("") : '<p class="small">No matching players found.</p>';
+}
 
-			.message p {
-				white-space: pre-line;
-				margin: 0;
-				overflow-wrap: anywhere;
-			}
+function showPlayer(name){
+  const p=players.find(x=>x.name===name);
+  if(!p)return;
+  document.getElementById("player-profile").innerHTML=`
+    <span class="pill">${p.pos} · ${p.team}</span>
+    <h2 style="margin-top:12px">${p.name}</h2>
+    <p class="small">${p.note}</p>
+    <p class="small">This is a player directory entry, not a verified current-season statistical profile.</p>
+    <button class="secondary" onclick="askAbout('${p.name.replace(/'/g,"\\'")}')">Ask AI about this player</button>`;
+}
 
-			.user-message {
-				background-color: var(--user-msg-bg);
-				align-self: flex-end;
-				margin-left: auto;
-			}
+function askAbout(name){
+  showPage("analyst");
+  const input=document.getElementById("user-input");
+  input.value="Analyze "+name+"'s playing style, strengths and weaknesses.";
+  input.focus();
+}
 
-			.assistant-message {
-				background-color: var(--assistant-msg-bg);
-				align-self: flex-start;
-			}
+function fillTeamSelect(id){
+  const el=document.getElementById(id);
+  el.innerHTML=teams.map(t=>`<option value="${t[1]}">${t[0]}</option>`).join("");
+}
 
-			.message-input {
-				display: flex;
-				padding: 0.75rem;
-				border-top: 1px solid var(--border-color);
-				background-color: white;
-			}
+function renderTeam(){
+  const code=document.getElementById("team-select").value;
+  const team=teams.find(t=>t[1]===code);
+  document.getElementById("team-profile").innerHTML=`
+    <div class="match-row" style="margin-top:15px">
+      <div><span class="team-logo">${team[1]}</span><strong>${team[0]}</strong></div>
+      <span class="pill">NFL TEAM</span>
+    </div>
+    <p class="small" style="margin-top:15px">Team profile selected. Live records, standings and statistical rankings have not yet been connected.</p>
+    <button class="secondary" onclick="askAbout('${team[0]}')">Ask AI about this team</button>`;
+}
 
-			#user-input {
-				flex: 1;
-				padding: 0.75rem;
-				border: 1px solid var(--border-color);
-				border-radius: 4px;
-				font-family: inherit;
-				resize: none;
-				min-height: 44px;
-			}
+function renderTeamList(){
+  document.getElementById("team-list").innerHTML=teams.map(t=>`
+    <div class="card" style="margin:0">
+      <div class="match-row">
+        <div><span class="team-logo">${t[1]}</span><strong style="font-size:12px">${t[0]}</strong></div>
+        <button class="secondary" onclick="selectTeam('${t[1]}')">View</button>
+      </div>
+    </div>`).join("");
+}
 
-			#send-button {
-				margin-left: 0.5rem;
-				padding: 0 1rem;
-				background-color: var(--primary-color);
-				color: white;
-				border: none;
-				border-radius: 4px;
-				cursor: pointer;
-				transition: background-color 0.2s;
-			}
+function selectTeam(code){
+  document.getElementById("team-select").value=code;
+  renderTeam();
+  showPage("teams");
+}
 
-			#send-button:hover {
-				background-color: var(--primary-hover);
-			}
+function compareTeams(){
+  const a=document.getElementById("team-a").value;
+  const b=document.getElementById("team-b").value;
+  const ta=teams.find(t=>t[1]===a);
+  const tb=teams.find(t=>t[1]===b);
+  const result=document.getElementById("matchup-result");
+  if(a===b){
+    result.innerHTML="<h2>Choose two different teams</h2><p class='small'>Select a different opponent to compare.</p>";
+    return;
+  }
+  result.innerHTML=`
+    <h2>${ta[0]} vs. ${tb[0]}</h2>
+    <div class="grid two">
+      <div class="card"><span class="team-logo">${ta[1]}</span><strong>${ta[0]}</strong></div>
+      <div class="card"><span class="team-logo">${tb[1]}</span><strong>${tb[0]}</strong></div>
+    </div>
+    <h3>Matchup breakdown</h3>
+    <p class="small">A full comparison requires current team statistics, injury information and confirmed rosters. Those data feeds are not connected yet.</p>
+    <button class="primary" onclick="askAbout('${ta[0]} vs ${tb[0]}')">Ask AI to analyze this matchup</button>`;
+}
 
-			#send-button:disabled {
-				background-color: var(--text-light);
-				cursor: not-allowed;
-			}
+function openPlay(type){
+  showPage("playlab");
+  document.getElementById("play-type").value=type;
+  drawPlay();
+}
 
-			.typing-indicator {
-				display: none;
-				font-style: italic;
-				color: var(--text-light);
-				padding: 1rem;
-			}
+const formations={
+  mesh:[[20,35],[20,65],[38,20],[38,80],[48,35],[48,65]],
+  four:[[20,35],[20,65],[35,20],[35,80],[48,35],[48,65]],
+  screen:[[20,35],[20,65],[38,20],[38,80],[48,35],[48,65]],
+  slant:[[20,35],[20,65],[38,20],[38,80],[48,35],[48,65]]
+};
 
-			.typing-indicator.visible {
-				display: block;
-			}
+function drawPlay(){
+  const field=document.getElementById("football-field");
+  const type=document.getElementById("play-type").value;
+  field.innerHTML="";
+  const positions=formations[type];
+  positions.forEach((pos,i)=>{
+    const dot=document.createElement("div");
+    dot.className="player-dot";
+    dot.textContent=i===0?"QB":i;
+    dot.style.left=pos[0]+"%";
+    dot.style.top=pos[1]+"%";
+    field.appendChild(dot);
+  });
+  const routes={
+    mesh:[[20,35,32,20],[20,65,32,80],[38,20,30,35],[38,80,30,65]],
+    four:[[20,35,62,20],[20,65,62,80],[35,20,60,20],[35,80,60,80]],
+    screen:[[20,35,30,35],[20,65,30,65],[38,20,25,40],[38,80,25,60]],
+    slant:[[20,35,30,25],[20,65,30,55],[38,20,25,35],[38,80,25,65]]
+  };
+  routes[type].forEach(r=>{
+    const line=document.createElement("div");
+    line.className="route-line";
+    const x1=r[0]/100*field.clientWidth;
+    const y1=r[1]/100*field.clientHeight;
+    const x2=r[2]/100*field.clientWidth;
+    const y2=r[3]/100*field.clientHeight;
+    const dx=x2-x1,dy=y2-y1;
+    line.style.left=x1+"px";
+    line.style.top=y1+"px";
+    line.style.width=Math.sqrt(dx*dx+dy*dy)+"px";
+    line.style.transform="rotate("+Math.atan2(dy,dx)+"rad)";
+    field.appendChild(line);
+  });
+}
 
-			footer {
-				margin-top: 1rem;
-				text-align: center;
-				font-size: 0.85rem;
-				color: var(--text-light);
-			}
-		</style>
-	</head>
-	<body>
-		<header>
-			<h1>Cloudflare AI Chat</h1>
-			<p>Powered by Cloudflare Workers AI</p>
-		</header>
+function animatePlay(){
+  const field=document.getElementById("football-field");
+  const dots=[...field.querySelectorAll(".player-dot")];
+  dots.forEach((dot,i)=>{
+    dot.animate([
+      {transform:"translate(0,0)"},
+      {transform:`translate(${i%2===0?65:-45}px,${i%2===0?-35:35}px)`}
+    ],{duration:1200/(Number(document.getElementById("play-speed").value)||1),fill:"forwards"});
+  });
+}
 
-		<div class="chat-container">
-			<div id="chat-messages" class="chat-messages">
-				<div class="message assistant-message">
-					<p>
-						Hello! I'm an LLM chat app powered by Cloudflare Workers AI. How can
-						I help you today?
-					</p>
-				</div>
-			</div>
+function initApp(){
+  fillTeamSelect("team-select");
+  fillTeamSelect("team-a");
+  fillTeamSelect("team-b");
+  renderPlayers();
+  renderTeam();
+  renderTeamList();
+  drawPlay();
+}
+initApp();
+</script>
 
-			<div class="typing-indicator" id="typing-indicator">
-				AI is thinking...
-			</div>
-
-			<div class="message-input">
-				<textarea
-					id="user-input"
-					placeholder="Type your message here..."
-					rows="1"
-					autofocus
-				></textarea>
-				<button id="send-button">Send</button>
-			</div>
-		</div>
-
-		<footer>
-			<p>Cloudflare Workers AI Chat Template &copy; 2025</p>
-		</footer>
-
-		<!-- Chat app script -->
-		<script src="chat.js"></script>
-	</body>
+<script src="chat.js"></script>
+</body>
 </html>
