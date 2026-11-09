@@ -383,7 +383,7 @@ footer {
   text-align:center;
 }
 .mobile-nav { display:none; }
-.notice {
+.play-meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.play-meta span{background:#172b43;border:1px solid #314965;color:#c6d9ee;border-radius:20px;padding:6px 10px;font-size:10px}.play-diagram-wrap{width:100%;overflow:hidden;border:1px solid #365b49;border-radius:12px;background:#0d352b}#play-diagram{display:block;width:100%;height:auto;min-height:170px}.play-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}.play-copy{font-size:12px;color:#b8c7d9;line-height:1.65;margin:0}.play-subhead{font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);margin:17px 0 7px}.play-assignments{padding-left:17px;margin:0;color:#b8c7d9;font-size:11px;line-height:1.8}.route-path{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#routeArrow)}.run-path{fill:none;stroke:#fbbf24;stroke-width:7;stroke-dasharray:12 8;marker-end:url(#runArrow)}.player-marker circle{fill:#facc15;stroke:#fff;stroke-width:2}.player-marker text{font-size:11px;font-weight:bold;fill:#172033}.defense-marker circle{fill:#60a5fa;stroke:#fff;stroke-width:2}.defense-marker text{font-size:10px;font-weight:bold;fill:#07182b}@media(max-width:650px){.play-info-grid{grid-template-columns:1fr}#play-diagram{min-height:140px}.play-meta span{font-size:9px}}.notice {
   padding:12px 14px;
   border:1px solid #66532a;
   background:#302713;
@@ -568,33 +568,25 @@ footer {
 
 <!-- PLAY LAB -->
 <section class="page" id="page-playlab">
-  <div class="page-heading">
-    <div><div class="eyebrow">X'S AND O'S</div><h1>Play Lab</h1><div class="subtitle">Explore basic offensive formations and football concepts.</div></div>
+ <div class="page-heading"><div><div class="eyebrow">X'S AND O'S · INTERACTIVE PLAYBOOK</div><h1>Play Lab</h1><div class="subtitle">Explore real football concepts, assignments, reads, and defensive answers.</div></div></div>
+ <div class="card">
+  <div class="search-row">
+   <select id="play-type" onchange="populatePlayChoices()"><option value="pass">Passing Concepts</option><option value="run">Running Concepts</option></select>
+   <select id="formation" onchange="drawPlay()"><option value="spread">Shotgun 2x2 Spread</option><option value="trips">Shotgun Trips</option><option value="single">Singleback / I-Formation</option></select>
+   <select id="play-choice" onchange="drawPlay()"></select>
   </div>
-  <div class="card">
-    <div class="search-row">
-      <select id="formation" onchange="drawPlay()">
-        <option value="spread">Shotgun Spread</option>
-        <option value="trips">Trips Formation</option>
-        <option value="single">Single Back</option>
-      </select>
-      <select id="play-type" onchange="drawPlay()">
-        <option value="pass">Passing Concept</option>
-        <option value="run">Running Concept</option>
-      </select>
-    </div>
-    <div class="field" id="play-field">
-      <div class="field-center"></div>
-      <div class="field-label">OFFENSIVE PLAY CONCEPT</div>
-    </div>
-    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
-      <button class="btn" onclick="drawPlay()">RESET PLAY</button>
-      <button class="btn secondary" onclick="animatePlay()">ANIMATE PLAY</button>
-    </div>
-    <p class="muted small" style="margin-top:13px">Illustrative play diagram. This is not NFL tracking data or game film.</p>
-  </div>
+  <div id="play-meta" class="play-meta"></div>
+  <div class="play-diagram-wrap"><svg id="play-diagram" viewBox="0 0 1000 440" role="img" aria-label="Football play diagram"></svg></div>
+  <div class="play-legend"><span>🟡 Offense</span><span>🔵 Defense</span><span>— Receiver route</span><span>╌ Run path / blocking track</span></div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px"><button class="btn" onclick="drawPlay()">RESET PLAY</button><button class="btn secondary" onclick="animatePlay()">ANIMATE ROUTES</button><button class="btn secondary" onclick="toggleDefense()">TOGGLE DEFENSE</button></div>
+  <p class="muted small" style="margin-top:13px">Teaching diagrams, not NFL tracking data or game film. Exact assignments vary by team, playbook, and defensive look.</p>
+ </div>
+ <div class="play-info-grid">
+  <div class="card"><div class="panel-title">Play Design</div><p id="play-description" class="play-copy"></p><div class="play-subhead">Personnel & formation</div><p id="play-personnel" class="play-copy"></p></div>
+  <div class="card"><div class="panel-title">Quarterback Read</div><p id="play-read" class="play-copy"></p><div class="play-subhead">Best Situations</div><p id="play-situation" class="play-copy"></p></div>
+  <div class="card"><div class="panel-title">Assignments & Coaching Points</div><ul id="play-assignments" class="play-assignments"></ul><div class="play-subhead">Defensive Counters</div><p id="play-counter" class="play-copy"></p></div>
+ </div>
 </section>
-
 <!-- TOP PLAYS -->
 <section class="page" id="page-topplays">
   <div class="page-heading">
@@ -785,39 +777,45 @@ function compareTeams() {
     '</div>';
 }
 
-function drawPlay() {
-  const field=document.getElementById("play-field");
-  field.querySelectorAll(".player-dot").forEach(dot=>dot.remove());
-  const formation=document.getElementById("formation").value;
-  const type=document.getElementById("play-type").value;
-  let positions;
-  if(formation==="trips") {
-    positions=[[22,23],[22,43],[22,63],[43,30],[43,55],[50,46],[66,23],[66,43],[66,63],[78,35],[78,57]];
-  } else if(formation==="single") {
-    positions=[[20,25],[20,43],[20,61],[40,33],[40,55],[49,44],[66,30],[66,57],[77,22],[77,44],[77,66]];
-  } else {
-    positions=[[18,22],[18,42],[18,62],[40,28],[40,56],[50,44],[70,20],[70,37],[70,55],[70,72],[83,44]];
-  }
-  positions.forEach((pos,i)=>{
-    const dot=document.createElement("div");
-    dot.className="player-dot "+(i<6?"":"offense");
-    dot.style.left=pos[0]+"%";
-    dot.style.top=pos[1]+"%";
-    field.appendChild(dot);
-  });
-  field.querySelector(".field-label").textContent=
-    (type==="pass"?"PASSING":"RUNNING")+" CONCEPT · "+formation.toUpperCase();
+const playbook={
+pass:[
+{id:"mesh",name:"Mesh",family:"Man coverage beater",desc:"Two shallow crossers run at slightly different depths to create traffic and horizontal stress. Outside routes clear space.",personnel:"11 personnel · Shotgun 2x2",read:"Read the leverage of both mesh runners. Take the first clean crossing window; if linebackers jump the crossers, work the sit route or outlet.",situation:"Especially useful against man coverage and on money downs.",assign:["X: shallow cross left-to-right.","Slot: shallow cross right-to-left at a different depth.","TE: settle in the middle window.","Outside WR: clear vertically.","RB: scan protection, then release."],counter:"Zone defenders can pass off the crossers; a robber sitting inside can take away the first window.",routes:["M120 100 C300 100 330 250 600 250 S760 230 820 230","M850 330 C700 330 650 180 400 180 S240 200 180 200","M650 100 L650 165 L590 165","M150 80 L150 8 L370 8"]},
+{id:"smash",name:"Smash",family:"High-low sideline stretch",desc:"A short hitch and a corner route put the flat defender in a high-low bind. One route attacks underneath; the other attacks behind him.",personnel:"11 personnel · Shotgun 2x2",read:"Key the corner and flat defender. If the corner squats on the hitch, throw the corner route. If he bails, take the hitch.",situation:"Classic answer versus Cover 2 and two-high structures.",assign:["Outside WR: five-yard hitch and sit.","Slot: corner route at 10–12 yards.","Backside WR: clear vertically or run a slant.","RB: scan inside-out, then check release."],counter:"Safety help can squeeze the corner route; a squatting corner can jump the hitch.",routes:["M120 100 L220 100","M850 330 C850 250 920 210 965 85","M150 80 L150 8 L380 8"]},
+{id:"four-verts",name:"Four Verticals",family:"Vertical stretch",desc:"Four eligible receivers threaten vertically, stretching deep coverage across the width of the field and attacking seams between safeties.",personnel:"10 or 11 personnel · Shotgun",read:"Identify the shell and safety leverage. Work the best seam or isolated outside matchup; do not force a throw into capped coverage.",situation:"Designed to stress Cover 3 seams and split-safety spacing. Needs time to develop.",assign:["Outside WRs: release vertically with outside leverage.","Slots / Y: attack seams between deep defenders.","RB: protect first, then check down.","OL: maintain a firm pocket."],counter:"Quarters can match verticals; a fast pass rush disrupts the longer-developing routes.",routes:["M120 100 L120 8","M850 330 L850 8","M650 100 C650 60 680 8 680 0","M150 80 L150 0"]},
+{id:"flood",name:"Flood / Sail",family:"Three-level stretch",desc:"Flat, intermediate sail, and deep clear-out routes attack one side at three levels to stretch a zone defender.",personnel:"11 personnel · Shotgun trips or 2x2",read:"Read the flat defender: if he widens, throw behind him to the sail; if he sinks, take the flat. Deep route is the alert.",situation:"Strong zone beater, often paired with boot action.",assign:["Outside WR: vertical clear-out.","Slot: intermediate sail / out route.","Inside receiver or RB: fast flat route.","Backside: dig or post to hold safety."],counter:"Pattern-match coverage can pass routes off and squeeze the intermediate window.",routes:["M850 330 L970 330","M650 100 C740 100 830 155 920 190","M150 80 L150 8 L400 8"]},
+{id:"levels",name:"Levels",family:"Layered in-breakers",desc:"Shallow and intermediate in-breaking routes cross at different depths, giving the quarterback layered windows behind underneath defenders.",personnel:"11 personnel · Shotgun 2x2",read:"If the underneath defender gains depth, take the shallow route. If the linebacker drives down, reset to the dig behind him.",situation:"Useful against spot-drop zone coverage and on intermediate downs.",assign:["Outside WR: 12–15 yard dig.","Slot: shallow cross at 4–6 yards.","TE: seam or sit route.","RB: protect, then outlet."],counter:"Match coverage can carry the dig; zone pressure can force a hot throw.",routes:["M120 100 C300 100 350 225 620 225","M850 330 C650 330 590 175 420 175","M650 100 L650 60 L780 60"]},
+{id:"dagger",name:"Dagger",family:"Clear-out + deep dig",desc:"An outside vertical clears the deep defender while a slot receiver stems vertically and breaks across on a deep dig.",personnel:"11 personnel · Shotgun 2x2",read:"The vertical is the clear-out. Look for the deep dig behind linebackers; check backside and outlet if the safety stays over it.",situation:"A middle-of-field concept against single-high looks.",assign:["Outside WR: take corner vertically.","Slot: stem upfield, then deep dig.","Backside WR: post or go to occupy safety.","RB: scan blitz, then check down."],counter:"A robber safety can close the dig window; pressure can force an early throw.",routes:["M120 100 L120 8","M650 100 L650 75 C650 210 520 225 410 225","M850 330 C850 210 920 120 960 55"]},
+{id:"stick",name:"Stick",family:"Quick game",desc:"A quick triangle pairs a flat route with a stick route that settles beyond the underneath defender while an outside receiver clears space.",personnel:"11 personnel · Shotgun trips",read:"Read the apex defender. If he widens with the flat route, throw the stick. If he sits inside, take the flat.",situation:"Quick answer versus soft zone leverage and a useful third-and-short call.",assign:["Inside receiver: quick flat route.","Slot / Y: five-yard stick and settle.","Outside WR: vertical clear-out.","RB: protect, then outlet."],counter:"Press-man disrupts timing; a defender squatting inside can jump the stick.",routes:["M850 330 L970 330","M650 100 L650 165 L710 165","M150 80 L150 8 L390 8"]},
+{id:"y-cross",name:"Y-Cross",family:"Play-action / intermediate",desc:"The tight end or inside receiver crosses at intermediate depth while other routes clear defenders and create a layered progression.",personnel:"12 personnel · Under center or shotgun",read:"Use safety rotation to locate the cross. If the safety drives on it, work the post / clear-out or checkdown.",situation:"Often paired with play action to influence linebackers.",assign:["Y / TE: cross at 12–18 yards.","Outside WR: post or go to occupy safety.","Backside WR: dig / comeback.","RB: sell run action, then protect."],counter:"A disciplined middle safety can track the crosser; match coverage squeezes timing.",routes:["M650 100 C520 100 500 65 380 65 S180 110 80 110","M850 330 C900 200 930 90 970 8","M150 80 L150 8 L380 8"]}
+],
+run:[
+{id:"inside-zone",name:"Inside Zone",family:"Zone run",desc:"The offensive line steps together toward the play side, combining on defensive linemen before climbing to linebackers. The back presses the track and makes one decisive cut.",personnel:"11 personnel · Shotgun or under center",read:"Press the play-side A/B gap. Read the first down lineman past the center: bend behind the combination or cut back if the defense overflows.",situation:"Foundational run versus multiple fronts; aiming point depends on the blocking rules.",assign:["Play-side OL: covered / uncovered zone steps and combinations.","Backside OL: reach, cutoff, or climb.","RB: press aiming point, read the down lineman, then cut.","QB: mesh and carry out backside fake if tagged."],counter:"Slanting fronts disrupt combinations; fast downhill linebackers close the cutback.",run:"M270 285 C350 280 390 260 490 245"},
+{id:"outside-zone",name:"Outside Zone",family:"Zone run",desc:"The line stretches the defense laterally. The back presses outside the tight end, then chooses bounce, bang, or bend based on leverage.",personnel:"12 / 21 personnel · Under center or shotgun",read:"Press the outside landmark. Bounce if the edge is soft, bang off the tackle's hip if defenders widen, or bend behind overpursuit.",situation:"Creates horizontal stress and cutback lanes.",assign:["Frontside OL: reach play-side shoulder / run defenders laterally.","TE: secure edge or climb to force player.","Backside OL: cut off pursuit.","RB: press outside, then choose bounce / bang / bend."],counter:"A firm edge and fast-flow linebackers can force the run sideways.",run:"M270 285 C360 260 420 220 520 190"},
+{id:"duo",name:"Duo",family:"Downhill gap run",desc:"Vertical double teams move the defensive front while the back reads linebackers behind the double teams. It is downhill and patient.",personnel:"12 / 21 personnel · Under center",read:"Press downhill and read linebacker flow behind the double teams. Stay square and avoid bouncing prematurely.",situation:"Physical short-yardage and early-down call.",assign:["Interior OL: vertical double teams.","Tackles / TEs: secure edges.","RB: press downhill and read linebacker fit.","H-back / FB: insert on play-side linebacker if included."],counter:"Run blitzes can split doubles; square linebackers close the cutback.",run:"M270 285 L360 265 L470 250"},
+{id:"power",name:"Power",family:"Gap scheme",desc:"Down blocks create an interior wall while a backside guard pulls to kick out the edge defender. A lead blocker wraps through the gap.",personnel:"11 / 12 personnel · Under center or shotgun",read:"Follow the pulling guard. Hit inside the kick-out; if the edge wrong-arms and spills the run, bounce behind the lead block.",situation:"Physical downhill call for short yardage and defined gaps.",assign:["Play-side OL: down block and secure wall.","Backside guard: pull and kick out edge.","H-back / FB: wrap and lead on linebacker.","RB: track puller and read edge block."],counter:"Wrong-arm technique spills the run wide; fast linebackers scrape over the top.",run:"M270 285 C350 285 390 250 500 245"},
+{id:"counter",name:"Counter",family:"Misdirection gap scheme",desc:"Backfield action initially moves away from the point of attack. Pullers lead the runner back across the formation, punishing fast defensive flow.",personnel:"11 personnel · Shotgun or pistol",read:"Sell the counter step, then follow the first puller's kick-out and the second puller's wrap block.",situation:"Designed to punish linebackers who overreact to initial backfield action.",assign:["Backside guard: pull and kick out edge.","Second puller: wrap to play-side linebacker.","Remaining OL: down block interior.","RB: counter step, square behind pullers, accelerate."],counter:"Defensive slants and disciplined backside pursuit can disrupt pullers.",run:"M270 285 C230 310 300 340 420 260"},
+{id:"split-zone",name:"Split Zone",family:"Zone run + slice block",desc:"Inside-zone blocking is paired with an H-back or tight end slicing across to block the backside edge and secure pursuit.",personnel:"12 personnel · Shotgun or under center",read:"Press the inside-zone track. Read the defensive line and cut frontside or bend behind the zone flow once the slice block secures the edge.",situation:"Pairs with bootleg and play-action because the H-back's motion sells the same action.",assign:["OL: inside-zone combination rules.","H-back / TE: slice across and block backside edge.","RB: press track and read first down lineman.","QB: carry out mesh and protect ball on fake."],counter:"Fast edge players can squeeze the slice block; linebackers can scrape over the top.",run:"M270 285 C350 275 400 250 485 235"},
+{id:"toss",name:"Toss Sweep",family:"Perimeter run",desc:"The quarterback tosses to a back moving toward the perimeter. Receivers and tight ends block force defenders while linemen reach or pull to create an outside lane.",personnel:"21 / 12 personnel · Under center",read:"Catch the toss while staying wide. Press the outside lane, then turn upfield once the force defender is blocked or displaced.",situation:"Perimeter answer when the offense likes its blocking numbers outside.",assign:["Playside WR: stalk block corner without holding.","TE: secure force / edge defender.","OL: reach blocks or pull to lead outside.","RB: catch toss, press sideline, get vertical."],counter:"A fast force defender can set a hard edge; defensive backs can defeat stalk blocks.",run:"M270 285 C350 260 430 170 600 110"}
+]};
+let showPlayDefense=true;
+function populatePlayChoices(){const type=document.getElementById("play-type").value,s=document.getElementById("play-choice");s.innerHTML="";playbook[type].forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name+" · "+p.family;s.appendChild(o)});drawPlay()}
+function currentPlay(){const type=document.getElementById("play-type").value;return playbook[type].find(p=>p.id===document.getElementById("play-choice").value)||playbook[type][0]}
+function drawPlay(){
+ const p=currentPlay(),svg=document.getElementById("play-diagram"),form=document.getElementById("formation").value;
+ const rec=form==="trips"?[[700,85,"X"],[700,165,"Y"],[700,245,"S"],[120,85,"Z"]]:[[120,85,"X"],[650,85,"S"],[650,335,"Y"],[860,335,"Z"]];
+ const off=[...rec,[365,145,"LT"],[365,195,"LG"],[365,245,"C"],[365,295,"RG"],[365,345,"RT"],[280,245,"QB"],[245,315,"RB"]];
+ const def=[[500,85,"CB"],[520,165,"OLB"],[535,245,"MLB"],[520,325,"OLB"],[700,55,"S"],[760,220,"S"],[500,365,"DE"],[490,135,"DE"]];
+ const mark=(arr,cls)=>arr.map(([x,y,l])=>'<g class="'+cls+'"><circle cx="'+x+'" cy="'+y+'" r="17"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle">'+l+'</text></g>').join("");
+ const paths=p.routes?p.routes.map(d=>'<path class="route-path" d="'+d+'"/>').join(""):'<path class="run-path" d="'+p.run+'"/>';
+ svg.innerHTML='<defs><pattern id="yards" width="100" height="440" patternUnits="userSpaceOnUse"><path d="M0 0V440" stroke="#b9ddc8" stroke-width="2" opacity=".3"/></pattern><marker id="routeArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L0 6L7 3Z" fill="#fff"/></marker><marker id="runArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L0 6L7 3Z" fill="#fbbf24"/></marker></defs><rect width="1000" height="440" fill="#104333"/><rect width="1000" height="440" fill="url(#yards)"/><path d="M400 0V440" stroke="#f5f5dc" stroke-width="3" stroke-dasharray="8 7"/><text x="415" y="28" fill="#d5f0df" font-size="15">LINE OF SCRIMMAGE</text>'+paths+(showPlayDefense?mark(def,"defense-marker"):"")+mark(off,"player-marker")+'<text x="20" y="415" fill="#c9e8d5" font-size="14">OFFENSE →</text>';
+ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+ document.getElementById("play-meta").innerHTML=[p.family,p.personnel,form==="trips"?"Trips":form==="single"?"Singleback / I":"Shotgun 2x2"].map(x=>"<span>"+esc(x)+"</span>").join("");
+ document.getElementById("play-description").textContent=p.desc;document.getElementById("play-personnel").textContent=p.personnel;document.getElementById("play-read").textContent=p.read;document.getElementById("play-situation").textContent=p.situation;document.getElementById("play-counter").textContent=p.counter;document.getElementById("play-assignments").innerHTML=p.assign.map(x=>"<li>"+esc(x)+"</li>").join("");
 }
-function animatePlay() {
-  const dots=[...document.querySelectorAll(".player-dot")];
-  dots.forEach((dot,i)=>{
-    dot.animate([
-      {transform:"translate(0,0)"},
-      {transform:"translate("+(i%2===0?35:-25)+"px,"+(i%3===0?-28:20)+"px)"}
-    ],{duration:1000,iterations:1});
-  });
-}
-drawPlay();
+function toggleDefense(){showPlayDefense=!showPlayDefense;drawPlay()}
+function animatePlay(){document.querySelectorAll("#play-diagram .route-path,#play-diagram .run-path").forEach((p,i)=>{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1200,delay:i*100,fill:"forwards",easing:"ease-out"})})}
+populatePlayChoices();
+loadPlayers();
 </script>
 
 </body>
