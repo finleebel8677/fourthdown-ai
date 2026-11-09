@@ -21,16 +21,22 @@ function renderField(){
  svg.onpointerup=()=>{if(drag!==null){drag=null;renderField();$("lf-status").textContent="Player position adjusted. This is a user-created tactical layout, not NFL tracking."}};
  svg.onclick=e=>{if(e.target.closest("[data-dot]"))return;const tool=$("lf-tool").value;if(tool!=="route"||routeStart===null)return;const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*1000,y=(e.clientY-r.top)/r.height*500,a=dots[routeStart];routes.push({x1:a.x,y1:a.y,x2:x,y2:y,kind:$("lf-route-kind").value,color:$("lf-route-kind").value==="Run"?"#39ff88":"#00e5ff"});routeStart=null;renderField();$("lf-status").textContent="Route added to tactical illustration."};
 }
-function metricChart(title,labels,values,color="#00e5ff"){
- const w=560,h=220,p=34,max=Math.max(1,...values),n=Math.max(1,values.length),slot=(w-p*2)/n,bw=Math.min(34,slot*.58);let out='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(title)+' bar chart" class="lf-chart">';
- for(let i=0;i<4;i++){const y=p+i*(h-p*2)/3;out+='<line x1="'+p+'" y1="'+y+'" x2="'+(w-p)+'" y2="'+y+'" stroke="#26394d" stroke-dasharray="3 5"/>';}
- values.forEach((v,i)=>{const bh=(Math.max(0,v)/max)*(h-p*2),x=p+slot*i+(slot-bw)/2,y=h-p-bh;out+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" fill="'+color+'" opacity=".88"><title>'+esc(labels[i])+': '+Number(v).toLocaleString()+'</title></rect><text x="'+(x+bw/2)+'" y="'+(h-9)+'" fill="#91a2b9" font-size="10" text-anchor="middle">'+esc(labels[i])+'</text>';});
+function metricChart(title,labels,values,color="#00e5ff",type="dots"){
+ const w=560,h=250,n=Math.max(1,values.length),safe=values.map(v=>Math.max(0,Number(v)||0)),max=Math.max(1,...safe);
+ let out='<svg viewBox="0 0 560 250" role="img" aria-label="'+esc(title)+' '+esc(type)+' chart" class="lf-chart" xmlns="'+ns+'">';
+ if(type==="radar"&&n>=3){const cx=280,cy=112,r=78,angle=i=>(Math.PI*2*i/n)-Math.PI/2,point=(i,v)=>[cx+Math.cos(angle(i))*r*v,cy+Math.sin(angle(i))*r*v];
+ for(let ring=1;ring<=4;ring++){const pts=labels.map((x,i)=>point(i,ring/4).join(",")).join(" ");out+='<polygon points="'+pts+'" fill="none" stroke="#34475e"/>';}
+ labels.forEach((label,i)=>{const q=point(i,1);out+='<line x1="'+cx+'" y1="'+cy+'" x2="'+q[0]+'" y2="'+q[1]+'" stroke="#34475e"/><text x="'+(cx+Math.cos(angle(i))*105)+'" y="'+(cy+Math.sin(angle(i))*105+4)+'" fill="#aebed0" font-size="11" text-anchor="middle">'+esc(label)+'</text>';});
+ const pts=safe.map((v,i)=>point(i,v/max).join(",")).join(" ");out+='<polygon points="'+pts+'" fill="'+color+'" fill-opacity=".2" stroke="'+color+'" stroke-width="3"/>';
+ safe.forEach((v,i)=>{const q=point(i,v/max);out+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="5" fill="'+color+'" stroke="#fff"><title>'+esc(labels[i])+": "+v.toLocaleString()+'</title></circle>';});
+ out+='<text x="280" y="238" fill="#8193a9" font-size="10" text-anchor="middle">Relative scale within profile · yards</text>';
+ }else{const row=180/n;safe.forEach((v,i)=>{const y=35+i*row+row/2,x=175+300*(v/max);out+='<text x="160" y="'+(y+4)+'" fill="#aebed0" font-size="11" text-anchor="end">'+esc(labels[i])+'</text><line x1="175" y1="'+y+'" x2="475" y2="'+y+'" stroke="#26394d" stroke-width="2"/><line x1="175" y1="'+y+'" x2="'+x+'" y2="'+y+'" stroke="'+color+'" stroke-opacity=".35" stroke-width="5"/><circle cx="'+x+'" cy="'+y+'" r="7" fill="'+color+'" stroke="#fff" stroke-width="2"/><text x="495" y="'+(y+4)+'" fill="#f4f7fb" font-size="11">'+v.toLocaleString()+'</text>';});}
  return out+"</svg>";
 }
 function renderPlayer(){
  const id=$("lf-player").value,p=rows().find(x=>x.id===id),box=$("lf-player-card");if(!p){box.innerHTML='<div class="muted">Select a player to inspect verified season statistics.</div>';return;}
  const stats=[["Passing yards",+p.passing_yards||0],["Rushing yards",+p.rushing_yards||0],["Receiving yards",+p.receiving_yards||0],["Touchdowns",(+p.passing_tds||0)+(+p.rushing_tds||0)+(+p.receiving_tds||0)]];
- box.innerHTML='<div class="lf-player-head"><div><div class="eyebrow">PLAYER INTELLIGENCE</div><h2>'+esc(p.name)+'</h2><span class="muted">'+esc(p.position)+' · '+esc((p.teams||[]).join("/"))+' · '+esc(p.games)+' games</span></div><span class="lf-live-dot">VERIFIED DATA</span></div><div class="lf-metric-grid">'+stats.map(x=>'<div class="lf-metric"><small>'+x[0]+'</small><strong>'+x[1].toLocaleString()+'</strong></div>').join("")+'</div><div class="lf-chart-wrap"><div class="panel-title">SEASON PRODUCTION PROFILE</div>'+metricChart("Production",stats.map(x=>x[0]),stats.map(x=>x[1]))+'</div><p class="muted small">Season totals from the NFL statistics dataset. These totals are not player tracking coordinates.</p>'; 
+ box.innerHTML='<div class="lf-player-head"><div><div class="eyebrow">PLAYER INTELLIGENCE</div><h2>'+esc(p.name)+'</h2><span class="muted">'+esc(p.position)+' · '+esc((p.teams||[]).join("/"))+' · '+esc(p.games)+' games</span></div><span class="lf-live-dot">VERIFIED DATA</span></div><div class="lf-metric-grid">'+stats.map(x=>'<div class="lf-metric"><small>'+x[0]+'</small><strong>'+x[1].toLocaleString()+'</strong></div>').join("")+'</div><div class="lf-chart-wrap"><div class="panel-title">SEASON PRODUCTION PROFILE</div>'+metricChart("Player season production",["Pass","Rush","Receive"],[stats[0][1],stats[1][1],stats[2][1]],"#00e5ff","radar")+'</div><p class="muted small">Season totals from the NFL statistics dataset. These totals are not player tracking coordinates.</p>'; 
  window.dispatchEvent(new CustomEvent("gridiron:field-player-selected",{detail:{id:p.id,name:p.name,position:p.position,teams:p.teams||[]}}));
 }
 function renderTeamCharts(){
@@ -43,7 +49,7 @@ function renderPredictive(){
  const t=$("lf-team").value,ps=teamRows(),qb=ps.filter(p=>p.position==="QB"),wr=ps.filter(p=>["WR","TE"].includes(p.position)),rb=ps.filter(p=>p.position==="RB");
  const total=arr=>arr.reduce((a,p)=>a+(+p.passing_yards||0)+(+p.rushing_yards||0)+(+p.receiving_yards||0),0);
  const groups=[["QB production",total(qb)],["WR/TE receiving",wr.reduce((a,p)=>a+(+p.receiving_yards||0),0)],["RB rushing",rb.reduce((a,p)=>a+(+p.rushing_yards||0),0)]];
- $("lf-predict-chart").innerHTML=metricChart("Offensive production profile",groups.map(x=>x[0]),groups.map(x=>x[1]),"#39ff88");
+ $("lf-predict-chart").innerHTML=metricChart("Offensive production profile",groups.map(x=>x[0]),groups.map(x=>x[1]),"#39ff88","radar");
  $("lf-predict-note").textContent="Descriptive profile for "+(teamNames[t]||t)+", calculated from player season totals. A true opponent-specific predictive advantage is not shown because verified opponent defensive/play-level inputs are not yet available in this dataset. No outcome probability is fabricated.";
 }
 function addCoreVisuals(){
