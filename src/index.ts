@@ -379,6 +379,7 @@ export default {
           season: data.season,
           isCurrentSeason: data.isCurrentSeason,
           count: results.length,
+          totalPlayers: data.players.length,
           players: results
         });
       } catch (error) {
