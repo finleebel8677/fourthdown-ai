@@ -115,6 +115,13 @@
     const ngsPromise = loadJson("/data/nfl-ngs-metrics.json").catch(error=>({error:error.message,metrics:[]}));
     const predPromise = loadJson("/data/nfl-matchup-predictions.json").catch(error=>({error:error.message,predictions:[]}));
     [playerData,ngsData,predictionData] = await Promise.all([playerPromise,ngsPromise,predPromise]);
+    const trackingStatus = $("lf-tracking-status");
+    if (trackingStatus) {
+      const count = Number(ngsData?.recordCount || ngsData?.metrics?.length || 0);
+      trackingStatus.innerHTML = count
+        ? '<strong>PUBLISHED NGS METRICS CONNECTED · RAW COORDINATES UNAVAILABLE</strong><p>Loaded '+fmt(count)+' published player-metric rows from nflverse ('+esc(ngsData.season || "latest available season")+'). These are tracking-derived performance metrics, not frame-by-frame player locations. No live movement trails or coordinates are generated.</p><div class="lf-data-tag">NGS METRICS CONNECTED · COORDINATES NOT INCLUDED</div>'
+        : '<strong>PUBLISHED NGS METRICS UNAVAILABLE · RAW COORDINATES UNAVAILABLE</strong><p>' + esc(ngsData?.error || "No published NGS metric rows were returned.") + ' Player season statistics remain available separately when the player feed loads. No tracking coordinates are fabricated.</p>';
+    }
     if ($("lf-ngs-panel")) {
       if (playerData && Array.isArray(playerData.players)) renderNgsForPlayer(getCurrentPlayer() || playerData.players[0]);
       else $("lf-ngs-panel").innerHTML='<div class="lf-section-kicker">NEXT GEN STATS</div><p class="muted small">Player dataset is not available.</p>';
