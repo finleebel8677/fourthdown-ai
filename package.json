@@ -1,16 +1,13 @@
-
 {
-  "name": "fourthdown-ai",
-  "description": "FOURTHDOWN AI - NFL analytics and football analyst",
+  "name": "gridiron-iq",
+  "description": "GRIDIRON IQ - NFL statistics and football analytics",
   "cloudflare": {
-    "label": "FOURTHDOWN AI",
+    "label": "GRIDIRON IQ",
     "products": [
-      "Workers",
-      "Workers AI",
-      "AI Gateway"
+      "Workers"
     ],
     "categories": [
-      "ai"
+      "sports"
     ],
     "docs_url": "https://developers.cloudflare.com/workers-ai/",
     "publish": true
