@@ -46,6 +46,23 @@ function renderPredictive(){
  $("lf-predict-chart").innerHTML=metricChart("Offensive production profile",groups.map(x=>x[0]),groups.map(x=>x[1]),"#39ff88");
  $("lf-predict-note").textContent="Descriptive profile for "+(teamNames[t]||t)+", calculated from player season totals. A true opponent-specific predictive advantage is not shown because verified opponent defensive/play-level inputs are not yet available in this dataset. No outcome probability is fabricated.";
 }
+function addCoreVisuals(){
+ const ps=rows();
+ const pHost=document.querySelector("#page-players .card");
+ if(pHost&&!$("core-player-chart")){
+  const wrap=document.createElement("div");wrap.className="card";wrap.id="core-player-chart";wrap.style.marginTop="14px";
+  const leaders=ps.filter(p=>["QB","RB","WR","TE"].includes(p.position)).map(p=>({name:p.name,yards:(+p.passing_yards||0)+(+p.rushing_yards||0)+(+p.receiving_yards||0)})).sort((a,b)=>b.yards-a.yards).slice(0,8);
+  wrap.innerHTML='<div class="lf-section-kicker">LEAGUE PRODUCTION LEADERS</div><div class="muted small">Combined passing, rushing and receiving yards · loaded season</div>'+metricChart("League production",leaders.map(x=>x.name.split(" ").slice(-1)[0]),leaders.map(x=>x.yards),"#00e5ff");
+  pHost.after(wrap);
+ }
+ const tHost=$("team-grid")?.parentElement;
+ if(tHost&&!$("core-team-chart")){
+  const wrap=document.createElement("div");wrap.className="card";wrap.id="core-team-chart";wrap.style.marginTop="14px";
+  const teamTotals=teams.map(t=>({t,y:ps.filter(p=>(p.teams||[]).includes(t)).reduce((a,p)=>a+(+p.passing_yards||0)+(+p.rushing_yards||0)+(+p.receiving_yards||0),0)})).sort((a,b)=>b.y-a.y).slice(0,10);
+  wrap.innerHTML='<div class="lf-section-kicker">TEAM PLAYER PRODUCTION</div><div class="muted small">Sum of available player season totals; not official team offense rankings.</div>'+metricChart("Team production",teamTotals.map(x=>x.t),teamTotals.map(x=>x.y),"#a855f7");
+  tHost.after(wrap);
+ }
+}
 function trackingStatus(){const s=$("lf-tracking-status");s.innerHTML='<strong>TRACKING FEED NOT CONNECTED</strong><p>Current NFLverse player records provide season statistics, not raw player coordinates for every play. Real movement trails and player-position replays remain disabled until a verified tracking feed is available.</p><div class="lf-data-tag">STATISTICS CONNECTED · COORDINATES UNAVAILABLE</div>';}
 function setup(){
  if(!$("page-livingfield"))return;
@@ -60,7 +77,7 @@ function setup(){
  $("lf-animate").onclick=()=>{const svg=$("lf-field");svg.querySelectorAll("path").forEach(p=>{if(!p.getAttribute("d"))return;try{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.animate([{strokeDashoffset:n},{strokeDashoffset:0}],{duration:1400,fill:"forwards",easing:"ease-out"})}catch(e){}});$("lf-status").textContent="Animating user-created tactical routes. This is not an actual game replay."};
  $("lf-save").onclick=()=>{const payload={team:$("lf-team").value,dots,routes,updated:Date.now()};localStorage.setItem("gridironIQLivingField",JSON.stringify(payload));$("lf-status").textContent="Field layout saved on this device."};
  $("lf-load").onclick=()=>{try{const p=JSON.parse(localStorage.getItem("gridironIQLivingField")||"null");if(!p)throw Error();dots=p.dots||[];routes=p.routes||[];if(p.team)$("lf-team").value=p.team;renderField();$("lf-status").textContent="Saved field layout restored."}catch(e){$("lf-status").textContent="No saved field layout found on this device."}};
- defaultDots();playerOptions();renderField();renderTeamCharts();renderPredictive();trackingStatus();
+ defaultDots();playerOptions();renderField();renderTeamCharts();renderPredictive();trackingStatus();if(rows().length){renderPlayer();addCoreVisuals()}window.addEventListener("gridiron:players-loaded",()=>{playerOptions();renderPlayer();renderTeamCharts();renderPredictive();addCoreVisuals()});
  const obs=new MutationObserver(()=>{if(rows().length){playerOptions();renderTeamCharts();renderPredictive();renderPlayer();obs.disconnect()}});obs.observe($("lf-player-card"),{childList:true,subtree:true});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
