@@ -817,7 +817,7 @@ function fillTeamSelectors() {
 fillTeamSelectors();
 
 
-function fillOptions(id,items,labelFn){const el=document.getElementById(id);if(!el)return;el.innerHTML="";items.forEach((item,i)=>{const o=document.createElement("option");o.value=typeof item==="string"?item:(item.id||item.name||String(i));o.textContent=labelFn?labelFn(item):typeof item==="string"?item:item.name;el.appendChild(o)})}
+function fillOptions(id,items,labelFn){const el=document.getElementById(id);if(!el)return;el.innerHTML="";items.forEach((item,i)=>{const o=document.createElement("option");o.value=typeof item==="string"?item:(Array.isArray(item)?item[0]:(item.id||item.name||String(i)));o.textContent=labelFn?labelFn(item):typeof item==="string"?item:item.name;el.appendChild(o)})}
 function populatePlanTeams(){["plan-team","plan-opponent"].forEach((id,i)=>fillOptions(id,teams));const a=document.getElementById("plan-team"),b=document.getElementById("plan-opponent");if(a&&b)b.selectedIndex=1}
 function buildGamePlan(){
  const team=document.getElementById("plan-team").value,opp=document.getElementById("plan-opponent").value,identity=document.getElementById("plan-identity").value,def=document.getElementById("plan-defense").value,sit=document.getElementById("plan-situation").value;
