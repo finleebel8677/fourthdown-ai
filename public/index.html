@@ -758,6 +758,8 @@ function showPage(page) {
 document.querySelectorAll("[data-page]").forEach(button=>{
   button.addEventListener("click",()=>showPage(button.dataset.page));
 });
+const moreToggle=document.getElementById("more-toggle"),moreMenu=document.getElementById("more-menu");
+if(moreToggle&&moreMenu){moreToggle.addEventListener("click",()=>moreMenu.classList.toggle("open"));moreMenu.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>moreMenu.classList.remove("open")));document.addEventListener("click",e=>{if(!moreMenu.contains(e.target)&&!moreToggle.contains(e.target))moreMenu.classList.remove("open")});}
 
 let loadedPlayerRows = [];
 
@@ -808,6 +810,7 @@ async function loadPlayers() {
     populateAdvancedPlayers();
     populatePlanTeams();
     populatePickTeams();
+    window.dispatchEvent(new CustomEvent("gridiron:players-loaded",{detail:{season:data.season}}));
   } catch(error) {
     table.innerHTML="";
     const row=document.createElement("tr"); const cell=document.createElement("td");
