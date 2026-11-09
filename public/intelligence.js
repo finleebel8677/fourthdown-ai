@@ -49,7 +49,7 @@
       if (!vals.length) continue;
       const average = vals.reduce((a,b)=>a+b,0)/vals.length;
       const latest = rows.filter(r=>Number.isFinite(Number(r[key]))).sort((a,b)=>(Number(b.week)||0)-(Number(a.week)||0))[0];
-      const label = key.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
+      const label = key.replaceAll("_"," ").replace(/\\b\\w/g,c=>c.toUpperCase());
       blocks.push('<div class="lf-metric"><small>'+esc(label)+'</small><strong>'+fmt(average)+'</strong><span class="muted small">Season weekly-row average · '+esc(typeNames[latest.metric_type] || latest.metric_type || "NGS")+'</span></div>');
     }
     host.innerHTML = '<div class="lf-section-kicker">NEXT GEN STATS · PUBLISHED METRICS</div>' +
@@ -124,6 +124,7 @@
     renderPredictionSelect();
     $("match-home")?.addEventListener("change",renderMatchupPrediction);
     $("match-away")?.addEventListener("change",renderMatchupPrediction);
+    window.addEventListener("gridiron:compare-teams",renderMatchupPrediction);
     renderMatchupPrediction();
   }
   if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
