@@ -106,10 +106,28 @@ def safe_mean(values, default):
     return float(np.mean(vals)) if vals else float(default)
 
 def build_predictions():
-    pbp, pbp_url = fetch_parquet("pbp", f"play_by_play_{datetime.now(timezone.utc).year}.parquet")
+    current_year = datetime.now(timezone.utc).year
+    pbp_frames, pbp_urls, pbp_errors = [], [], []
+    required_pbp = ["game_id","season","play_type","posteam","defteam","epa","success","yards_gained",
+                    "interception","fumble_lost","first_down","down","yardline_100","touchdown"]
+    # A single season is not enough to train and validate a real model. Pull eleven seasons,
+    # retaining only the columns used below to limit GitHub Actions memory.
+    for year in range(max(2010, current_year - 10), current_year + 1):
+        try:
+            frame, url = fetch_parquet("pbp", f"play_by_play_{year}.parquet")
+            missing = [c for c in required_pbp if c not in frame.columns]
+            if missing:
+                raise RuntimeError("missing required columns: " + ", ".join(missing))
+            pbp_frames.append(frame[required_pbp].copy())
+            pbp_urls.append(url)
+            print(f"Loaded play-by-play {year}: {len(frame):,} rows")
+        except Exception as exc:
+            pbp_errors.append(f"{year}: {exc}")
+            print(f"Skipping unavailable play-by-play {year}: {exc}")
+    if not pbp_frames:
+        raise RuntimeError("No historical play-by-play seasons could be downloaded: " + " | ".join(pbp_errors))
+    pbp = pd.concat(pbp_frames, ignore_index=True)
     schedules, schedule_url = fetch_parquet("schedules", "games.parquet")
-    # Current season may not be posted yet; retry latest available PBP release only on current-year 404.
-    # (The normal workflow uses the actual season year.)
     if "season" not in pbp or "game_id" not in pbp:
         raise RuntimeError("nflverse play-by-play is missing season/game_id fields")
     pbp["season"] = num(pbp["season"]).astype(int)
@@ -156,7 +174,7 @@ def build_predictions():
     schedules["season"] = num(schedules["season"]).astype(int)
     if "game_type" in schedules:
         schedules = schedules[schedules["game_type"].isin(["REG","POST"])]
-    schedules = schedules[schedules["season"] >= 2010]
+    schedules = schedules[schedules["season"] >= int(pbp["season"].min())]
     schedules["sort_date"] = pd.to_datetime(schedules.get("gameday", pd.Series(index=schedules.index, dtype=str)), errors="coerce")
     schedules = schedules.sort_values(["sort_date","season","week"], na_position="last")
     history = defaultdict(lambda: deque(maxlen=10))
@@ -273,7 +291,7 @@ def build_predictions():
         })
     payload = {
         "season":int(schedules["season"].max()),"source":"nflverse play-by-play + schedules",
-        "sourceUrls":[pbp_url,schedule_url],"retrievedAt":datetime.now(timezone.utc).isoformat(),
+        "sourceUrls":pbp_urls+[schedule_url],"retrievedAt":datetime.now(timezone.utc).isoformat(),
         "model":{"name":"GRIDIRON IQ rolling-form logistic regression","trainingGames":len(training_y),
                  "trainingSeasons":[min(years),max(years)],"holdoutSeason":int(holdout_year),
                  "holdoutGames":len(test_idx),"holdoutAccuracy":round(accuracy,4),
