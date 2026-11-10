@@ -17,7 +17,9 @@ BASE = "https://github.com/nflverse/nflverse-data/releases/download/stats_player
 STAT_COLUMNS = [
     "passing_yards", "passing_tds", "interceptions",
     "rushing_yards", "rushing_tds", "carries",
-    "receiving_yards", "receiving_tds", "receptions", "targets"
+    "receiving_yards", "receiving_tds", "receptions", "targets",
+    "def_tackles", "def_tackles_solo", "def_tackle_assists", "def_tackles_for_loss",
+    "def_sacks", "def_qb_hits", "def_interceptions", "def_pass_defended", "def_fumbles_forced"
 ]
 
 def fetch_season(year):
@@ -96,6 +98,8 @@ payload = {
     "source": "nflverse",
     "sourceUrl": source_url,
     "totalPlayers": len(players),
+    "availableStatColumns": [c for c in STAT_COLUMNS if c in frame.columns],
+    "defensiveStatsAvailable": any(c in frame.columns for c in STAT_COLUMNS if c.startswith("def_")),
     "players": players,
 }
 (OUT / "nfl-players.json").write_text(json.dumps(payload, separators=(",", ":")))
@@ -134,7 +138,7 @@ if not ARCHIVE_PATH.exists():
         old_payload = {"season": ARCHIVE_YEAR, "isCurrentSeason": False,
                        "retrievedAt": datetime.now(timezone.utc).isoformat(),
                        "source": "nflverse", "sourceUrl": old_url,
-                       "totalPlayers": len(old_players), "players": old_players}
+                       "totalPlayers": len(old_players), "availableStatColumns": [c for c in STAT_COLUMNS if c in old_frame.columns], "defensiveStatsAvailable": any(c in old_frame.columns for c in STAT_COLUMNS if c.startswith("def_")), "players": old_players}
         ARCHIVE_PATH.write_text(json.dumps(old_payload, separators=(",", ":")))
         print(f"Saved historical archive: {len(old_players)} real player records for {ARCHIVE_YEAR}")
     except Exception as exc:
