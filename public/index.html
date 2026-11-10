@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080f1d">
-<title>GRIDIRON IQ | NFL Analytics</title>
+<title>GRIDIRON IQ | NFL Analytics</title>\n<link rel="icon" type="image/svg+xml" href="/gridiron-iq-logo.svg">\n<link rel="apple-touch-icon" href="/gridiron-iq-logo.svg">
 
 <style>
 :root {
@@ -402,7 +402,7 @@ footer {
 @media(max-width:650px) {
   header { height:58px; padding:0 14px; }
   .brand { font-size:15px; }
-  .brand-mark { width:32px;height:32px; }
+  .brand-logo{width:38px;height:38px}\n  .brand-mark { width:32px;height:32px; }
   .header-right { display:none; }
   .layout { display:block; min-height:calc(100vh - 58px); }
   .sidebar { display:none; }
@@ -514,7 +514,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 .module-shortcuts button{border:1px solid #2b455e;background:#101e30;color:#a9c6de;padding:8px 11px;border-radius:4px;font-size:10px}
 @media(max-width:650px){.embedded-module{padding-top:15px;margin-top:17px}.embedded-module .page-heading h1{font-size:17px}}
 
-</style>
+\n/* Final GRIDIRON IQ polish */\n.brand-logo{filter:drop-shadow(0 0 10px #00cfff35)}\n.health-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin:12px 0}\n.health-grid .stat-number{font-size:21px}\nbutton,.btn,select,input{min-height:42px}\nbutton:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #00e5ff;outline-offset:2px}\n.table-wrap{-webkit-overflow-scrolling:touch}\n@media(max-width:650px){main{padding:16px 12px calc(108px + env(safe-area-inset-bottom))}.health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav{padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:68px}.mobile-nav button{min-height:48px}.card{overflow-wrap:anywhere}.page-heading{gap:10px}}\n</style>
 </head>
 
 <body>
@@ -522,7 +522,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 
 <header>
   <div class="brand">
-    <div class="brand-mark">🏈</div>
+    <img class="brand-logo" src="/gridiron-iq-logo.svg" alt="GRIDIRON IQ logo">
     <div>GRIDIRON IQ<small>NFL ANALYTICS</small></div>
   </div>
   <div class="header-right">NFL ANALYTICS CENTER &nbsp; | &nbsp; 2026 SEASON</div>
@@ -586,7 +586,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
   <div class="page-heading">
     <div><div class="eyebrow">INDIVIDUAL PERFORMANCE</div><h1>Player Analytics</h1><div class="subtitle" id="player-season">Search player statistics from the latest available season.</div></div>
   </div>
-  <div class="notice">Player statistics load from the nflverse data feed. The season label is shown with the results.</div>
+  <div class="notice">Player statistics load from the nflverse data feed. The season label is shown with the results.</div>\n  <div class="card" style="margin-bottom:16px"><div class="panel-title">Historical Season Explorer</div><p class="muted small">Browse archived seasons only when a verified season file is available in the app.</p><div class="search-row"><select id="history-season"><option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option><option value="2020">2020</option><option value="2019">2019</option><option value="2018">2018</option><option value="2017">2017</option><option value="2016">2016</option></select></div><div id="history-result"><p class="muted small">Checking archive availability…</p></div></div>
   <div class="search-row">
     <input id="player-search" placeholder="Search players by name..." oninput="filterPlayers()">
     <select id="position-filter" onchange="filterPlayers()" style="max-width:180px">
@@ -651,7 +651,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
  <div class="notice">Team-level opponent tendencies and official injury reports are not currently connected. Recommendations below are strategic templates, not claims about current team tendencies.</div>
  <div class="card"><div class="two-col"><div><div class="stat-label">Your team</div><select id="plan-team"></select></div><div><div class="stat-label">Opponent</div><select id="plan-opponent"></select></div></div><div class="three-col" style="margin-top:14px"><div><div class="stat-label">Offensive identity</div><select id="plan-identity"><option>Balanced</option><option>Pass-heavy</option><option>Run-heavy</option><option>Play-action focused</option></select></div><div><div class="stat-label">Defensive approach</div><select id="plan-defense"><option>Multiple / adaptable</option><option>Pressure-focused</option><option>Coverage-first</option><option>Run-stopping</option></select></div><div><div class="stat-label">Game situation</div><select id="plan-situation"><option>Opening script</option><option>Early downs</option><option>Third down</option><option>Red zone</option><option>Two-minute offense</option><option>Protecting a lead</option></select></div></div><button class="btn" onclick="buildGamePlan()" style="margin-top:16px">BUILD GAME PLAN</button></div>
  <div class="card" id="plan-result" style="margin-top:14px"><div class="panel-title">Your Game Plan</div><p class="muted small">Select your teams and coaching approach to generate a plan.</p></div>
-</section></section>
+<div class="card" style="margin-top:16px"><div class="panel-title">Prediction Accuracy Tracker</div><div id="prediction-accuracy-content">Loading forecast tracker…</div></div></section></section>
 
 <!-- PLAY LAB -->
 <section class="page" id="page-playlab">
@@ -774,7 +774,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <script src="/notebook-designer.js"></script>
 <script src="/living-field.js" defer></script>
 <script src="/intelligence.js" defer></script>
-<script src="/advanced-data.js" defer></script>
+<script src="/advanced-data.js" defer></script>\n<script src="/polish.js" defer></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
