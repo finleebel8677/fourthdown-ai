@@ -540,6 +540,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <aside class="sidebar">
   <div class="nav-label">GRIDIRON IQ</div>
   <button class="nav-btn active" data-page="overview"><span class="nav-icon">⌂</span>Home</button>
+  <button class="nav-btn" data-page="intelligence"><span class="nav-icon">✦</span>Intelligence</button>
   <button class="nav-btn" data-page="players"><span class="nav-icon">♟</span>Player Center</button>
   <button class="nav-btn" data-page="teams"><span class="nav-icon">🛡</span>Team Center</button>
   <button class="nav-btn" data-page="matchup"><span class="nav-icon">⚔</span>Matchup Center</button>
@@ -550,6 +551,15 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 </aside>
 
 <main>
+
+<!-- GRIDIRON INTELLIGENCE -->
+<section class="page" id="page-intelligence">
+  <div class="page-heading">
+    <div><div class="eyebrow">GRIDIRON IQ · RESEARCH & ANALYSIS</div><h1>GRIDIRON INTELLIGENCE</h1><div class="subtitle">One connected headquarters for NFL league intelligence, player scouting, statistical discoveries, and forecasts.</div></div>
+    <span class="pill">NFL ONLY · DATA-DRIVEN</span>
+  </div>
+  <div id="iq-intelligence-center"><p class="muted small">Loading verified NFL intelligence data…</p></div>
+</section>
 
 <!-- OVERVIEW -->
 <section class="page active" id="page-overview">
@@ -783,7 +793,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 
 <nav class="mobile-nav">
 <button class="active" data-page="overview"><span>⌂</span>Home</button><button data-page="players"><span>▥</span>Stats</button><button data-page="livingfield"><span>⌖</span>Field</button><button data-page="matchup"><span>⚔</span>Matchup</button><button type="button" id="more-toggle"><span>☷</span>More</button></nav>
-<div class="more-menu" id="more-menu" aria-label="More GRIDIRON IQ sections"><button data-page="teams">Team Center</button><button data-page="playlab">Play Lab</button><button data-page="scoreboard">NFL Live</button><button data-page="notebook">My Football HQ</button></div>
+<div class="more-menu" id="more-menu" aria-label="More GRIDIRON IQ sections"><button data-page="intelligence">GRIDIRON INTELLIGENCE</button><button data-page="teams">Team Center</button><button data-page="playlab">Play Lab</button><button data-page="scoreboard">NFL Live</button><button data-page="notebook">My Football HQ</button></div>
 
 </div>
 
@@ -794,6 +804,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <script src="/advanced-data.js" defer></script>\n<script src="/polish.js" defer></script>
 <script src="/micro-polish.js" defer></script>
 <script src="/player-scouting.js" defer></script>
+<script src="/intelligence-center.js" defer></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
