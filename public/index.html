@@ -600,7 +600,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
   </div>
   <div class="notice">Player statistics load from the nflverse data feed. The season label is shown with the results.</div>\n  <div class="card" style="margin-bottom:16px"><div class="panel-title">Historical Season Explorer</div><p class="muted small">Browse archived seasons only when a verified season file is available in the app.</p><div class="search-row"><select id="history-season"><option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option><option value="2020">2020</option><option value="2019">2019</option><option value="2018">2018</option><option value="2017">2017</option><option value="2016">2016</option></select></div><div id="history-result"><p class="muted small">Checking archive availability…</p></div></div>
   <div class="search-row">
-  <div class="card iq-feature" style="margin:16px 0"><div class="panel-title">Player Scouting Snapshot</div><p class="muted small">Position-relative grades calculated from current-season yards per game. Grades are descriptive statistical percentiles, not subjective talent ratings.</p><div class="search-row"><input id="scout-player-search" placeholder="Find a player for a scouting snapshot…"><select id="scout-player-select"><option value="">Choose player…</option></select></div><div id="scout-player-result"><p class="muted small">Choose a player to see a position-relative statistical snapshot.</p></div></div>
+  <div class="card iq-feature" style="margin:16px 0"><div class="panel-title">GRIDIRON SCOUT · NFL PLAYER EVALUATION</div><p class="muted small">Search, evaluate, compare, and save NFL players using verified professional statistics. This scouting center contains NFL players only; it does not include college prospects.</p><div id="iq-player-scouting"><p class="muted small">Loading NFL Player Scouting…</p></div></div>
     <input id="player-search" placeholder="Search players by name..." oninput="filterPlayers()">
     <select id="position-filter" onchange="filterPlayers()" style="max-width:180px">
       <option value="">All Positions</option>
@@ -793,6 +793,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <script src="/intelligence.js" defer></script>
 <script src="/advanced-data.js" defer></script>\n<script src="/polish.js" defer></script>
 <script src="/micro-polish.js" defer></script>
+<script src="/player-scouting.js" defer></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
