@@ -25,7 +25,7 @@ def clean(df):
     for c in df.columns:
         if pd.api.types.is_datetime64_any_dtype(df[c]):
             df[c]=df[c].astype(str)
-    df=df.where(pd.notna(df),None)
+    df=df.astype(object).where(pd.notna(df),None)
     return df.to_dict(orient="records")
 
 def write(name,payload):
