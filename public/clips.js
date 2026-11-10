@@ -1,53 +1,82 @@
 (function(){
 'use strict';
-const sources=[
- {id:'nfl-latest',league:'nfl',type:'Latest highlights',title:'NFL Video & Highlights',desc:'Latest NFL clips, top plays, game recaps, catches, runs, touchdowns, and defensive highlights from the league’s official video hub.',url:'https://www.nfl.com/videos/',tags:'nfl pro football latest clips catches runs touchdowns sacks interceptions recaps'},
- {id:'nfl-games',league:'nfl',type:'Game recaps',title:'NFL Game Highlights',desc:'Official game-by-game highlight collections, including individual player plays and full matchup recaps.',url:'https://www.nfl.com/videos/channel/game-highlights-vc',tags:'nfl games recap matchup highlights touchdowns players'},
- {id:'ncaa-video',league:'college',type:'College football',title:'NCAA Official Video',desc:'Browse NCAA video coverage and choose Football in the sport selector for college football features and highlights.',url:'https://www.ncaa.com/video',tags:'college ncaa football fbs fcs highlights videos'},
- {id:'acc-video',league:'college',type:'Conference highlights',title:'ACC Digital Network',desc:'Official ACC conference video hub featuring football highlights, must-see moments, and original programming.',url:'https://theaccdn.com/',tags:'college acc football conference highlights must see moments'},
- {id:'big12-video',league:'college',type:'Conference highlights',title:'Big 12 Studios',desc:'Official Big 12 video hub with football highlights and conference programming.',url:'https://big12studios.com/',tags:'college big 12 football conference highlights'},
- {id:'ncaa-football',league:'college',type:'College football',title:'NCAA Football Video Search',desc:'Open the NCAA video library and explore its football coverage and latest official uploads.',url:'https://www.ncaa.com/video/football',tags:'college ncaa football video highlights'}
-];
-let league='all';
 const feed=document.getElementById('clips-feed');
 const search=document.getElementById('clips-search');
 if(!feed)return;
+let league='all',videos=[],observer=null,activeVideo='';
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'')??fallback}catch(_){return fallback}};
 const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));return true}catch(_){return false}};
 let likes=read('gridironClipsLikes',{}),comments=read('gridironClipsComments',{});
 const make=(tag,cls,txt)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(txt!==undefined)el.textContent=txt;return el};
-function render(){const q=(search?.value||'').trim().toLowerCase();const list=sources.filter(s=>(league==='all'||s.league===league)&&(!q||(s.title+' '+s.desc+' '+s.type+' '+s.tags).toLowerCase().includes(q)));
- feed.innerHTML='';
- if(!list.length){feed.appendChild(make('div','clips-empty','No official highlight sources match that search. Try another team, league, or play type.'));return;}
- list.forEach(s=>{
-  const card=make('article','clips-card');card.setAttribute('aria-label',s.title+' highlight channel');
-  const watch=make('div','clips-watch');watch.setAttribute('aria-label','Highlight preview area. Double tap to like.');
-  const top=make('div','clips-card-top');top.append(make('span','clips-league-tag',s.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-type-tag',s.type.toUpperCase()));
-  const middle=make('div','');middle.append(make('div','clips-play','▶'),make('h3','',s.title),make('p','',s.desc));
-  const bottom=make('div','clips-card-bottom');bottom.append(make('span','','DOUBLE TAP TO LIKE'),make('span','','♥'));
-  watch.append(top,middle,bottom);
-  const watchLink=make('a','clips-watch-link','▶ Watch official source ↗');watchLink.href=s.url;watchLink.target='_blank';watchLink.rel='noopener noreferrer';watchLink.setAttribute('aria-label','Open '+s.title+' at official source');
-  const social=make('div','clips-social');
-  const liked=!!likes[s.id];
-  const like=make('button',liked?'liked':'',(liked?'♥ Liked':'♡ Like'));like.type='button';like.setAttribute('aria-pressed',String(liked));
-  const share=make('button','','↗ Share');share.type='button';
-  const commentBtn=make('button','','▤ Comment ('+(comments[s.id]||[]).length+')');commentBtn.type='button';
-  social.append(like,share,commentBtn);
-  const toggleLike=()=>{likes[s.id]=!likes[s.id];if(!likes[s.id])delete likes[s.id];write('gridironClipsLikes',likes);like.classList.toggle('liked',!!likes[s.id]);like.textContent=likes[s.id]?'♥ Liked':'♡ Like';like.setAttribute('aria-pressed',String(!!likes[s.id]));};
-  let lastTap=0;
-  watch.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')return;const now=Date.now();if(now-lastTap<330){e.preventDefault();toggleLike();watch.classList.add('clips-double-liked');setTimeout(()=>watch.classList.remove('clips-double-liked'),650);lastTap=0;}else lastTap=now;});
-  watch.addEventListener('dblclick',e=>{e.preventDefault();toggleLike();watch.classList.add('clips-double-liked');setTimeout(()=>watch.classList.remove('clips-double-liked'),650);});
-  const commentPanel=make('div','clips-comments');
-  const commentList=make('div','clips-comment-list');
-  const renderComments=()=>{commentList.innerHTML='';const rows=comments[s.id]||[];if(!rows.length)commentList.append(make('div','clips-comment-empty','No comments yet. Add the first note on this device.'));rows.forEach(c=>commentList.append(make('div','clips-comment',c)));commentBtn.textContent='▤ Comment ('+rows.length+')';};
-  const form=make('form','clips-comment-form');const input=make('input','');input.type='text';input.maxLength=240;input.placeholder='Write a comment…';input.setAttribute('aria-label','Write a comment');const send=make('button','','Post');send.type='submit';form.append(input,send);commentPanel.append(commentList,form);renderComments();
-  like.addEventListener('click',toggleLike);
-  share.addEventListener('click',async()=>{const data={title:s.title,text:'Check out this official football highlight source on GRIDIRON IQ.',url:s.url};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(s.url);share.textContent='✓ Copied';setTimeout(()=>share.textContent='↗ Share',1800);}else{window.prompt('Copy this official highlight link:',s.url);}}catch(err){if(err?.name!=='AbortError'){try{window.prompt('Copy this official highlight link:',s.url);}catch(_){}}}});
-  commentBtn.addEventListener('click',()=>{commentPanel.classList.toggle('open');if(commentPanel.classList.contains('open'))input.focus();});
-  form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;comments[s.id]=comments[s.id]||[];comments[s.id].push(value);if(!write('gridironClipsComments',comments)){comments[s.id].pop();return;}input.value='';renderComments();});
-  card.append(watch,watchLink,social,commentPanel);feed.append(card);
- });
+const dateLabel=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})};
+function pauseCard(card){const frame=card.querySelector('iframe');if(frame)frame.remove();const play=card.querySelector('.clips-tap-play');if(play)play.hidden=false;}
+function playCard(card){
+ const id=card.dataset.videoId;if(!id||activeVideo===id&&card.querySelector('iframe'))return;
+ document.querySelectorAll('.clip-card').forEach(other=>{if(other!==card)pauseCard(other)});
+ activeVideo=id;
+ const frame=document.createElement('iframe');
+ frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1';
+ frame.title=card.dataset.title||'Official football highlight';
+ frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+ frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
+ card.querySelector('.clips-player').append(frame);
+ const play=card.querySelector('.clips-tap-play');if(play)play.hidden=true;
 }
-document.querySelectorAll('.clips-filter').forEach(b=>b.addEventListener('click',()=>{league=b.dataset.league;document.querySelectorAll('.clips-filter').forEach(x=>x.classList.toggle('active',x===b));render();}));
-search?.addEventListener('input',render);render();
+function render(){
+ if(observer){observer.disconnect();observer=null}
+ const q=(search?.value||'').trim().toLowerCase();
+ const list=videos.filter(v=>(league==='all'||v.league===league)&&(!q||(v.title+' '+v.channel+' '+v.league).toLowerCase().includes(q)));
+ feed.innerHTML='';activeVideo='';
+ if(!list.length){feed.append(make('div','clips-empty',videos.length?'No official videos match that search. Try another league or search term.':'No official videos are available right now. Tap Refresh to try again.'));return}
+ list.forEach((v,index)=>{
+  const card=make('article','clips-card clip-card');card.dataset.videoId=v.videoId;card.dataset.title=v.title;
+  const player=make('div','clips-player');
+  const poster=make('img','clips-poster');poster.src=v.thumbnail;poster.alt='Thumbnail for '+v.title;poster.loading=index<2?'eager':'lazy';
+  const tap=make('button','clips-tap-play','▶ Tap to play');tap.type='button';tap.addEventListener('click',()=>playCard(card));
+  player.append(poster,tap);
+  const top=make('div','clips-video-top');top.append(make('span','clips-league-tag',v.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-channel',v.channel));
+  const meta=make('div','clips-video-meta');meta.append(make('h3','',v.title),make('p','',v.channel+' · '+dateLabel(v.published)));
+  const actions=make('div','clips-social clips-video-social');
+  const liked=!!likes[v.id];
+  const like=make('button',liked?'liked':'',liked?'♥':'♡');like.type='button';like.title='Like';like.setAttribute('aria-label','Like video');like.setAttribute('aria-pressed',String(liked));
+  const share=make('button','','↗');share.type='button';share.title='Share';share.setAttribute('aria-label','Share video');
+  const commentBtn=make('button','','▤');commentBtn.type='button';commentBtn.title='Comments';commentBtn.setAttribute('aria-label','Comments');
+  actions.append(like,share,commentBtn);
+  const panel=make('div','clips-comments clips-video-comments');const listEl=make('div','clips-comment-list');
+  const form=make('form','clips-comment-form');const input=make('input','');input.type='text';input.maxLength=240;input.placeholder='Add a comment on this device…';input.setAttribute('aria-label','Add comment');const send=make('button','','Post');send.type='submit';form.append(input,send);panel.append(listEl,form);
+  const refreshComments=()=>{listEl.innerHTML='';const rows=comments[v.id]||[];if(!rows.length)listEl.append(make('div','clips-comment-empty','No comments yet on this device.'));rows.forEach(c=>listEl.append(make('div','clips-comment',c)));};
+  refreshComments();
+  like.addEventListener('click',()=>{likes[v.id]=!likes[v.id];if(!likes[v.id])delete likes[v.id];write('gridironClipsLikes',likes);like.classList.toggle('liked',!!likes[v.id]);like.textContent=likes[v.id]?'♥':'♡';like.setAttribute('aria-pressed',String(!!likes[v.id]));});
+  share.addEventListener('click',async()=>{const data={title:v.title,text:'Official football video from '+v.channel,url:v.url};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(v.url);share.textContent='✓';setTimeout(()=>share.textContent='↗',1500)}else window.prompt('Copy video link:',v.url)}catch(e){if(e?.name!=='AbortError')window.prompt('Copy video link:',v.url)}});
+  commentBtn.addEventListener('click',()=>{panel.classList.toggle('open');if(panel.classList.contains('open'))input.focus()});
+  form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;comments[v.id]=comments[v.id]||[];comments[v.id].push(value);if(write('gridironClipsComments',comments)){input.value='';refreshComments()}else comments[v.id].pop()});
+  const doubleTap=(()=>{let last=0;return()=>{const now=Date.now();if(now-last<330){like.click();card.classList.add('clips-liked-pop');setTimeout(()=>card.classList.remove('clips-liked-pop'),550);last=0}else last=now}})();
+  card.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'&&!e.target.closest('button'))doubleTap()});
+  card.append(player,top,meta,actions,panel);feed.append(card);
+ });
+ if('IntersectionObserver'in window){
+  observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting&&entry.intersectionRatio>=.72)playCard(entry.target);else if(entry.target.dataset.videoId===activeVideo)pauseCard(entry.target)})},{root:feed,threshold:[0,.25,.72,1]});
+  feed.querySelectorAll('.clip-card').forEach(card=>observer.observe(card));
+ }else{
+  feed.querySelectorAll('.clip-card').forEach(card=>card.querySelector('.clips-tap-play').hidden=false);
+ }
+}
+async function loadVideos(){
+ const status=document.getElementById('clips-status');if(status)status.textContent='Loading official NFL and college videos…';
+ const refresh=document.getElementById('clips-refresh');if(refresh){refresh.disabled=true;refresh.textContent='Loading…'}
+ try{
+  const response=await fetch('/api/clips',{headers:{'Accept':'application/json'},cache:'no-store'});
+  if(!response.ok)throw new Error('Video feed returned HTTP '+response.status);
+  const data=await response.json();videos=Array.isArray(data.videos)?data.videos:[];
+  if(status)status.textContent=videos.length+' official videos · Updated '+new Date(data.updatedAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+  render();
+ }catch(error){
+  if(status)status.textContent='Could not load official videos. '+(error?.message||'Try again.');
+  feed.innerHTML='';feed.append(make('div','clips-empty','The official video feeds could not be reached. Check your connection and tap Refresh.'));
+ }finally{if(refresh){refresh.disabled=false;refresh.textContent='↻ Refresh'}}
+}
+document.querySelectorAll('.clips-filter').forEach(button=>button.addEventListener('click',()=>{league=button.dataset.league;document.querySelectorAll('.clips-filter').forEach(x=>x.classList.toggle('active',x===button));render()}));
+search?.addEventListener('input',render);
+document.getElementById('clips-refresh')?.addEventListener('click',loadVideos);
+loadVideos();
 })();
