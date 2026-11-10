@@ -34,6 +34,7 @@ const styles=`
 function addStyle(){if($("iq-focus-style"))return;const s=document.createElement("style");s.id="iq-focus-style";s.textContent=styles;document.head.appendChild(s)}
 function buildPageTabs(pageId,defs,classify){
  const page=$(pageId);if(!page||page.dataset.iqTabsBuilt)return;
+ if(pageId==="page-players"){const scout=page.querySelector("#iq-player-scouting")?.closest(".card");const filters=page.querySelector("#player-search")?.closest(".search-row");if(scout&&filters&&scout.parentElement===filters)filters.insertAdjacentElement("beforebegin",scout)}
  const heading=page.querySelector(":scope > .page-heading");if(!heading)return;
  const nodes=[...page.children].filter(el=>el!==heading&&!el.classList.contains("iq-page-tabs")&&!el.classList.contains("iq-tab-panel"));
  if(!nodes.length)return;
