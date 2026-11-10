@@ -34,11 +34,13 @@ jobs:
         run: python scripts/update_nfl_data.py
       - name: Build Next Gen Stats metrics and matchup predictions
         run: python scripts/update_advanced_nfl_data.py
+      - name: Download injury, snap count, and advanced player data
+        run: python scripts/update_intelligence_data.py
       - name: Commit refreshed data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/nfl-players*.json public/data/nfl-status.json public/data/nfl-ngs-metrics.json public/data/nfl-matchup-predictions.json
+          git add public/data/nfl-players*.json public/data/nfl-status.json public/data/nfl-ngs-metrics.json public/data/nfl-matchup-predictions.json public/data/nfl-injuries.json public/data/nfl-snap-counts.json public/data/nfl-pfr-advanced.json
           if git diff --cached --quiet; then
             echo "No NFL data changes to commit."
           else
