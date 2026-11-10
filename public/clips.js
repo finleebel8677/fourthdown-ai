@@ -3,6 +3,20 @@
 const feed=document.getElementById('clips-feed'),search=document.getElementById('clips-search');
 if(!feed)return;
 let league='all',videos=[],observer=null,activeVideo='',socialEnabled=false,likeCounts={},commentsByVideo={},socialBusy=false,soundEnabled=true;
+const unavailableVideos=new Set(),players=new Map();
+let ytApiPromise=null,playerSequence=0;
+function loadYouTubeApi(){
+ if(window.YT&&window.YT.Player)return Promise.resolve(window.YT);
+ if(ytApiPromise)return ytApiPromise;
+ ytApiPromise=new Promise(resolve=>{
+  const previous=window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady=()=>{if(typeof previous==='function')previous();resolve(window.YT)};
+  if(!document.querySelector('script[data-gridiron-youtube-api]')){
+   const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.async=true;script.dataset.gridironYoutubeApi='1';document.head.append(script);
+  }
+ });
+ return ytApiPromise;
+}
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'')??fallback}catch(_){return fallback}};
 const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));return true}catch(_){return false}};
 let likes=read('gridironClipsLikes',{});
@@ -10,14 +24,34 @@ let userId=read('gridironClipsUserId','');
 if(!userId){userId='fan_'+(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now());write('gridironClipsUserId',userId);}
 const make=(tag,cls,txt)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(txt!==undefined)el.textContent=txt;return el};
 const dateLabel=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})};
-function pauseCard(card){const frame=card.querySelector('iframe');if(frame)frame.remove();const play=card.querySelector('.clips-tap-play');if(play)play.hidden=false;}
-function playCard(card){
- const id=card.dataset.videoId;if(!id||activeVideo===id&&card.querySelector('iframe'))return;
+function pauseCard(card){
+ const id=card.dataset.videoId,player=players.get(id);
+ if(player){try{player.destroy()}catch(_){}players.delete(id);}
+ const frame=card.querySelector('iframe');if(frame)frame.remove();
+ const play=card.querySelector('.clips-tap-play');if(play)play.hidden=false;
+}
+function handleUnavailable(card,id){
+ unavailableVideos.add(id);const player=players.get(id);if(player){try{player.destroy()}catch(_){}players.delete(id);}
+ const playerBox=card.querySelector('.clips-player');if(playerBox){playerBox.innerHTML='';const poster=make('img','clips-poster');poster.src=videos.find(v=>v.videoId===id)?.thumbnail||'';poster.alt='Video unavailable for embedding';playerBox.append(poster);const message=make('div','clips-unavailable','This video cannot be played inside the app.');const link=make('a','clips-open-source','Watch on YouTube ↗');link.href='https://www.youtube.com/watch?v='+encodeURIComponent(id);link.target='_blank';link.rel='noopener noreferrer';playerBox.append(message,link);}
+ if(activeVideo===id)activeVideo='';
+ if(status)status.textContent='A video is restricted from embedding. Skipping to another clip…';
+ const cards=[...feed.querySelectorAll('.clip-card')],index=cards.indexOf(card),next=cards.slice(index+1).find(c=>!unavailableVideos.has(c.dataset.videoId));
+ if(next)setTimeout(()=>next.scrollIntoView({behavior:'smooth',block:'center'}),350);
+}
+async function playCard(card){
+ const id=card.dataset.videoId;if(!id||unavailableVideos.has(id)||activeVideo===id&&players.has(id))return;
  document.querySelectorAll('.clip-card').forEach(other=>{if(other!==card)pauseCard(other)});
- activeVideo=id;const frame=document.createElement('iframe');
- frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute='+(soundEnabled?'0':'1')+'&playsinline=1&controls=1&rel=0&modestbranding=1';
- frame.title=card.dataset.title||'Official football highlight';frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
- card.querySelector('.clips-player').append(frame);const play=card.querySelector('.clips-tap-play');if(play)play.hidden=true;
+ activeVideo=id;const playerBox=card.querySelector('.clips-player');if(!playerBox)return;
+ const mount=make('div','clips-youtube-mount');mount.id='clips-player-'+(++playerSequence);playerBox.append(mount);
+ const play=card.querySelector('.clips-tap-play');if(play)play.hidden=true;
+ try{
+  const YT=await loadYouTubeApi();if(activeVideo!==id){mount.remove();return;}
+  const player=new YT.Player(mount.id,{videoId:id,host:'https://www.youtube-nocookie.com',playerVars:{autoplay:1,controls:1,playsinline:1,rel:0,modestbranding:1,origin:location.origin},events:{
+   onReady:event=>{if(activeVideo!==id){event.target.destroy();return;}if(soundEnabled){event.target.unMute();event.target.setVolume(100);}else event.target.mute();event.target.playVideo();},
+   onError:event=>{if([100,101,150,153].includes(event.data))handleUnavailable(card,id);}
+  }});
+  players.set(id,player);
+ }catch(_){handleUnavailable(card,id);}
 }
 async function loadSocial(){
  if(!videos.length)return;
@@ -46,7 +80,7 @@ async function postSocial(payload){
 function render(){
  if(observer){observer.disconnect();observer=null}
  const q=(search?.value||'').trim().toLowerCase();
- let list=videos.filter(v=>(league==='my-likes'?!!likes[v.videoId]:(league==='all'||v.league===league))&&(!q||(v.title+' '+v.channel+' '+v.league).toLowerCase().includes(q)));
+ let list=videos.filter(v=>!unavailableVideos.has(v.videoId)&&(league==='my-likes'?!!likes[v.videoId]:(league==='all'||v.league===league))&&(!q||(v.title+' '+v.channel+' '+v.league).toLowerCase().includes(q)));
  feed.innerHTML='';activeVideo='';
  if(!list.length){feed.append(make('div','clips-empty',league==='my-likes'?'You have not liked any clips yet. Tap the heart on a clip and it will appear here.':videos.length?'No official videos match that search. Try another league or search term.':'No official videos are available right now. Tap Refresh to try again.'));return}
  list.forEach((v,index)=>{
