@@ -26,7 +26,14 @@ async function loadSocial(){
   const response=await fetch('/api/clips-social?videoIds='+encodeURIComponent(ids.join(',')),{cache:'no-store'});
   if(!response.ok)throw new Error('Shared activity is not configured');
   const data=await response.json();socialEnabled=!!data.enabled;likeCounts={};commentsByVideo={};
-  (data.likes||[]).forEach(row=>{likeCounts[row.video_id]=(likeCounts[row.video_id]||0)+1;});
+  const rows=data.likes||[];
+  rows.forEach(row=>{likeCounts[row.video_id]=(likeCounts[row.video_id]||0)+1;});
+  if(socialEnabled){
+   const mine=new Set(rows.filter(row=>row.user_id===userId).map(row=>row.video_id));
+   for(const videoId of Object.keys(likes).filter(id=>likes[id]&&!mine.has(id)&&videos.some(v=>v.videoId===id))){
+    try{await postSocial({action:'like',videoId,liked:true});rows.push({video_id:videoId,user_id:userId});likeCounts[videoId]=(likeCounts[videoId]||0)+1;}catch(_){}
+   }
+  }
   (data.comments||[]).forEach(row=>{(commentsByVideo[row.video_id]??=[]).push(row);});
  }catch(_){socialEnabled=false;}
 }
