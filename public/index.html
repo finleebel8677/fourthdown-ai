@@ -514,7 +514,9 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 .module-shortcuts button{border:1px solid #2b455e;background:#101e30;color:#a9c6de;padding:8px 11px;border-radius:4px;font-size:10px}
 @media(max-width:650px){.embedded-module{padding-top:15px;margin-top:17px}.embedded-module .page-heading h1{font-size:17px}}
 
-\n/* Final GRIDIRON IQ polish */\n.brand-logo{filter:drop-shadow(0 0 10px #00cfff35)}\n.health-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin:12px 0}\n.health-grid .stat-number{font-size:21px}\nbutton,.btn,select,input{min-height:42px}\nbutton:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #00e5ff;outline-offset:2px}\n.table-wrap{-webkit-overflow-scrolling:touch}\n@media(max-width:650px){main{padding:16px 12px calc(108px + env(safe-area-inset-bottom))}.health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav{padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:68px}.mobile-nav button{min-height:48px}.card{overflow-wrap:anywhere}.page-heading{gap:10px}}\n</style>
+\n/* Final GRIDIRON IQ polish */\n.brand-logo{filter:drop-shadow(0 0 10px #00cfff35)}\n.health-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin:12px 0}\n.health-grid .stat-number{font-size:21px}\nbutton,.btn,select,input{min-height:42px}\nbutton:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #00e5ff;outline-offset:2px}\n.table-wrap{-webkit-overflow-scrolling:touch}\n@media(max-width:650px){main{padding:16px 12px calc(108px + env(safe-area-inset-bottom))}.health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav{padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:68px}.mobile-nav button{min-height:48px}.card{overflow-wrap:anywhere}.page-heading{gap:10px}}\n
+.iq-feature{border-color:#315078}.iq-meter-row{display:grid;grid-template-columns:minmax(100px,1fr) 2fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px}.iq-meter{height:10px;background:#243750;border-radius:20px;overflow:hidden}.iq-meter span{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#3b82f6)}.iq-grade{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:7px 9px;border-radius:8px;background:#183756;color:#a5e5ff;font-weight:900}.iq-trend{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;align-items:end;height:130px;margin:18px 0 8px}.iq-trend-col{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:5px;height:100%;font-size:10px;color:var(--muted)}.iq-trend-bar{width:100%;max-width:38px;min-height:2px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#38bdf8,#2563eb)}.iq-trend-col strong{color:var(--text);font-size:10px}@media(max-width:650px){.iq-meter-row{grid-template-columns:85px 1fr 44px}.iq-trend{gap:4px}}
+</style>
 </head>
 
 <body>
@@ -566,6 +568,9 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 
   <div class="card" style="margin:18px 0"><div class="panel-title">Data Health Center</div><div id="data-health-content"><p class="muted small">Loading verified source status…</p></div></div>
 
+
+  <div class="card iq-feature" style="margin:18px 0"><div class="panel-title">My Team Dashboard</div><p class="muted small">Choose a favorite team to personalize this dashboard on this device.</p><div class="search-row"><select id="favorite-team"><option value="">Choose favorite team…</option></select></div><div id="favorite-team-content"><p class="muted small">Select a team to see its current player leaders from the verified season dataset.</p></div></div>
+  <div class="card iq-feature" style="margin:18px 0"><div class="panel-title">2026 Season Trends</div><p class="muted small">Weekly player participation recorded in the current nflverse player dataset. This is not a scoring or win trend.</p><div id="season-trends-content"><p class="muted small">Loading weekly trend data…</p></div></div>
   <div class="two-col">
     <div class="card">
       <div class="panel-title">Explore Football Analytics</div>
@@ -640,6 +645,8 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
     <div class="panel-title">Matchup Breakdown</div>
     <p class="muted small">Choose two teams to create a matchup workspace. Team statistics will appear here once a verified team feed is connected.</p>
   </div>
+
+  <div class="card iq-feature" style="margin-top:16px"><div class="panel-title">Matchup Advantage Meter</div><p class="muted small">Visualizes the model's published pregame advantage categories. It does not add new stats or override the forecast.</p><div id="matchup-advantage-meter"><p class="muted small">Select a scheduled matchup with available model output.</p></div></div>
   <div class="card" id="prediction-engine" style="margin-top:16px">
     <div class="lf-section-kicker">GRIDIRON IQ · MODEL-DRIVEN FORECASTS</div>
     <h2 style="font-size:19px;margin:0 0 8px">NFL Matchup Predictions</h2>
