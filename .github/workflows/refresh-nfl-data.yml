@@ -3,14 +3,16 @@ name: Refresh NFL statistics
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "public/data/**"
+    paths:
+      - "scripts/**"
+      - ".github/workflows/refresh-nfl-data.yml"
   workflow_dispatch:
   schedule:
     - cron: "30 12 * * *"
 
 concurrency:
   group: nfl-data-refresh
+  queue: max
   cancel-in-progress: false
 
 permissions:
@@ -41,6 +43,6 @@ jobs:
             echo "No NFL data changes to commit."
           else
             git commit -m "Refresh NFL statistics data"
-            git pull --rebase origin main
+            git pull --rebase -X theirs origin main
             git push
           fi
