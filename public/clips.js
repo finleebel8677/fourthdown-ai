@@ -21,26 +21,31 @@ function render(){const q=(search?.value||'').trim().toLowerCase();const list=so
  if(!list.length){feed.appendChild(make('div','clips-empty','No official highlight sources match that search. Try another team, league, or play type.'));return;}
  list.forEach(s=>{
   const card=make('article','clips-card');
-  const watch=make('a','clips-watch');watch.href=s.url;watch.target='_blank';watch.rel='noopener noreferrer';watch.setAttribute('aria-label','Watch '+s.title+' at official source');
+  const watch=make('div','clips-watch');watch.setAttribute('aria-label','Highlight preview area. Double tap to like.');
   const top=make('div','clips-card-top');top.append(make('span','clips-league-tag',s.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-type-tag',s.type.toUpperCase()));
   const middle=make('div','');middle.append(make('div','clips-play','▶'),make('h3','',s.title),make('p','',s.desc));
-  const bottom=make('div','clips-card-bottom');bottom.append(make('span','','WATCH AT OFFICIAL SOURCE'),make('span','','↗'));
+  const bottom=make('div','clips-card-bottom');bottom.append(make('span','','DOUBLE TAP TO LIKE'),make('span','','♥'));
   watch.append(top,middle,bottom);
+  const watchLink=make('a','clips-watch-link','▶ Watch official source ↗');watchLink.href=s.url;watchLink.target='_blank';watchLink.rel='noopener noreferrer';watchLink.setAttribute('aria-label','Open '+s.title+' at official source');
   const social=make('div','clips-social');
   const liked=!!likes[s.id];
   const like=make('button',liked?'liked':'',(liked?'♥ Liked':'♡ Like'));like.type='button';like.setAttribute('aria-pressed',String(liked));
   const share=make('button','','↗ Share');share.type='button';
   const commentBtn=make('button','','▤ Comment ('+(comments[s.id]||[]).length+')');commentBtn.type='button';
   social.append(like,share,commentBtn);
+  const toggleLike=()=>{likes[s.id]=!likes[s.id];if(!likes[s.id])delete likes[s.id];write('gridironClipsLikes',likes);like.classList.toggle('liked',!!likes[s.id]);like.textContent=likes[s.id]?'♥ Liked':'♡ Like';like.setAttribute('aria-pressed',String(!!likes[s.id]));};
+  let lastTap=0;
+  watch.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')return;const now=Date.now();if(now-lastTap<330){e.preventDefault();toggleLike();watch.classList.add('clips-double-liked');setTimeout(()=>watch.classList.remove('clips-double-liked'),650);lastTap=0;}else lastTap=now;});
+  watch.addEventListener('dblclick',e=>{e.preventDefault();toggleLike();watch.classList.add('clips-double-liked');setTimeout(()=>watch.classList.remove('clips-double-liked'),650);});
   const commentPanel=make('div','clips-comments');
   const commentList=make('div','clips-comment-list');
   const renderComments=()=>{commentList.innerHTML='';const rows=comments[s.id]||[];if(!rows.length)commentList.append(make('div','clips-comment-empty','No comments yet. Add the first note on this device.'));rows.forEach(c=>commentList.append(make('div','clips-comment',c)));commentBtn.textContent='▤ Comment ('+rows.length+')';};
   const form=make('form','clips-comment-form');const input=make('input','');input.type='text';input.maxLength=240;input.placeholder='Write a comment…';input.setAttribute('aria-label','Write a comment');const send=make('button','','Post');send.type='submit';form.append(input,send);commentPanel.append(commentList,form);renderComments();
-  like.addEventListener('click',()=>{likes[s.id]=!likes[s.id];if(!likes[s.id])delete likes[s.id];write('gridironClipsLikes',likes);like.classList.toggle('liked',!!likes[s.id]);like.textContent=likes[s.id]?'♥ Liked':'♡ Like';like.setAttribute('aria-pressed',String(!!likes[s.id]));});
+  like.addEventListener('click',toggleLike);
   share.addEventListener('click',async()=>{const data={title:s.title,text:'Check out this official football highlight source on GRIDIRON IQ.',url:s.url};try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(s.url);share.textContent='✓ Copied';setTimeout(()=>share.textContent='↗ Share',1800);}else{window.prompt('Copy this official highlight link:',s.url);}}catch(err){if(err?.name!=='AbortError'){try{window.prompt('Copy this official highlight link:',s.url);}catch(_){}}}});
   commentBtn.addEventListener('click',()=>{commentPanel.classList.toggle('open');if(commentPanel.classList.contains('open'))input.focus();});
   form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;comments[s.id]=comments[s.id]||[];comments[s.id].push(value);if(!write('gridironClipsComments',comments)){comments[s.id].pop();return;}input.value='';renderComments();});
-  card.append(watch,social,commentPanel);feed.append(card);
+  card.append(watch,watchLink,social,commentPanel);feed.append(card);
  });
 }
 document.querySelectorAll('.clips-filter').forEach(b=>b.addEventListener('click',()=>{league=b.dataset.league;document.querySelectorAll('.clips-filter').forEach(x=>x.classList.toggle('active',x===b));render();}));
