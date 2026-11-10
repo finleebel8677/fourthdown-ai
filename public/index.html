@@ -644,14 +644,14 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
     <p class="muted small">Select an upcoming scheduled game to view a probability generated from historical NFL play-by-play and pregame rolling team performance.</p>
     <div class="search-row"><select id="prediction-game" aria-label="Select an upcoming game"><option value="">Loading verified upcoming games…</option></select></div>
     <p id="prediction-status" class="muted small">Loading model and validation data…</p>
-    <div id="prediction-results"><p class="muted small">No predictions are shown until the verified data pipeline completes.</p></div>
+    <div id="prediction-results"><p class="muted small">No predictions are shown until the verified data pipeline completes.</p></div><div class="card" style="margin-top:16px"><div class="panel-title">Prediction Accuracy Tracker</div><div id="prediction-accuracy-content">Loading forecast tracker…</div></div>
   </div>
 <div class="embedded-module-label">MATCHUP GAME PLANNING</div><section class="embedded-module" id="module-gameplan">
  <div class="page-heading"><div><div class="eyebrow">WEEKLY COACHING WORKSPACE</div><h1>Game Planning Center</h1><div class="subtitle">Build a matchup-specific plan using available team/player data and football concepts.</div></div></div>
  <div class="notice">Team-level opponent tendencies and official injury reports are not currently connected. Recommendations below are strategic templates, not claims about current team tendencies.</div>
  <div class="card"><div class="two-col"><div><div class="stat-label">Your team</div><select id="plan-team"></select></div><div><div class="stat-label">Opponent</div><select id="plan-opponent"></select></div></div><div class="three-col" style="margin-top:14px"><div><div class="stat-label">Offensive identity</div><select id="plan-identity"><option>Balanced</option><option>Pass-heavy</option><option>Run-heavy</option><option>Play-action focused</option></select></div><div><div class="stat-label">Defensive approach</div><select id="plan-defense"><option>Multiple / adaptable</option><option>Pressure-focused</option><option>Coverage-first</option><option>Run-stopping</option></select></div><div><div class="stat-label">Game situation</div><select id="plan-situation"><option>Opening script</option><option>Early downs</option><option>Third down</option><option>Red zone</option><option>Two-minute offense</option><option>Protecting a lead</option></select></div></div><button class="btn" onclick="buildGamePlan()" style="margin-top:16px">BUILD GAME PLAN</button></div>
  <div class="card" id="plan-result" style="margin-top:14px"><div class="panel-title">Your Game Plan</div><p class="muted small">Select your teams and coaching approach to generate a plan.</p></div>
-<div class="card" style="margin-top:16px"><div class="panel-title">Prediction Accuracy Tracker</div><div id="prediction-accuracy-content">Loading forecast tracker…</div></div></section></section>
+</section></section>
 
 <!-- PLAY LAB -->
 <section class="page" id="page-playlab">
