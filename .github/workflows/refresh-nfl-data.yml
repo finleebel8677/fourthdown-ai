@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/nfl-players.json public/data/nfl-status.json public/data/nfl-ngs-metrics.json public/data/nfl-matchup-predictions.json
+          git add public/data/nfl-players*.json public/data/nfl-status.json public/data/nfl-ngs-metrics.json public/data/nfl-matchup-predictions.json
           if git diff --cached --quiet; then
             echo "No NFL data changes to commit."
           else
