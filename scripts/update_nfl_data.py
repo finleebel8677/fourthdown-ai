@@ -56,6 +56,7 @@ required = [name_col, id_col]
 if any(col not in frame.columns for col in required):
     raise SystemExit("The nflverse file is missing player identity columns")
 
+source_stat_columns = [c for c in STAT_COLUMNS if c in frame.columns]
 for col in STAT_COLUMNS:
     if col not in frame.columns:
         alternate = {"interceptions": "passing_interceptions", "carries": "rushing_attempts"}.get(col)
@@ -98,8 +99,8 @@ payload = {
     "source": "nflverse",
     "sourceUrl": source_url,
     "totalPlayers": len(players),
-    "availableStatColumns": [c for c in STAT_COLUMNS if c in frame.columns],
-    "defensiveStatsAvailable": any(c in frame.columns for c in STAT_COLUMNS if c.startswith("def_")),
+    "availableStatColumns": source_stat_columns,
+    "defensiveStatsAvailable": any(c in source_stat_columns for c in STAT_COLUMNS if c.startswith("def_")),
     "players": players,
 }
 (OUT / "nfl-players.json").write_text(json.dumps(payload, separators=(",", ":")))
@@ -117,6 +118,7 @@ if not ARCHIVE_PATH.exists():
         old_name_col = "player_display_name" if "player_display_name" in old_frame.columns else "player_name"
         old_id_col = "player_id" if "player_id" in old_frame.columns else old_name_col
         old_team_col = "recent_team" if "recent_team" in old_frame.columns else ("team" if "team" in old_frame.columns else None)
+        old_source_stat_columns = [c for c in STAT_COLUMNS if c in old_frame.columns]
         for col in STAT_COLUMNS:
             if col not in old_frame.columns:
                 alternate = {"interceptions": "passing_interceptions", "carries": "rushing_attempts"}.get(col)
@@ -138,7 +140,7 @@ if not ARCHIVE_PATH.exists():
         old_payload = {"season": ARCHIVE_YEAR, "isCurrentSeason": False,
                        "retrievedAt": datetime.now(timezone.utc).isoformat(),
                        "source": "nflverse", "sourceUrl": old_url,
-                       "totalPlayers": len(old_players), "availableStatColumns": [c for c in STAT_COLUMNS if c in old_frame.columns], "defensiveStatsAvailable": any(c in old_frame.columns for c in STAT_COLUMNS if c.startswith("def_")), "players": old_players}
+                       "totalPlayers": len(old_players), "availableStatColumns": old_source_stat_columns, "defensiveStatsAvailable": any(c in old_source_stat_columns for c in STAT_COLUMNS if c.startswith("def_")), "players": old_players}
         ARCHIVE_PATH.write_text(json.dumps(old_payload, separators=(",", ":")))
         print(f"Saved historical archive: {len(old_players)} real player records for {ARCHIVE_YEAR}")
     except Exception as exc:
