@@ -20,7 +20,7 @@ function render(){const q=(search?.value||'').trim().toLowerCase();const list=so
  feed.innerHTML='';
  if(!list.length){feed.appendChild(make('div','clips-empty','No official highlight sources match that search. Try another team, league, or play type.'));return;}
  list.forEach(s=>{
-  const card=make('article','clips-card');
+  const card=make('article','clips-card');card.setAttribute('aria-label',s.title+' highlight channel');
   const watch=make('div','clips-watch');watch.setAttribute('aria-label','Highlight preview area. Double tap to like.');
   const top=make('div','clips-card-top');top.append(make('span','clips-league-tag',s.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-type-tag',s.type.toUpperCase()));
   const middle=make('div','');middle.append(make('div','clips-play','▶'),make('h3','',s.title),make('p','',s.desc));
