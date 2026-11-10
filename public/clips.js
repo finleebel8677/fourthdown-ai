@@ -2,7 +2,7 @@
 'use strict';
 const feed=document.getElementById('clips-feed'),search=document.getElementById('clips-search');
 if(!feed)return;
-let league='all',videos=[],observer=null,activeVideo='',socialEnabled=false,likeCounts={},commentsByVideo={},socialBusy=false;
+let league='all',videos=[],observer=null,activeVideo='',socialEnabled=false,likeCounts={},commentsByVideo={},socialBusy=false,soundEnabled=true;
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'')??fallback}catch(_){return fallback}};
 const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));return true}catch(_){return false}};
 let likes=read('gridironClipsLikes',{});
@@ -15,7 +15,7 @@ function playCard(card){
  const id=card.dataset.videoId;if(!id||activeVideo===id&&card.querySelector('iframe'))return;
  document.querySelectorAll('.clip-card').forEach(other=>{if(other!==card)pauseCard(other)});
  activeVideo=id;const frame=document.createElement('iframe');
- frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1';
+ frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute='+(soundEnabled?'0':'1')+'&playsinline=1&controls=1&rel=0&modestbranding=1';
  frame.title=card.dataset.title||'Official football highlight';frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
  card.querySelector('.clips-player').append(frame);const play=card.querySelector('.clips-tap-play');if(play)play.hidden=true;
 }
@@ -52,8 +52,9 @@ function render(){
  list.forEach((v,index)=>{
   const card=make('article','clips-card clip-card');card.dataset.videoId=v.videoId;card.dataset.title=v.title;
   const player=make('div','clips-player'),poster=make('img','clips-poster');poster.src=v.thumbnail;poster.alt='Thumbnail for '+v.title;poster.loading=index<2?'eager':'lazy';
-  const tap=make('button','clips-tap-play','▶ Tap to play');tap.type='button';tap.addEventListener('click',()=>playCard(card));player.append(poster,tap);
-  const top=make('div','clips-video-top');top.append(make('span','clips-league-tag',v.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-channel',v.channel));
+  const tap=make('button','clips-tap-play',soundEnabled?'▶ Tap to play with sound':'▶ Tap to play');tap.type='button';tap.addEventListener('click',()=>{soundEnabled=true;playCard(card)});player.append(poster,tap);
+  const sound=make('button','clips-sound-toggle','🔊 Sound on');sound.type='button';sound.title='Toggle clip sound';sound.addEventListener('click',()=>{soundEnabled=!soundEnabled;sound.textContent=soundEnabled?'🔊 Sound on':'🔇 Sound off';const frame=card.querySelector('iframe');if(frame){const id=v.videoId;frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute='+(soundEnabled?'0':'1')+'&playsinline=1&controls=1&rel=0&modestbranding=1';}document.querySelectorAll('.clips-sound-toggle').forEach(btn=>btn.textContent=soundEnabled?'🔊 Sound on':'🔇 Sound off');});
+  const top=make('div','clips-video-top');top.append(make('span','clips-league-tag',v.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-channel',v.channel),sound);
   const meta=make('div','clips-video-meta');meta.append(make('h3','',v.title),make('p','',v.channel+' · '+dateLabel(v.published)));
   const sourceLink=make('a','clips-open-source','Open in YouTube ↗');sourceLink.href=v.url;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';
   const actions=make('div','clips-social clips-video-social'),like=make('button',likes[v.videoId]?'liked':'',likes[v.videoId]?'♥':'♡');
