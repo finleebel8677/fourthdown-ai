@@ -147,6 +147,45 @@ def build_predictions():
     plays["redzone_try"] = (plays["yardline_100"] <= 20).astype(int)
     plays["redzone_td"] = ((plays["yardline_100"] <= 20) & (plays["touchdown"] > 0)).astype(int)
 
+    # Publish current-season team offensive and defensive efficiency rates.
+    current = plays[plays["season"] == current_year].copy()
+    team_rows = []
+    def team_summary(group, side):
+        third = group[group["third_down_try"] > 0]
+        rz = group[group["redzone_try"] > 0]
+        pp = group[group["play_type"] == "pass"]
+        rp = group[group["play_type"].isin(["run", "rush"])]
+        games = max(1, int(group["game_id"].nunique()))
+        return {
+            "team": str(group["posteam"].iloc[0] if side == "offense" else group["defteam"].iloc[0]),
+            "side": side, "games": games, "plays": int(len(group)),
+            "epa_per_play": float(group["epa"].mean()) if len(group) else None,
+            "success_rate": float(group["success"].mean()) if len(group) else None,
+            "yards_per_play": float(group["yards_gained"].mean()) if len(group) else None,
+            "pass_epa_per_play": float(pp["epa"].mean()) if len(pp) else None,
+            "rush_epa_per_play": float(rp["epa"].mean()) if len(rp) else None,
+            "third_down_rate": float(third["third_down_conv"].mean()) if len(third) else None,
+            "redzone_td_rate": float(rz["redzone_td"].mean()) if len(rz) else None,
+            "turnovers_per_game": float(group["turnover"].sum() / games)
+        }
+    if len(current):
+        for team, group in current.dropna(subset=["posteam"]).groupby("posteam"):
+            team_rows.append(team_summary(group, "offense"))
+        for team, group in current.dropna(subset=["defteam"]).groupby("defteam"):
+            row = team_summary(group, "defense")
+            row["team"] = str(team)
+            for old, new in [("epa_per_play","epa_allowed_per_play"),("success_rate","success_allowed_rate"),("yards_per_play","yards_allowed_per_play"),("pass_epa_per_play","pass_epa_allowed_per_play"),("rush_epa_per_play","rush_epa_allowed_per_play"),("third_down_rate","third_down_allowed_rate"),("redzone_td_rate","redzone_td_allowed_rate"),("turnovers_per_game","turnovers_forced_per_game")]:
+                row[new] = row.pop(old)
+            team_rows.append(row)
+    write_json("nfl-team-intelligence.json", {
+        "season": current_year, "source": "nflverse play-by-play",
+        "sourceUrls": [u for u in pbp_urls if str(current_year) in u],
+        "retrievedAt": datetime.now(timezone.utc).isoformat(),
+        "recordCount": len(team_rows), "teams": team_rows,
+        "note": "Current-season offensive and defensive efficiency and situational rates aggregated from published play-by-play. Early-season samples can be unstable."
+    })
+    print(f"Team intelligence: published {len(team_rows)} team summaries.")
+
     def aggregate(group):
         def mean(col, mask=None):
             x = group if mask is None else group[mask]
