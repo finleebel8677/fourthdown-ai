@@ -505,6 +505,15 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 .lf-trail-status.ready{border-color:#2d7653;background:#0e241b;color:#a7f3c5}
 @media(max-width:650px){.lf-feature-grid{grid-template-columns:1fr}.lf-power-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.lf-field-wrap.lf-stadium-3d{padding:8px}.lf-field-wrap.lf-stadium-3d #lf-field{transform:rotateX(16deg) scale(.98)}}
 
+
+.embedded-module{display:block!important;margin-top:22px;padding-top:20px;border-top:1px solid #263247}
+.embedded-module .page-heading{margin-bottom:14px}
+.embedded-module .page-heading h1{font-size:19px}
+.embedded-module-label{margin-top:26px;padding:10px 12px;border-left:3px solid #00e5ff;background:#00e5ff0b;color:#00e5ff;font-size:10px;font-weight:900;letter-spacing:1.8px}
+.module-shortcuts{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.module-shortcuts button{border:1px solid #2b455e;background:#101e30;color:#a9c6de;padding:8px 11px;border-radius:4px;font-size:10px}
+@media(max-width:650px){.embedded-module{padding-top:15px;margin-top:17px}.embedded-module .page-heading h1{font-size:17px}}
+
 </style>
 </head>
 
@@ -522,23 +531,15 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <div class="layout">
 
 <aside class="sidebar">
-  <div class="nav-label">MAIN MENU</div>
-  <button class="nav-btn active" data-page="overview"><span class="nav-icon">⌂</span>Overview</button>
-  <button class="nav-btn" data-page="players"><span class="nav-icon">♟</span>Player Analytics</button>
-  <button class="nav-btn" data-page="teams"><span class="nav-icon">🛡</span>Team Analytics</button>
+  <div class="nav-label">GRIDIRON IQ</div>
+  <button class="nav-btn active" data-page="overview"><span class="nav-icon">⌂</span>Home</button>
+  <button class="nav-btn" data-page="players"><span class="nav-icon">♟</span>Player Center</button>
+  <button class="nav-btn" data-page="teams"><span class="nav-icon">🛡</span>Team Center</button>
   <button class="nav-btn" data-page="matchup"><span class="nav-icon">⚔</span>Matchup Center</button>
-  <button class="nav-btn" data-page="livingfield"><span class="nav-icon">⌖</span>The Living Field</button>
-  <div class="nav-label">NFL ANALYTICS</div>
+  <button class="nav-btn" data-page="livingfield"><span class="nav-icon">⌖</span>Living Field</button>
   <button class="nav-btn" data-page="playlab"><span class="nav-icon">▤</span>Play Lab</button>
-  <button class="nav-btn" data-page="topplays"><span class="nav-icon">▶</span>Weekly Top Plays</button>
-  <button class="nav-btn" data-page="simulator"><span class="nav-icon">🎮</span>Game Simulator</button>
-  <button class="nav-btn" data-page="gameplan"><span class="nav-icon">📋</span>Game Planning</button>
-  <button class="nav-btn" data-page="advanced"><span class="nav-icon">📊</span>Advanced Analytics</button>
-  <button class="nav-btn" data-page="filmroom"><span class="nav-icon">🎥</span>Film Room</button>
-  <button class="nav-btn" data-page="picks"><span class="nav-icon">🎯</span>Predictions & Picks</button><button class="nav-btn" data-page="scoreboard"><span class="nav-icon">🏟</span>Scores</button><button class="nav-btn" data-page="tendencies"><span class="nav-icon">🔥</span>Tendencies</button><button class="nav-btn" data-page="dashboard"><span class="nav-icon">⭐</span>My Dashboard</button>
-  <button class="nav-btn" data-page="news"><span class="nav-icon">▣</span>NFL News</button>
-  <button class="nav-btn" data-page="designer"><span class="nav-icon">✏️</span>Play Designer</button>
-  <button class="nav-btn" data-page="notebook"><span class="nav-icon">📓</span>My NFL Notebook</button>
+  <button class="nav-btn" data-page="scoreboard"><span class="nav-icon">🏟</span>NFL Live</button>
+  <button class="nav-btn" data-page="notebook"><span class="nav-icon">📓</span>My Football HQ</button>
 </aside>
 
 <main>
@@ -601,7 +602,12 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
       </table>
     </div>
   </div>
-</section>
+<div class="embedded-module-label">PLAYER EFFICIENCY & ADVANCED METRICS</div><section class="embedded-module" id="module-advanced">
+ <div class="page-heading"><div><div class="eyebrow">PLAYER PERFORMANCE LAB</div><h1>Advanced Player Analytics</h1><div class="subtitle">Calculated efficiency indicators using the available nflverse player totals.</div></div></div>
+ <div class="notice">Metrics are calculated from the currently loaded season totals. EPA, route participation, pressure rate, target share, and other unavailable fields are intentionally not fabricated.</div>
+ <div class="card"><div class="search-row"><select id="adv-position" onchange="populateAdvancedPlayers()"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select><select id="adv-player" onchange="renderAdvancedPlayer()"></select></div><div id="advanced-player-result"><p class="muted small">Load player data to explore calculated efficiency metrics.</p></div></div>
+ <div class="card" style="margin-top:14px"><div class="panel-title">Player vs. Player Comparison</div><div class="two-col"><select id="adv-compare-a"></select><select id="adv-compare-b"></select></div><button class="btn" onclick="comparePlayersAdvanced()" style="margin-top:14px">COMPARE PLAYERS</button><div id="adv-compare-result" style="margin-top:14px"></div></div>
+</section><div class="embedded-module-label">PLAYER PRODUCTION TRENDS</div><section class="embedded-module" id="module-tendencies"><div class="page-heading"><div><div class="eyebrow">PLAYER PRODUCTION PROFILE</div><h1>Player Tendencies & Heat Maps</h1><div class="subtitle">Season production and game participation.</div></div></div><div class="notice">The current player feed contains season totals and weeks played, not route coordinates or target locations. These visuals are production profiles, not field-location tracking.</div><div class="card"><div class="search-row"><select id="tendency-position" onchange="populateTendencyPlayers()"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select><select id="tendency-player" onchange="renderTendencyProfile()"></select></div><div id="tendency-profile">Choose a player.</div></div></section><div class="section-title">Player Comparison Lab</div><div id="player-comparison-module"></div></section>
 
 <!-- TEAMS -->
 <section class="page" id="page-teams">
@@ -614,7 +620,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
     <div class="panel-title">Team Information</div>
     <p class="muted small">Select a team above to open its team workspace.</p>
   </div>
-</section>
+<div class="section-title">Team Identity & League Power Map</div><div id="team-intelligence-modules" class="lf-feature-grid"></div></section>
 
 <!-- MATCHUP -->
 <section class="page" id="page-matchup">
@@ -640,7 +646,12 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
     <p id="prediction-status" class="muted small">Loading model and validation data…</p>
     <div id="prediction-results"><p class="muted small">No predictions are shown until the verified data pipeline completes.</p></div>
   </div>
-</section>
+<div class="embedded-module-label">MATCHUP GAME PLANNING</div><section class="embedded-module" id="module-gameplan">
+ <div class="page-heading"><div><div class="eyebrow">WEEKLY COACHING WORKSPACE</div><h1>Game Planning Center</h1><div class="subtitle">Build a matchup-specific plan using available team/player data and football concepts.</div></div></div>
+ <div class="notice">Team-level opponent tendencies and official injury reports are not currently connected. Recommendations below are strategic templates, not claims about current team tendencies.</div>
+ <div class="card"><div class="two-col"><div><div class="stat-label">Your team</div><select id="plan-team"></select></div><div><div class="stat-label">Opponent</div><select id="plan-opponent"></select></div></div><div class="three-col" style="margin-top:14px"><div><div class="stat-label">Offensive identity</div><select id="plan-identity"><option>Balanced</option><option>Pass-heavy</option><option>Run-heavy</option><option>Play-action focused</option></select></div><div><div class="stat-label">Defensive approach</div><select id="plan-defense"><option>Multiple / adaptable</option><option>Pressure-focused</option><option>Coverage-first</option><option>Run-stopping</option></select></div><div><div class="stat-label">Game situation</div><select id="plan-situation"><option>Opening script</option><option>Early downs</option><option>Third down</option><option>Red zone</option><option>Two-minute offense</option><option>Protecting a lead</option></select></div></div><button class="btn" onclick="buildGamePlan()" style="margin-top:16px">BUILD GAME PLAN</button></div>
+ <div class="card" id="plan-result" style="margin-top:14px"><div class="panel-title">Your Game Plan</div><p class="muted small">Select your teams and coaching approach to generate a plan.</p></div>
+</section></section>
 
 <!-- PLAY LAB -->
 <section class="page" id="page-playlab">
@@ -666,22 +677,20 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
   <div class="card"><div class="panel-title">Quarterback Read</div><p id="play-read" class="play-copy"></p><div class="play-subhead">Best Situations</div><p id="play-situation" class="play-copy"></p></div>
   <div class="card"><div class="panel-title">Assignments & Coaching Points</div><ul id="play-assignments" class="play-assignments"></ul><div class="play-subhead">Defensive Counters</div><p id="play-counter" class="play-copy"></p></div>
  </div>
-</section>
-<!-- TOP PLAYS -->
-<section class="page" id="page-topplays">
-  <div class="page-heading">
-    <div><div class="eyebrow">FILM ROOM</div><h1>Weekly Top Plays</h1><div class="subtitle">Football concepts and play breakdowns.</div></div>
-  </div>
-  <div class="notice">Verified weekly game plays and source links will appear here after a real NFL news and play-data feed is connected.</div>
-  <div class="three-col">
-    <div class="card"><div class="pill">OFFENSE</div><div class="panel-title" style="margin-top:13px">Play Action Pass</div><p class="muted small">A quarterback sells the run before attacking a passing window downfield.</p></div>
-    <div class="card"><div class="pill">DEFENSE</div><div class="panel-title" style="margin-top:13px">Cover 3 Rotation</div><p class="muted small">Three deep defenders divide the deep field while underneath defenders cover short zones.</p></div>
-    <div class="card"><div class="pill">SPECIAL TEAMS</div><div class="panel-title" style="margin-top:13px">Kick Return Lane</div><p class="muted small">Blocking assignments create a running lane for the returner.</p></div>
-  </div>
-</section>
-
-<!-- CUSTOM PLAY DESIGNER -->
-<section class="page" id="page-designer">
+<div class="embedded-module-label">FOOTBALL CONCEPT LIBRARY</div><section class="embedded-module" id="module-filmroom">
+ <div class="page-heading"><div><div class="eyebrow">FOOTBALL CONCEPT LIBRARY</div><h1>NFL Film Room</h1><div class="subtitle">Learn formations, coverages, route concepts, and situational football.</div></div></div>
+ <div class="notice">This is an interactive coaching lesson library, not licensed NFL game footage or actual team film.</div>
+ <div class="card"><div class="search-row"><select id="film-category" onchange="populateFilmLessons()"><option value="concepts">Offensive concepts</option><option value="coverage">Defensive coverages</option><option value="fronts">Defensive fronts</option><option value="situations">Situational football</option></select><select id="film-lesson" onchange="renderFilmLesson()"></select></div><div id="film-content"></div></div>
+</section><div class="embedded-module-label">INTERACTIVE COACHING SIMULATOR</div><section class="embedded-module" id="module-simulator">
+ <div class="page-heading"><div><div class="eyebrow">INTERACTIVE COACHING SANDBOX</div><h1>Game Simulator</h1><div class="subtitle">Call an offensive concept against a defensive look and explore a clearly labeled illustrative result.</div></div></div>
+ <div class="notice">This is a football teaching simulation, not a predictive engine, real game simulation, or NFL tracking feed. Outcomes are illustrative and do not represent measured player ability.</div>
+ <div class="card"><div class="three-col">
+  <div><div class="stat-label">Offensive concept</div><select id="sim-play"><option value="Mesh">Mesh</option><option value="Smash">Smash</option><option value="Four Verticals">Four Verticals</option><option value="Flood / Sail">Flood / Sail</option><option value="Levels">Levels</option><option value="Dagger">Dagger</option><option value="Stick">Stick</option><option value="Inside Zone">Inside Zone</option><option value="Power">Power</option><option value="Counter">Counter</option><option value="Outside Zone">Outside Zone</option></select></div>
+  <div><div class="stat-label">Defensive coverage</div><select id="sim-coverage"><option>Cover 0</option><option>Cover 1</option><option selected>Cover 2</option><option>Cover 3</option><option>Cover 4 / Quarters</option></select></div>
+  <div><div class="stat-label">Pressure package</div><select id="sim-pressure"><option>No blitz</option><option>Mike blitz</option><option>Edge pressure</option><option>Double A-gap</option><option>Zone blitz</option></select></div>
+ </div><button class="btn" onclick="runPlaySimulation()" style="margin-top:16px">SIMULATE THE SNAP</button></div>
+ <div class="card" id="sim-result" style="margin-top:14px"><div class="panel-title">Snap Result</div><p class="muted small">Choose a play and defensive look to run the teaching simulation.</p></div>
+</section><div class="embedded-module-label">CUSTOM PLAY DESIGNER</div><section class="embedded-module" id="module-designer">
  <div class="page-heading"><div><div class="eyebrow">BUILD YOUR OWN PLAYBOOK</div><h1>Play Designer</h1><div class="subtitle">Place players, draw routes, and save your custom football concepts.</div></div></div>
  <div class="notice">Interactive playbook canvas. These are user-created diagrams, not official NFL play calls or tracking data. Your saved plays stay on this device/browser.</div>
  <div class="card"><div class="designer-controls">
@@ -692,10 +701,15 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
  <div class="designer-field-wrap"><svg id="designer-field" viewBox="0 0 1000 500" role="img" aria-label="Interactive football field"></svg></div>
  <div class="designer-actions"><button class="btn" id="play-save">SAVE PLAY</button><button class="btn secondary" id="play-clear">CLEAR FIELD</button><span class="muted small" id="designer-status">Tap the field to place players. Drag markers to reposition them.</span></div></div>
  <div class="card" style="margin-top:16px"><div class="panel-title">My Saved Plays</div><div id="designer-play-list"></div></div>
-</section>
+</section></section>
+<!-- TOP PLAYS -->
+
+
+<!-- CUSTOM PLAY DESIGNER -->
+
 <!-- MY NFL NOTEBOOK -->
 <section class="page" id="page-notebook">
- <div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL LIBRARY</div><h1>My NFL Notebook</h1><div class="subtitle">Save scouting reports, player observations, ideas, and custom football notes.</div></div></div>
+ <div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL HQ</div><h1>My Football HQ</h1><div class="subtitle">Keep your picks, scouting reports, player observations, ideas, and custom football notes.</div></div></div>
  <div class="notice">Notes and saved plays are stored locally in this browser on this device. They are not synced across devices or backed up to an online account.</div>
  <div class="card"><div class="panel-title">Create a Notebook Entry</div><input id="note-id" type="hidden">
  <div class="notebook-form"><div><label class="stat-label" for="note-title">TITLE</label><input id="note-title" placeholder="e.g. Rookie WR scouting report" maxlength="100"></div>
@@ -704,64 +718,29 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
  <div class="designer-actions"><button class="btn" id="note-save">SAVE NOTE</button><button class="btn secondary" id="note-clear">NEW NOTE</button><span class="muted small" id="note-status">Your notes save on this device.</span></div></div>
  <div class="search-row" style="margin-top:18px"><input id="note-search" placeholder="Search your notebook..."><select id="note-filter" style="max-width:220px"><option>All</option><option>Player Scouting</option><option>Team Notes</option><option>Game Analysis</option><option>Draft Prospects</option><option>Strategy</option><option>General</option></select></div>
  <div id="note-list" class="notebook-list"></div><div class="card" style="margin-top:16px"><div class="panel-title">Saved Playbooks</div><p class="muted small">Every play you save in Play Designer is kept in your local playbook, ready to reopen and edit.</p><button class="btn secondary" onclick="showPage('designer')">OPEN PLAY DESIGNER</button></div>
-</section>
-
-<!-- NEWS -->
-<section class="page" id="page-news">
-  <div class="page-heading">
-    <div><div class="eyebrow">AROUND THE LEAGUE</div><h1>NFL News</h1><div class="subtitle">Your football news center.</div></div>
-  </div>
-  <div class="notice">Live news headlines are not connected yet. This section currently identifies the news categories to be populated from verified sources.</div>
-  <div class="card">
-    <div class="news-item"><strong>League News & Transactions</strong><p>Player movement, roster changes, and league announcements.</p></div>
-    <div class="news-item"><strong>Injury Reports</strong><p>Injury updates and player availability from verified sources.</p></div>
-    <div class="news-item"><strong>Game Analysis</strong><p>Game recaps, tactical breakdowns, and performance analysis.</p></div>
-    <div class="news-item"><strong>Draft & College Football</strong><p>Prospect evaluations, scouting, and draft developments.</p></div>
-    <p class="muted small">Planned news sources include official NFL reporting and established sports outlets.</p>
-  </div>
-</section>
-
-
-<!-- GAME SIMULATOR -->
-<section class="page" id="page-simulator">
- <div class="page-heading"><div><div class="eyebrow">INTERACTIVE COACHING SANDBOX</div><h1>Game Simulator</h1><div class="subtitle">Call an offensive concept against a defensive look and explore a clearly labeled illustrative result.</div></div></div>
- <div class="notice">This is a football teaching simulation, not a predictive engine, real game simulation, or NFL tracking feed. Outcomes are illustrative and do not represent measured player ability.</div>
- <div class="card"><div class="three-col">
-  <div><div class="stat-label">Offensive concept</div><select id="sim-play"><option value="Mesh">Mesh</option><option value="Smash">Smash</option><option value="Four Verticals">Four Verticals</option><option value="Flood / Sail">Flood / Sail</option><option value="Levels">Levels</option><option value="Dagger">Dagger</option><option value="Stick">Stick</option><option value="Inside Zone">Inside Zone</option><option value="Power">Power</option><option value="Counter">Counter</option><option value="Outside Zone">Outside Zone</option></select></div>
-  <div><div class="stat-label">Defensive coverage</div><select id="sim-coverage"><option>Cover 0</option><option>Cover 1</option><option selected>Cover 2</option><option>Cover 3</option><option>Cover 4 / Quarters</option></select></div>
-  <div><div class="stat-label">Pressure package</div><select id="sim-pressure"><option>No blitz</option><option>Mike blitz</option><option>Edge pressure</option><option>Double A-gap</option><option>Zone blitz</option></select></div>
- </div><button class="btn" onclick="runPlaySimulation()" style="margin-top:16px">SIMULATE THE SNAP</button></div>
- <div class="card" id="sim-result" style="margin-top:14px"><div class="panel-title">Snap Result</div><p class="muted small">Choose a play and defensive look to run the teaching simulation.</p></div>
-</section>
-<!-- GAME PLANNING -->
-<section class="page" id="page-gameplan">
- <div class="page-heading"><div><div class="eyebrow">WEEKLY COACHING WORKSPACE</div><h1>Game Planning Center</h1><div class="subtitle">Build a matchup-specific plan using available team/player data and football concepts.</div></div></div>
- <div class="notice">Team-level opponent tendencies and official injury reports are not currently connected. Recommendations below are strategic templates, not claims about current team tendencies.</div>
- <div class="card"><div class="two-col"><div><div class="stat-label">Your team</div><select id="plan-team"></select></div><div><div class="stat-label">Opponent</div><select id="plan-opponent"></select></div></div><div class="three-col" style="margin-top:14px"><div><div class="stat-label">Offensive identity</div><select id="plan-identity"><option>Balanced</option><option>Pass-heavy</option><option>Run-heavy</option><option>Play-action focused</option></select></div><div><div class="stat-label">Defensive approach</div><select id="plan-defense"><option>Multiple / adaptable</option><option>Pressure-focused</option><option>Coverage-first</option><option>Run-stopping</option></select></div><div><div class="stat-label">Game situation</div><select id="plan-situation"><option>Opening script</option><option>Early downs</option><option>Third down</option><option>Red zone</option><option>Two-minute offense</option><option>Protecting a lead</option></select></div></div><button class="btn" onclick="buildGamePlan()" style="margin-top:16px">BUILD GAME PLAN</button></div>
- <div class="card" id="plan-result" style="margin-top:14px"><div class="panel-title">Your Game Plan</div><p class="muted small">Select your teams and coaching approach to generate a plan.</p></div>
-</section>
-<!-- ADVANCED ANALYTICS -->
-<section class="page" id="page-advanced">
- <div class="page-heading"><div><div class="eyebrow">PLAYER PERFORMANCE LAB</div><h1>Advanced Player Analytics</h1><div class="subtitle">Calculated efficiency indicators using the available nflverse player totals.</div></div></div>
- <div class="notice">Metrics are calculated from the currently loaded season totals. EPA, route participation, pressure rate, target share, and other unavailable fields are intentionally not fabricated.</div>
- <div class="card"><div class="search-row"><select id="adv-position" onchange="populateAdvancedPlayers()"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select><select id="adv-player" onchange="renderAdvancedPlayer()"></select></div><div id="advanced-player-result"><p class="muted small">Load player data to explore calculated efficiency metrics.</p></div></div>
- <div class="card" style="margin-top:14px"><div class="panel-title">Player vs. Player Comparison</div><div class="two-col"><select id="adv-compare-a"></select><select id="adv-compare-b"></select></div><button class="btn" onclick="comparePlayersAdvanced()" style="margin-top:14px">COMPARE PLAYERS</button><div id="adv-compare-result" style="margin-top:14px"></div></div>
-</section>
-<!-- FILM ROOM -->
-<section class="page" id="page-filmroom">
- <div class="page-heading"><div><div class="eyebrow">FOOTBALL CONCEPT LIBRARY</div><h1>NFL Film Room</h1><div class="subtitle">Learn formations, coverages, route concepts, and situational football.</div></div></div>
- <div class="notice">This is an interactive coaching lesson library, not licensed NFL game footage or actual team film.</div>
- <div class="card"><div class="search-row"><select id="film-category" onchange="populateFilmLessons()"><option value="concepts">Offensive concepts</option><option value="coverage">Defensive coverages</option><option value="fronts">Defensive fronts</option><option value="situations">Situational football</option></select><select id="film-lesson" onchange="renderFilmLesson()"></select></div><div id="film-content"></div></div>
-</section>
-<!-- PREDICTIONS & PICKS -->
-<section class="page" id="page-picks">
+<div class="embedded-module-label">PREDICTIONS & PICK TRACKER</div><section class="embedded-module" id="module-picks">
  <div class="page-heading"><div><div class="eyebrow">PICK TRACKER</div><h1>Weekly Predictions & Picks</h1><div class="subtitle">Make your own picks, save them on this device, and track your accuracy.</div></div></div>
  <div class="notice">No live betting lines or official schedules are connected. This tracker records your selections; it does not claim to predict actual game results. Picks are stored locally in this browser.</div>
  <div class="grid"><div class="card"><div class="stat-label">Picks recorded</div><div class="stat-number" id="pick-count">0</div></div><div class="card"><div class="stat-label">Correct</div><div class="stat-number" id="pick-correct">0</div></div><div class="card"><div class="stat-label">Incorrect</div><div class="stat-number" id="pick-incorrect">0</div></div><div class="card"><div class="stat-label">Accuracy</div><div class="stat-number" id="pick-accuracy">—</div></div></div>
  <div class="card"><div class="panel-title">Record a Game Pick</div><div class="three-col"><div><div class="stat-label">Team 1</div><select id="pick-team-a"></select></div><div><div class="stat-label">Team 2</div><select id="pick-team-b"></select></div><div><div class="stat-label">Your pick</div><select id="pick-winner"></select></div></div><input id="pick-note" placeholder="Optional note (e.g. matchup reason)" style="margin-top:12px"><button class="btn" onclick="saveGamePick()" style="margin-top:12px">SAVE PICK</button></div>
  <div class="card" style="margin-top:14px"><div class="panel-title">Your Pick History</div><div id="pick-history" class="muted small">No picks recorded yet.</div></div>
-</section>
-<section class="page" id="page-scoreboard"><div class="page-heading"><div><div class="eyebrow">AROUND THE NFL</div><h1>Live Scores & Schedule</h1><div class="subtitle">Current games and weekly matchups from ESPN.</div></div><button class="btn secondary" onclick="loadScoreboard()">REFRESH</button></div><div class="notice" id="score-status">Connecting to scoreboard…</div><div class="card"><div class="panel-title">Current Scoreboard</div><div id="live-scoreboard">Loading games…</div></div><div class="card" style="margin-top:14px"><div class="panel-title">Weekly Schedule</div><div class="search-row"><select id="schedule-season"><option>2026</option><option>2025</option><option>2024</option></select><select id="schedule-type"><option value="2">Regular season</option><option value="1">Preseason</option><option value="3">Postseason</option></select><select id="schedule-week"></select><button class="btn" onclick="loadWeeklySchedule()">LOAD WEEK</button></div><div id="weekly-schedule">Choose a week.</div></div><p class="muted small">Uses the public ESPN scoreboard feed, not an official NFL API.</p></section><section class="page" id="page-tendencies"><div class="page-heading"><div><div class="eyebrow">PLAYER PRODUCTION PROFILE</div><h1>Player Tendencies & Heat Maps</h1><div class="subtitle">Season production and game participation.</div></div></div><div class="notice">The current player feed contains season totals and weeks played, not route coordinates or target locations. These visuals are production profiles, not field-location tracking.</div><div class="card"><div class="search-row"><select id="tendency-position" onchange="populateTendencyPlayers()"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select><select id="tendency-player" onchange="renderTendencyProfile()"></select></div><div id="tendency-profile">Choose a player.</div></div></section><section class="page" id="page-dashboard"><div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL HQ</div><h1>My Dashboard</h1><div class="subtitle">Choose a favorite team, player, and dashboard widgets.</div></div></div><div class="card"><div class="panel-title">Customize</div><div class="two-col"><div><div class="stat-label">Favorite team</div><select id="dash-team"></select></div><div><div class="stat-label">Favorite player</div><select id="dash-player"></select></div></div><div class="section-title">Widgets</div><div class="dash-toggles"><label><input type="checkbox" id="dash-show-player" checked> Favorite player</label><label><input type="checkbox" id="dash-show-team" checked> Favorite team</label><label><input type="checkbox" id="dash-show-leaders" checked> Statistical leaders</label><label><input type="checkbox" id="dash-show-picks" checked> Pick record</label></div><button class="btn" onclick="saveDashboardSettings()" style="margin-top:15px">SAVE DASHBOARD</button><span id="dash-save-status" class="muted small"></span></div><div id="personal-dashboard" class="dashboard-grid" style="margin-top:15px">Save preferences to build your dashboard.</div></section><!-- LIVING FIELD --><section class="page" id="page-livingfield">
+</section><div class="embedded-module-label">PERSONALIZED DASHBOARD</div><section class="embedded-module" id="module-dashboard"><div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL HQ</div><h1>My Dashboard</h1><div class="subtitle">Choose a favorite team, player, and dashboard widgets.</div></div></div><div class="card"><div class="panel-title">Customize</div><div class="two-col"><div><div class="stat-label">Favorite team</div><select id="dash-team"></select></div><div><div class="stat-label">Favorite player</div><select id="dash-player"></select></div></div><div class="section-title">Widgets</div><div class="dash-toggles"><label><input type="checkbox" id="dash-show-player" checked> Favorite player</label><label><input type="checkbox" id="dash-show-team" checked> Favorite team</label><label><input type="checkbox" id="dash-show-leaders" checked> Statistical leaders</label><label><input type="checkbox" id="dash-show-picks" checked> Pick record</label></div><button class="btn" onclick="saveDashboardSettings()" style="margin-top:15px">SAVE DASHBOARD</button><span id="dash-save-status" class="muted small"></span></div><div id="personal-dashboard" class="dashboard-grid" style="margin-top:15px">Save preferences to build your dashboard.</div></section></section>
+
+<!-- NEWS -->
+
+
+
+<!-- GAME SIMULATOR -->
+
+<!-- GAME PLANNING -->
+
+<!-- ADVANCED ANALYTICS -->
+
+<!-- FILM ROOM -->
+
+<!-- PREDICTIONS & PICKS -->
+
+<section class="page" id="page-scoreboard"><div class="page-heading"><div><div class="eyebrow">AROUND THE NFL</div><h1>Live Scores & Schedule</h1><div class="subtitle">Current games and weekly matchups from ESPN.</div></div><button class="btn secondary" onclick="loadScoreboard()">REFRESH</button></div><div class="notice" id="score-status">Connecting to scoreboard…</div><div class="card"><div class="panel-title">Current Scoreboard</div><div id="live-scoreboard">Loading games…</div></div><div class="card" style="margin-top:14px"><div class="panel-title">Weekly Schedule</div><div class="search-row"><select id="schedule-season"><option>2026</option><option>2025</option><option>2024</option></select><select id="schedule-type"><option value="2">Regular season</option><option value="1">Preseason</option><option value="3">Postseason</option></select><select id="schedule-week"></select><button class="btn" onclick="loadWeeklySchedule()">LOAD WEEK</button></div><div id="weekly-schedule">Choose a week.</div></div><p class="muted small">Uses the public ESPN scoreboard feed, not an official NFL API.</p></section><!-- LIVING FIELD --><section class="page" id="page-livingfield">
 <div class="page-heading"><div><div class="eyebrow">GRIDIRON IQ · TACTICAL COMMAND</div><h1>The Living Field</h1><div class="subtitle">Explore verified player production, build tactical diagrams, and inspect data-backed team profiles.</div></div><span class="pill">TACTICAL SYSTEM</span></div>
 <div class="notice">Verified player statistics and published NFL Next Gen Stats metrics are shown when available. Raw player coordinates are not part of the free feed. The separate Matchup Center displays historical-data model probabilities only when a validated prediction artifact is available. Tactical field positions and drawn routes remain user-created illustrations—not actual NFL player tracking.</div>
 <div class="card"><div class="lf-toolbar"><select id="lf-team" aria-label="Select NFL team"></select><select id="lf-player" aria-label="Select player"><option value="">Select a player</option></select><select id="lf-tool"><option value="move">Move players</option><option value="route">Draw route</option></select><select id="lf-route-kind"><option>Pass</option><option>Run</option></select><button class="btn secondary" id="lf-reset">RESET FIELD</button></div>
@@ -787,8 +766,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 
 <nav class="mobile-nav">
 <button class="active" data-page="overview"><span>⌂</span>Home</button><button data-page="players"><span>▥</span>Stats</button><button data-page="livingfield"><span>⌖</span>Field</button><button data-page="matchup"><span>⚔</span>Matchup</button><button type="button" id="more-toggle"><span>☷</span>More</button></nav>
-<div class="more-menu" id="more-menu" aria-label="More GRIDIRON IQ sections">
-<button data-page="teams">Team Analytics</button><button data-page="playlab">Play Lab</button><button data-page="topplays">Weekly Top Plays</button><button data-page="simulator">Game Simulator</button><button data-page="gameplan">Game Planning</button><button data-page="advanced">Advanced Analytics</button><button data-page="filmroom">Film Room</button><button data-page="picks">Predictions & Picks</button><button data-page="scoreboard">Scores</button><button data-page="tendencies">Tendencies</button><button data-page="dashboard">My Dashboard</button><button data-page="news">NFL News</button><button data-page="designer">Play Designer</button><button data-page="notebook">My NFL Notebook</button></div>
+<div class="more-menu" id="more-menu" aria-label="More GRIDIRON IQ sections"><button data-page="teams">Team Center</button><button data-page="playlab">Play Lab</button><button data-page="scoreboard">NFL Live</button><button data-page="notebook">My Football HQ</button></div>
 
 </div>
 
@@ -810,14 +788,25 @@ const teams = [
 ];
 
 const players = [];
+function organizeAnalyticsModules(){
+ const comparison=document.getElementById("lf-compare-result")?.closest(".lf-feature-card");
+ if(comparison)document.getElementById("player-comparison-module")?.appendChild(comparison);
+ const identity=document.getElementById("lf-identity-result")?.closest(".lf-feature-card");
+ const power=document.getElementById("lf-power-map")?.closest(".lf-feature-card");
+ const teamBox=document.getElementById("team-intelligence-modules");
+ if(teamBox&&identity)teamBox.appendChild(identity);
+ if(teamBox&&power)teamBox.appendChild(power);
+}
+organizeAnalyticsModules();
 function showPage(page) {
+  const parentMap={advanced:"players",tendencies:"players",gameplan:"matchup",filmroom:"playlab",simulator:"playlab",designer:"playlab",picks:"notebook",dashboard:"notebook"};
+  const parent=parentMap[page]||page;
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  const target=document.getElementById("page-"+page);
+  const target=document.getElementById("page-"+parent);
   if(target) target.classList.add("active");
-  document.querySelectorAll("[data-page]").forEach(b=>{
-    b.classList.toggle("active",b.dataset.page===page);
-  });
-  window.scrollTo({top:0,behavior:"smooth"});
+  document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===parent));
+  const module=parentMap[page]?document.getElementById("module-"+page):null;
+  window.scrollTo({top:module?module.getBoundingClientRect().top+window.scrollY-82:0,behavior:"smooth"});
 }
 
 document.querySelectorAll("[data-page]").forEach(button=>{
