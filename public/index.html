@@ -785,6 +785,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <script src="/living-field.js" defer></script>
 <script src="/intelligence.js" defer></script>
 <script src="/advanced-data.js" defer></script>\n<script src="/polish.js" defer></script>
+<script src="/micro-polish.js" defer></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
@@ -839,6 +840,8 @@ function renderPlayers(list) {
   }
   list.forEach(p=>{
     const row=document.createElement("tr");
+    row.dataset.playerId=String(p.id ?? "");
+    row.style.cursor="pointer";
     const team=(p.teams || []).join(", ") || "—";
     [p.name,p.position || "—",team,
      Number(p.passing_yards || 0).toLocaleString(),
@@ -859,6 +862,7 @@ async function loadPlayers() {
     if(!response.ok) throw new Error("Prepared NFL statistics file is not available yet");
     const data=await response.json();
     loadedPlayerRows=data.players || [];
+    window.loadedPlayerRows=loadedPlayerRows;
     document.getElementById("player-season").textContent=
       "Regular-season player statistics · " + data.season +
       (data.isCurrentSeason ? " · current season" : " · latest available completed season");
