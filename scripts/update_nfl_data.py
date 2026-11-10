@@ -102,3 +102,40 @@ payload = {
 status = {k: v for k, v in payload.items() if k != "players"}
 (OUT / "nfl-status.json").write_text(json.dumps(status, separators=(",", ":")))
 print(f"Saved {len(players)} real player records for {season_used}")
+
+# Keep one prior-season archive for year-over-year context. This runs only
+# when the archive is missing, so daily refreshes do not repeatedly download it.
+ARCHIVE_YEAR = YEAR - 1
+ARCHIVE_PATH = OUT / f"nfl-players-{ARCHIVE_YEAR}.json"
+if not ARCHIVE_PATH.exists():
+    try:
+        old_frame, old_url = fetch_season(ARCHIVE_YEAR)
+        old_name_col = "player_display_name" if "player_display_name" in old_frame.columns else "player_name"
+        old_id_col = "player_id" if "player_id" in old_frame.columns else old_name_col
+        old_team_col = "recent_team" if "recent_team" in old_frame.columns else ("team" if "team" in old_frame.columns else None)
+        for col in STAT_COLUMNS:
+            if col not in old_frame.columns:
+                alternate = {"interceptions": "passing_interceptions", "carries": "rushing_attempts"}.get(col)
+                old_frame[col] = old_frame[alternate] if alternate and alternate in old_frame.columns else 0
+            old_frame[col] = pd.to_numeric(old_frame[col], errors="coerce").fillna(0)
+        old_players = []
+        for old_id, group in old_frame.groupby(old_id_col, dropna=False):
+            first = group.iloc[0]
+            old_teams = [str(t) for t in group[old_team_col].dropna().unique() if str(t).strip()] if old_team_col else []
+            old_weeks = sorted({int(w) for w in pd.to_numeric(group.get("week", pd.Series(dtype=float)), errors="coerce").dropna() if w > 0})
+            record = {"id": str(old_id), "name": str(first.get(old_name_col, "")),
+                      "position": str(first.get("position", "")) if pd.notna(first.get("position", "")) else "",
+                      "teams": old_teams, "weeks": old_weeks, "games": len(old_weeks)}
+            for col in STAT_COLUMNS:
+                record[col] = round(float(group[col].sum()), 2)
+            if record["name"] and record["name"] != "nan":
+                old_players.append(record)
+        old_players.sort(key=lambda p: p["name"].lower())
+        old_payload = {"season": ARCHIVE_YEAR, "isCurrentSeason": False,
+                       "retrievedAt": datetime.now(timezone.utc).isoformat(),
+                       "source": "nflverse", "sourceUrl": old_url,
+                       "totalPlayers": len(old_players), "players": old_players}
+        ARCHIVE_PATH.write_text(json.dumps(old_payload, separators=(",", ":")))
+        print(f"Saved historical archive: {len(old_players)} real player records for {ARCHIVE_YEAR}")
+    except Exception as exc:
+        print(f"Historical archive not created for {ARCHIVE_YEAR}: {exc}")
