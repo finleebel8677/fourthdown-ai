@@ -35,7 +35,7 @@ function render(){
   const tap=make('button','clips-tap-play','▶ Tap to play');tap.type='button';tap.addEventListener('click',()=>playCard(card));
   player.append(poster,tap);
   const top=make('div','clips-video-top');top.append(make('span','clips-league-tag',v.league==='nfl'?'NFL':'COLLEGE'),make('span','clips-channel',v.channel));
-  const meta=make('div','clips-video-meta');meta.append(make('h3','',v.title),make('p','',v.channel+' · '+dateLabel(v.published)));
+  const meta=make('div','clips-video-meta');meta.append(make('h3','',v.title),make('p','',v.channel+' · '+dateLabel(v.published)));const sourceLink=make('a','clips-open-source','Open in YouTube ↗');sourceLink.href=v.url;sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';
   const actions=make('div','clips-social clips-video-social');
   const liked=!!likes[v.id];
   const like=make('button',liked?'liked':'',liked?'♥':'♡');like.type='button';like.title='Like';like.setAttribute('aria-label','Like video');like.setAttribute('aria-pressed',String(liked));
@@ -52,7 +52,7 @@ function render(){
   form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;comments[v.id]=comments[v.id]||[];comments[v.id].push(value);if(write('gridironClipsComments',comments)){input.value='';refreshComments()}else comments[v.id].pop()});
   const doubleTap=(()=>{let last=0;return()=>{const now=Date.now();if(now-last<330){like.click();card.classList.add('clips-liked-pop');setTimeout(()=>card.classList.remove('clips-liked-pop'),550);last=0}else last=now}})();
   card.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'&&!e.target.closest('button'))doubleTap()});
-  card.append(player,top,meta,actions,panel);feed.append(card);
+  card.append(player,top,meta,sourceLink,actions,panel);feed.append(card);
  });
  if('IntersectionObserver'in window){
   observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting&&entry.intersectionRatio>=.72)playCard(entry.target);else if(entry.target.dataset.videoId===activeVideo)pauseCard(entry.target)})},{root:feed,threshold:[0,.25,.72,1]});
