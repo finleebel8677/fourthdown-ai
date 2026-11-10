@@ -520,6 +520,18 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 
 \n/* Final GRIDIRON IQ polish */\n.brand-logo{filter:drop-shadow(0 0 10px #00cfff35)}\n.health-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin:12px 0}\n.health-grid .stat-number{font-size:21px}\nbutton,.btn,select,input{min-height:42px}\nbutton:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #00e5ff;outline-offset:2px}\n.table-wrap{-webkit-overflow-scrolling:touch}\n@media(max-width:650px){main{padding:16px 12px calc(108px + env(safe-area-inset-bottom))}.health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-nav{padding-bottom:max(10px,env(safe-area-inset-bottom));min-height:68px}.mobile-nav button{min-height:48px}.card{overflow-wrap:anywhere}.page-heading{gap:10px}}\n
 .iq-feature{border-color:#315078}.iq-meter-row{display:grid;grid-template-columns:minmax(100px,1fr) 2fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px}.iq-meter{height:10px;background:#243750;border-radius:20px;overflow:hidden}.iq-meter span{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#3b82f6)}.iq-grade{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:7px 9px;border-radius:8px;background:#183756;color:#a5e5ff;font-weight:900}.iq-trend{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;align-items:end;height:130px;margin:18px 0 8px}.iq-trend-col{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:5px;height:100%;font-size:10px;color:var(--muted)}.iq-trend-bar{width:100%;max-width:38px;min-height:2px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#38bdf8,#2563eb)}.iq-trend-col strong{color:var(--text);font-size:10px}@media(max-width:650px){.iq-meter-row{grid-template-columns:85px 1fr 44px}.iq-trend{gap:4px}}
+
+/* GRIDIRON CLIPS */
+#page-clips .clips-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:18px 0}
+.clips-league-filters{display:flex;gap:7px;flex-wrap:wrap}.clips-filter{border:1px solid var(--border);background:#101d30;color:var(--muted);border-radius:22px;padding:9px 14px;font-weight:700;font-size:12px}.clips-filter.active{background:#173d69;border-color:#3989d9;color:#fff}
+#clips-search{min-width:min(100%,280px);flex:1;max-width:380px;background:#0a1423;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 13px}
+.clips-feed-heading{display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px;gap:12px}.clips-feed-heading strong{display:block;font-size:12px;letter-spacing:1px}.clips-feed-heading span{display:block;color:var(--muted);font-size:11px;margin-top:4px}.clips-live-dot{color:#7dd3fc!important;letter-spacing:1px;font-size:10px!important}
+.clips-feed{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.clips-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:285px;padding:20px;border-radius:16px;border:1px solid #29415e;background:radial-gradient(circle at 85% 12%,rgba(56,189,248,.22),transparent 35%),linear-gradient(145deg,#142943,#0b1423 72%);color:var(--text);text-decoration:none;overflow:hidden;transition:transform .18s,border-color .18s;isolation:isolate}
+.clips-card:before{content:"";position:absolute;inset:auto -25px -75px 20%;height:180px;background:repeating-linear-gradient(115deg,transparent 0 17px,rgba(255,255,255,.045) 18px 20px);transform:skewY(-12deg);z-index:-1}.clips-card:hover{transform:translateY(-3px);border-color:#60a5fa}
+.clips-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.clips-league-tag,.clips-type-tag{font-size:10px;font-weight:800;letter-spacing:.8px;padding:6px 9px;border-radius:20px;background:#203c5b;color:#dbeafe}.clips-type-tag{background:#172b43;color:#a9c9e8}.clips-play{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:rgba(56,189,248,.18);border:1px solid rgba(125,211,252,.65);font-size:24px;margin:30px 0 16px;box-shadow:0 0 28px rgba(56,189,248,.13)}
+.clips-card h3{font-size:20px;line-height:1.15;margin:0 0 9px}.clips-card p{font-size:12px;line-height:1.5;color:#a9bbd1;margin:0}.clips-card-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:22px;color:#7dd3fc;font-size:11px;font-weight:800;letter-spacing:.6px}.clips-card-bottom span:last-child{font-size:18px}.clips-empty{grid-column:1/-1;padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:12px}.clips-footnote{font-size:11px;color:var(--muted);margin:16px 0 4px}
+@media(max-width:650px){#page-clips .clips-toolbar{align-items:stretch}.clips-league-filters{display:grid;grid-template-columns:repeat(3,1fr)}.clips-filter{padding:10px 7px}.clips-feed{display:flex;flex-direction:column;gap:12px}.clips-card{min-height:250px}.clips-feed-heading{align-items:flex-start}}
 </style>
 </head>
 
@@ -546,6 +558,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
   <button class="nav-btn" data-page="playlab"><span class="nav-icon">▤</span>Play Lab</button>
   <button class="nav-btn" data-page="scoreboard"><span class="nav-icon">🏟</span>NFL Live</button>
   <button class="nav-btn" data-page="notebook"><span class="nav-icon">📓</span>My Football HQ</button>
+  <button class="nav-btn" data-page="clips"><span class="nav-icon">▶</span>GRIDIRON CLIPS</button>
 </aside>
 
 <main>
@@ -722,6 +735,15 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <!-- CUSTOM PLAY DESIGNER -->
 
 <!-- MY NFL NOTEBOOK -->
+<section class="page" id="page-clips">
+ <div class="page-heading"><div><div class="eyebrow">THE FOOTBALL HIGHLIGHT FEED</div><h1>GRIDIRON CLIPS</h1><div class="subtitle">A vertical-style discovery feed for official NFL and college football highlights.</div></div><span class="pill">NFL + COLLEGE</span></div>
+ <div class="notice">Clips open from their official publishers. GRIDIRON IQ does not download, copy, or rehost game footage. Some publishers restrict third-party playback, so a clip may open on its original site.</div>
+ <div id="clips-app"><div class="clips-toolbar"><div class="clips-league-filters" role="group" aria-label="Choose league"><button class="clips-filter active" data-league="all">All football</button><button class="clips-filter" data-league="nfl">NFL</button><button class="clips-filter" data-league="college">College</button></div><input id="clips-search" type="search" placeholder="Search teams, players, or highlight types…" aria-label="Search highlight sources"></div>
+ <div class="clips-feed-heading"><div><strong>OFFICIAL HIGHLIGHT CHANNELS</strong><span>Tap a card to watch at the source</span></div><span class="clips-live-dot">SOURCE LINKS</span></div>
+ <div id="clips-feed" class="clips-feed" aria-live="polite"></div>
+ <div class="clips-footnote">More official feeds will be added as playback and sharing permissions are verified.</div></div>
+</section>
+
 <section class="page" id="page-notebook">
  <div class="page-heading"><div><div class="eyebrow">YOUR PERSONAL FOOTBALL HQ</div><h1>My Football HQ</h1><div class="subtitle">Keep your picks, scouting reports, player observations, ideas, and custom football notes.</div></div></div>
  <div class="notice">Notes and saved plays are stored locally in this browser on this device. They are not synced across devices or backed up to an online account.</div>
@@ -780,7 +802,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 
 <nav class="mobile-nav">
 <button class="active" data-page="overview"><span>⌂</span>Home</button><button data-page="players"><span>▥</span>Stats</button><button data-page="livingfield"><span>⌖</span>Field</button><button data-page="matchup"><span>⚔</span>Matchup</button><button type="button" id="more-toggle"><span>☷</span>More</button></nav>
-<div class="more-menu" id="more-menu" aria-label="More GRIDIRON IQ sections"><button data-page="teams">Team Center</button><button data-page="playlab">Play Lab</button><button data-page="scoreboard">NFL Live</button><button data-page="notebook">My Football HQ</button></div>
+<div class="more-menu" id="more-menu" aria-label="More GRIDIRON IQ sections"><button data-page="teams">Team Center</button><button data-page="playlab">Play Lab</button><button data-page="scoreboard">NFL Live</button><button data-page="notebook">My Football HQ</button><button data-page="clips">GRIDIRON CLIPS</button></div>
 
 </div>
 
@@ -790,6 +812,7 @@ th{color:#8da4bc;border-color:#263247}td{border-color:#1e2b40}tr:hover td{backgr
 <script src="/intelligence.js" defer></script>
 <script src="/advanced-data.js" defer></script>\n<script src="/polish.js" defer></script>
 <script src="/micro-polish.js" defer></script>
+<script src="/clips.js" defer></script>
 <script>
 const teams = [
 "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills",
