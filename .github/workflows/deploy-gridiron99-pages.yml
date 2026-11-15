@@ -1,0 +1,48 @@
+name: Deploy GRIDIRON '99 to GitHub Pages
+
+on:
+  push:
+    branches:
+      - retro-football-game
+    paths:
+      - "public/retro-bowl/**"
+      - "public/data/nfl-players.json"
+      - ".github/workflows/deploy-gridiron99-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out game branch
+        uses: actions/checkout@v4
+      - name: Prepare standalone game site
+        run: |
+          mkdir -p site/data
+          cp -R public/retro-bowl/. site/
+          cp public/data/nfl-players.json site/data/nfl-players.json
+          touch site/.nojekyll
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
