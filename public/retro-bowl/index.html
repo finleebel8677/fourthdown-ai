@@ -54,8 +54,27 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-acti
  <header class="top"><div class="logo">GRIDIRON '99<small>PIXEL FOOTBALL • FRANCHISE EDITION</small></div><div class="pill">BUILD 0.1 • PLAYABLE PREVIEW</div></header>
  <section id="home" class="panel">
   <div class="row spread"><div><h1>WELCOME TO THE GRIDIRON</h1><p>Build a franchise. Take the field. Chase the championship.</p></div><div class="pill" id="data-status">LOADING NFL PLAYERS…</div></div>
+  <h2>CHOOSE YOUR GAME MODE</h2>
+  <div class="row" style="margin-bottom:14px">
+   <button class="btn" id="standard-mode">STANDARD FRANCHISE</button>
+   <button class="btn secondary" id="league-mode">LEAGUE RESET DRAFT</button>
+  </div>
+  <p id="mode-description">Standard Franchise: start with each team's existing NFL player group.</p>
   <h2>CHOOSE YOUR TEAM</h2><div id="team-grid" class="team-grid"></div>
-  <div class="notice" style="margin-top:12px">Player names and team associations are seeded from the NFL player-stat dataset already stored in this repository. Player ratings in this prototype are gameplay estimates, not official NFL ratings.</div>
+  <div class="notice" style="margin-top:12px">Player names and team associations are seeded from the NFL player-stat dataset already stored in this repository. Player ratings in this prototype are gameplay estimates, not official NFL ratings. League Reset pools every player record in the dataset into one shared draft.</div>
+ </section>
+ <section id="draft" class="hidden">
+  <div class="panel">
+   <div class="row spread"><div><div class="pill">LEAGUE RESET • ALL-PLAYER DRAFT</div><h1 id="draft-title">BUILD YOUR TEAM</h1><p id="draft-progress">Your picks are highlighted.</p></div><button class="btn secondary" id="draft-exit">EXIT DRAFT</button></div>
+   <div class="statline"><div class="stat"><b id="draft-round">1</b><small>ROUND</small></div><div class="stat"><b id="draft-pick">1</b><small>OVERALL PICK</small></div><div class="stat"><b id="draft-left">0</b><small>PLAYERS LEFT</small></div></div>
+  </div>
+  <div class="panel">
+   <h2>AVAILABLE PLAYERS</h2>
+   <div class="row"><input id="draft-search" placeholder="Search player name…" style="flex:1;min-width:150px;background:#0c1712;border:1px solid #526c56;color:var(--ink);padding:11px;border-radius:4px"><select id="draft-position"><option value="ALL">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option><option>OL</option><option>LB</option><option>CB</option><option>S</option><option>DE</option><option>DT</option></select></div>
+   <div id="draft-players" class="roster" style="margin-top:12px"></div>
+   <div class="row spread" style="margin-top:12px"><span class="pill" id="draft-selected">Select a player</span><button class="btn" id="make-pick" disabled>MAKE DRAFT PICK</button></div>
+  </div>
+  <div class="panel"><h2>DRAFT BOARD</h2><div id="draft-board" class="roster"></div></div>
  </section>
  <section id="franchise" class="hidden">
   <div class="panel">
@@ -73,7 +92,7 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-acti
    <div id="field-wrap"><canvas id="field" width="960" height="390" aria-label="Pixel football field"></canvas></div>
    <div class="controls">
     <div class="control-box"><h3>PLAYER MOVEMENT</h3><div class="pad"><button class="empty">•</button><button data-move="up">↑</button><button class="empty">•</button><button data-move="left">←</button><button data-move="down">↓</button><button data-move="right">→</button></div><p style="text-align:center;margin:8px 0 0">Swipe the field or use the arrows</p></div>
-    <div class="control-box"><h3>PLAY ACTIONS</h3><div class="actions"><button class="action primary" id="snap">SNAP PLAY</button><button class="action" id="pass">PASS / THROW</button><button class="action" id="sprint">SPRINT</button><button class="action" id="dodge">DODGE</button></div><p id="play-status" style="margin:8px 0 0">Choose SNAP PLAY to begin.</p></div>
+    <div class="control-box"><h3>PLAY ACTIONS</h3><div class="actions"><button class="action primary" id="snap">START OFFENSE</button><button class="action" id="pass">PASS / THROW</button><button class="action" id="sprint">SPRINT</button><button class="action" id="dodge">DODGE</button><button class="action" id="kick-return">KICK RETURN</button></div><p id="play-status" style="margin:8px 0 0">Choose SNAP PLAY to begin.</p></div>
    </div>
   </div>
  </section>
