@@ -14,7 +14,7 @@ The existing GRIDIRON IQ app, Worker API, deployment configuration, and NFL anal
 
 - Side-view pixel-style football field rendered with Canvas.
 - Responsive layout and touch controls for phones.
-- Run, pass/throw, sprint, and dodge actions.
+- Run, pass/throw, sprint, and dodge actions.\n- Opening kickoffs, user-controlled kick returns, return tackles, return touchdowns, and kickoffs after scoring plays.\n- Two franchise starts: Standard Franchise (existing team player groups) and League Reset (all 1,779 player records in the shared 2026 dataset enter a 32-team snake draft; the user makes their team's picks and CPU teams draft automatically).
 - First downs, tackles, turnovers on downs, touchdowns, quarter clock, and score.
 - Franchise team selection, 17-game regular season structure, basic win/loss record, and browser-local save.
 - Roster panel populated with real NFL player names and team associations from the repository's existing 2026 player dataset.
@@ -43,7 +43,7 @@ Then open `http://localhost:8787/retro-bowl/`.
 
 1. Improve the play engine and make pass targeting/catching/tackling more reliable.
 2. Add playable defensive possessions and defensive controls.
-3. Add authentic 32-team schedules, standings, playoffs, and Super Bowl.
+3. Complete authentic 32-team schedules, standings, playoffs, and Super Bowl (the current schedule/opponent and season wrap are still prototype logic).
 4. Build deeper rosters, depth charts, player ratings, contracts, draft, trades, injuries, and progression.
 5. Add original pixel-art player sprites, team customization, sound, and an installable iPhone experience.
 6. Add automated tests and verify the game in mobile Safari.
