@@ -361,7 +361,7 @@
     setMode("standard");
     const existing=loadSave();
     try{
-      const response=await fetch("/data/nfl-players.json",{cache:"no-store"});
+      const response=await fetch("./data/nfl-players.json",{cache:"no-store"});
       if(!response.ok)throw new Error("NFL player dataset not available");
       const data=await response.json();
       playerData=Array.isArray(data.players)?data.players:[];
