@@ -226,7 +226,6 @@
   document.querySelectorAll("[data-move]").forEach(b=>{
     const dir=b.dataset.move;
     b.addEventListener("pointerdown",e=>{e.preventDefault();move(dir);});
-    b.addEventListener("click",()=>move(dir));
   });
   canvas.addEventListener("pointerdown",e=>{
     if(!game||!game.active||game.mode!=="pass")return;
