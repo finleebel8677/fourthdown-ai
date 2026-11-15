@@ -1,0 +1,18 @@
+{
+  "name": "GRIDIRON '99 — Retro Football",
+  "short_name": "GRIDIRON '99",
+  "start_url": "/retro-bowl/",
+  "scope": "/retro-bowl/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b1411",
+  "theme_color": "#101b18",
+  "icons": [
+    {
+      "src": "/retro-bowl/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
