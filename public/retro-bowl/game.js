@@ -358,6 +358,7 @@
 
   async function init(){
     renderTeams();
+    setMode("standard");
     const existing=loadSave();
     try{
       const response=await fetch("/data/nfl-players.json",{cache:"no-store"});
