@@ -15,7 +15,7 @@
   ];
   const aliases = { JAX:"JAC", WAS:"WSH", LAR:"LA" };
   const $ = id => document.getElementById(id);
-  const screens = ["home","franchise","game","result"];
+  const screens = ["home","franchise","game","result","draft"];
   const show = id => screens.forEach(s => $(s).classList.toggle("hidden",s!==id));
   const saveKey = "gridiron99-franchise-v1";
   let playerData = [];
@@ -23,6 +23,9 @@
   let franchise = null;
   let opponent = null;
   let game = null;
+  let selectedMode = "standard";
+  let draft = null;
+  let selectedDraftId = null;
   let raf = 0;
   let lastFrame = 0;
   const canvas = $("field");
@@ -53,18 +56,84 @@
   }
   function persist() { try { localStorage.setItem(saveKey,JSON.stringify(franchise)); } catch {} }
   function selectTeam(code) {
+    if (selectedMode === "league") {
+      startLeagueDraft(code);
+      return;
+    }
     const squad = teamPlayers(code);
     if (!squad.length) {
       $("data-status").textContent = "ROSTER DATA UNAVAILABLE";
       return;
     }
-    franchise = { team:code, wins:0, losses:0, week:1, season:1, titles:0, roster:squad.map(p=>p.id), history:[] };
+    franchise = { team:code, mode:"standard", wins:0, losses:0, week:1, season:1, titles:0, roster:squad.map(p=>p.id), history:[] };
     persist(); renderFranchise(); show("franchise");
+  }
+  function setMode(mode) {
+    selectedMode=mode;
+    $("standard-mode").classList.toggle("secondary",mode!=="standard");
+    $("league-mode").classList.toggle("secondary",mode!=="league");
+    $("mode-description").textContent=mode==="league"
+      ?"League Reset: every player in the available NFL dataset enters one shared 32-team snake draft. You make every pick for your team; CPU teams draft automatically."
+      :"Standard Franchise: start with each team's existing NFL player group.";
+  }
+  function startLeagueDraft(code) {
+    const unique=[...new Map(playerData.map(p=>[p.id,p])).values()].sort((a,b)=>rating(b)-rating(a));
+    if(!unique.length){$("data-status").textContent="PLAYER POOL UNAVAILABLE";return;}
+    draft={userTeam:code,pool:unique,available:unique.map(p=>p.id),rosters:Object.fromEntries(teams.map(t=>[t[0],[]])),pick:0,board:[],rounds:Math.ceil(unique.length/32)};
+    selectedDraftId=null;
+    runCpuDraft();
+    show("draft");
+  }
+  function draftTeamAt(index) {
+    const round=Math.floor(index/32),slot=index%32;
+    const teamIndex=round%2===0?slot:31-slot;
+    return teams[teamIndex][0];
+  }
+  function runCpuDraft() {
+    if(!draft)return;
+    while(draft.pick<draft.pool.length && draftTeamAt(draft.pick)!==draft.userTeam){
+      const team=draftTeamAt(draft.pick);
+      const player=draft.pool.find(p=>draft.available.includes(p.id));
+      if(!player)break;
+      makeDraftSelection(player.id,team);
+    }
+    renderDraft();
+  }
+  function makeDraftSelection(playerId,team) {
+    const player=draft.pool.find(p=>p.id===playerId);
+    if(!player||!draft.available.includes(playerId))return;
+    draft.available=draft.available.filter(id=>id!==playerId);
+    draft.rosters[team].push(playerId);
+    draft.board.push({pick:draft.pick+1,round:Math.floor(draft.pick/32)+1,team,player});
+    draft.pick++;
+  }
+  function renderDraft() {
+    if(!draft)return;
+    if(draft.pick>=draft.pool.length){completeLeagueDraft();return;}
+    const currentTeam=draftTeamAt(draft.pick);
+    $("draft-title").textContent=getTeamName(draft.userTeam).toUpperCase()+" • LEAGUE RESET";
+    $("draft-progress").textContent="Your team picks at #"+(draft.pick+1)+". CPU teams automatically fill their rosters.";
+    $("draft-round").textContent=Math.floor(draft.pick/32)+1;
+    $("draft-pick").textContent=draft.pick+1;
+    $("draft-left").textContent=draft.available.length;
+    $("draft-selected").textContent=selectedDraftId?"Selected: "+(draft.pool.find(p=>p.id===selectedDraftId)?.name||"Player"):"Select a player";
+    $("make-pick").disabled=!selectedDraftId||currentTeam!==draft.userTeam;
+    $("draft-players").innerHTML=draft.pool.filter(p=>draft.available.includes(p.id))
+      .filter(p=>(($("draft-search").value||"").trim()===""||p.name.toLowerCase().includes($("draft-search").value.trim().toLowerCase())))
+      .filter(p=>$("draft-position").value==="ALL"||p.position===$("draft-position").value)
+      .slice(0,28).map(p=>'<button class="team-card draft-option" data-player="'+escapeHtml(p.id)+'"><strong>'+escapeHtml(p.name)+' • '+rating(p)+'</strong><span>'+escapeHtml(p.position||"—")+' • '+escapeHtml((p.teams||[]).join("/"))+'</span></button>').join("")||"<p>No matching players. Change the search or position filter.</p>";
+    document.querySelectorAll(".draft-option").forEach(b=>b.addEventListener("click",()=>{selectedDraftId=b.dataset.player;renderDraft();}));
+    $("draft-board").innerHTML=draft.board.slice(-20).reverse().map(p=>'<div class="player"><div><b>#'+p.pick+' '+escapeHtml(p.player.name)+'</b><br><span>'+p.team+' • '+escapeHtml(p.player.position||"—")+'</span></div><b>'+rating(p.player)+'</b></div>').join("");
+  }
+  function completeLeagueDraft() {
+    const roster=draft.rosters[draft.userTeam];
+    franchise={team:draft.userTeam,mode:"league",leagueRosters:draft.rosters,wins:0,losses:0,week:1,season:1,titles:0,roster,history:[]};
+    persist();draft=null;renderFranchise();show("franchise");
   }
   function getTeamName(code) { return teams.find(t=>t[0]===code)?.[1] || code; }
   function getRoster() {
     const ids = new Set(franchise.roster);
-    return playerData.filter(p=>ids.has(p.id) && (p.teams||[]).some(t=>(aliases[t]||t)===franchise.team));
+    return playerData.filter(p=>ids.has(p.id) && (franchise.mode==="league" || (p.teams||[]).some(t=>(aliases[t]||t)===franchise.team)));
   }
   function renderFranchise() {
     $("team-title").textContent = getTeamName(franchise.team).toUpperCase();
@@ -85,9 +154,28 @@
     if (!franchise) return;
     game={home:0,away:0,quarter:1,clock:45,down:1,toGo:10,spot:20,active:false,player:{x:190,y:245},receiver:{x:510,y:150},defenders:[],ball:null,mode:"idle",plays:0,finished:false,aim:{x:560,y:150},sprint:false,dodge:0,team:franchise.team,opponent:opponent[0]};
     $("game-title").textContent=franchise.team+"  vs  "+opponent[0];
-    $("play-status").textContent="Choose SNAP PLAY to begin.";
+    $("play-status").textContent="Kickoff! Return the opening kick.";
+    $("snap").textContent="START OFFENSE";
     $("score").textContent="0 — 0"; $("quarter").textContent="1ST"; $("clock").textContent="0:45"; $("down").textContent="1ST & 10";
-    show("game"); cancelAnimationFrame(raf); lastFrame=0; raf=requestAnimationFrame(loop);
+    show("game"); cancelAnimationFrame(raf); lastFrame=0; raf=requestAnimationFrame(loop); beginKickReturn();
+  }
+  function beginKickReturn() {
+    if(!game||game.finished||game.active)return;
+    game.active=true;game.mode="kickReturn";game.player={x:112,y:194};game.ball={x:112,y:165};
+    game.defenders=[0,1,2,3,4].map((_,i)=>({x:390+i*92,y:65+i*58,speed:42+Math.random()*24}));
+    game.receiver={x:game.player.x,y:game.player.y};game.sprint=false;game.dodge=0;
+    $("snap").textContent="START OFFENSE";
+    $("play-status").textContent="KICK RETURN: sprint, dodge defenders, and look for open grass.";
+  }
+  function finishKickReturn(touchdown=false) {
+    if(!game||!game.active||game.mode!=="kickReturn")return;
+    game.active=false;game.mode="idle";game.ball=null;game.sprint=false;
+    if(touchdown){game.home+=6;game.spot=20;$("play-status").textContent="KICK RETURN TOUCHDOWN! +6";}
+    else {game.spot=Math.max(15,Math.min(99,Math.round(15+(game.player.x-112)/8.2)));$("play-status").textContent="RETURN COMPLETE: "+(game.spot-15)+" YARD RETURN. Start your offense.";}
+    game.down=1;game.toGo=10;game.plays++;
+    updateHud();
+    $("snap").textContent="START OFFENSE";
+    if(game.plays>=20){endGame();}
   }
   function snap() {
     if(!game||game.finished||game.active)return;
@@ -102,7 +190,7 @@
   function finishPlay(kind) {
     if(!game||!game.active)return;
     game.active=false; game.sprint=false; game.ball=null;
-    const gain=Math.max(-2,Math.round((game.player.x-(160+game.spot*6.1))/6));
+    const oldScore=game.home+game.away;\n    const gain=Math.max(-2,Math.round((game.player.x-(160+game.spot*6.1))/6));
     if(kind==="touchdown" || game.player.x>=875){
       game.home+=7; game.spot=20; game.down=1; game.toGo=10;
       $("play-status").textContent="TOUCHDOWN! +7";
@@ -154,10 +242,10 @@
     ctx.fillStyle="#d8e6c0";ctx.font="bold 18px monospace";ctx.fillText(game.team,22, h-20);ctx.fillText(game.opponent, w-65,h-20);
     if(game.active){
       ctx.strokeStyle="#f6d36f";ctx.setLineDash([8,8]);ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(game.player.x+65,45);ctx.lineTo(game.player.x+65,h-45);ctx.stroke();ctx.setLineDash([]);
-      drawPlayer(game.receiver.x,game.receiver.y,"#f2cf72","#6d4822");
+      if(game.mode!=="kickReturn") drawPlayer(game.receiver.x,game.receiver.y,"#f2cf72","#6d4822");
       game.defenders.forEach(d=>drawPlayer(d.x,d.y,"#8bc2e9","#244c75"));
       drawPlayer(game.player.x,game.player.y,"#f4d35e","#9d3e31",true);
-      if(game.ball){ctx.fillStyle="#9b5b2b";ctx.fillRect(game.ball.x-7,game.ball.y-4,14,8);ctx.strokeStyle="#f7e4bd";ctx.strokeRect(game.ball.x-7,game.ball.y-4,14,8);}
+      if(game.ball){ctx.fillStyle="#9b5b2b";ctx.fillRect(game.ball.x-7,game.ball.y-4,14,8);ctx.strokeStyle="#f7e4bd";ctx.strokeRect(game.ball.x-7,game.ball.y-4,14,8);}\n      if(game.mode==="kickReturn"){ctx.fillStyle="#fff1b2";ctx.font="bold 17px monospace";ctx.fillText("KICK RETURN",w/2-75,38);}
       if(game.mode==="pass"){ctx.strokeStyle="#fff0a5";ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(game.player.x,game.player.y-15);ctx.lineTo(game.aim.x,game.aim.y);ctx.stroke();ctx.setLineDash([]);}
     }else{
       ctx.fillStyle="#dbe8c6";ctx.font="bold 20px monospace";ctx.fillText("GRIDIRON '99",w/2-110,h/2-12);
@@ -218,7 +306,7 @@
       $("pass").textContent="PASS / THROW";
     }
   }
-  $("snap").addEventListener("click",snap);
+  $("snap").addEventListener("click",snap);\n  $("kick-return").addEventListener("click",beginKickReturn);
   $("pass").addEventListener("click",pass);
   $("sprint").addEventListener("pointerdown",()=>{if(game)game.sprint=true;});
   ["pointerup","pointerleave","pointercancel"].forEach(e=>$("sprint").addEventListener(e,()=>{if(game)game.sprint=false;}));
@@ -233,7 +321,7 @@
     game.aim={x:Math.max(game.player.x+50,Math.min(900,(e.clientX-r.left)*sx)),y:Math.max(45,Math.min(345,(e.clientY-r.top)*sy))};
     $("play-status").textContent="Target set. Tap THROW.";
   });
-  $("play-game").addEventListener("click",startGame);
+  $("play-game").addEventListener("click",startGame);\n  $("standard-mode").addEventListener("click",()=>setMode("standard"));\n  $("league-mode").addEventListener("click",()=>setMode("league"));\n  $("make-pick").addEventListener("click",()=>{if(!draft||!selectedDraftId||draftTeamAt(draft.pick)!==draft.userTeam)return;makeDraftSelection(selectedDraftId,draft.userTeam);selectedDraftId=null;runCpuDraft();});\n  $("draft-search").addEventListener("input",renderDraft);\n  $("draft-position").addEventListener("change",renderDraft);\n  $("draft-exit").addEventListener("click",()=>{if(confirm("Leave this draft? Its unsaved progress will be lost.")){draft=null;show("home");}});
   $("exit-game").addEventListener("click",()=>{cancelAnimationFrame(raf);renderFranchise();show("franchise");});
   $("continue-franchise").addEventListener("click",()=>{renderFranchise();show("franchise");});
   $("rematch").addEventListener("click",startGame);
