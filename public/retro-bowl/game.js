@@ -190,7 +190,8 @@
   function finishPlay(kind) {
     if(!game||!game.active)return;
     game.active=false; game.sprint=false; game.ball=null;
-    const oldScore=game.home+game.away;\n    const gain=Math.max(-2,Math.round((game.player.x-(160+game.spot*6.1))/6));
+    const oldScore=game.home+game.away;
+    const gain=Math.max(-2,Math.round((game.player.x-(160+game.spot*6.1))/6));
     if(kind==="touchdown" || game.player.x>=875){
       game.home+=7; game.spot=20; game.down=1; game.toGo=10;
       $("play-status").textContent="TOUCHDOWN! +7";
@@ -208,6 +209,7 @@
     if(game.clock<=0){game.quarter++;game.clock=45;if(game.quarter>4){endGame();return;}}
     if(game.plays>=20){endGame();return;}
     updateHud();
+    if(game.home+game.away>oldScore) setTimeout(beginKickReturn,550);
   }
   function updateHud(){
     $("score").textContent=game.home+" — "+game.away;
@@ -245,7 +247,9 @@
       if(game.mode!=="kickReturn") drawPlayer(game.receiver.x,game.receiver.y,"#f2cf72","#6d4822");
       game.defenders.forEach(d=>drawPlayer(d.x,d.y,"#8bc2e9","#244c75"));
       drawPlayer(game.player.x,game.player.y,"#f4d35e","#9d3e31",true);
-      if(game.ball){ctx.fillStyle="#9b5b2b";ctx.fillRect(game.ball.x-7,game.ball.y-4,14,8);ctx.strokeStyle="#f7e4bd";ctx.strokeRect(game.ball.x-7,game.ball.y-4,14,8);}\n      if(game.mode==="kickReturn"){ctx.fillStyle="#fff1b2";ctx.font="bold 17px monospace";ctx.fillText("KICK RETURN",w/2-75,38);}
+      if(game.ball){ctx.fillStyle="#9b5b2b";ctx.fillRect(game.ball.x-7,game.ball.y-4,14,8);ctx.strokeStyle="#f7e4bd";ctx.strokeRect(game.ball.x-7,game.ball.y-4,14,8);}
+      if(game.mode==="kickReturn"){ctx.fillStyle="#fff1b2";ctx.font="bold 17px monospace";ctx.fillText("KICK RETURN",w/2-75,38);}
+      if(game.mode==="kickReturn"){ctx.fillStyle="#fff1b2";ctx.font="bold 17px monospace";ctx.fillText("KICK RETURN",w/2-75,38);}
       if(game.mode==="pass"){ctx.strokeStyle="#fff0a5";ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(game.player.x,game.player.y-15);ctx.lineTo(game.aim.x,game.aim.y);ctx.stroke();ctx.setLineDash([]);}
     }else{
       ctx.fillStyle="#dbe8c6";ctx.font="bold 20px monospace";ctx.fillText("GRIDIRON '99",w/2-110,h/2-12);
@@ -277,11 +281,20 @@
       game.defenders.forEach(d=>{
         const dx=p.x-d.x,dy=p.y-d.y,dist=Math.hypot(dx,dy)||1;
         d.x+=(dx/dist)*d.speed*dt;d.y+=(dy/dist)*d.speed*dt;
-        if(dist<24&&game.active&&game.dodge<=0)finishPlay("tackle");
+        if(dist<24&&game.active&&game.dodge<=0){
+          if(game.mode==="kickReturn")finishKickReturn(false);
+          else finishPlay("tackle");
+        }
       });
       if(game.dodge>0)game.dodge-=dt;
-      if(p.x>875&&game.active)finishPlay("touchdown");
-      if(p.y<48||p.y>342)finishPlay("tackle");
+      if(p.x>875&&game.active){
+        if(game.mode==="kickReturn")finishKickReturn(true);
+        else finishPlay("touchdown");
+      }
+      if((p.y<48||p.y>342)&&game.active){
+        if(game.mode==="kickReturn")finishKickReturn(false);
+        else finishPlay("tackle");
+      }
     }
     drawField();raf=requestAnimationFrame(loop);
   }
@@ -306,7 +319,8 @@
       $("pass").textContent="PASS / THROW";
     }
   }
-  $("snap").addEventListener("click",snap);\n  $("kick-return").addEventListener("click",beginKickReturn);
+  $("snap").addEventListener("click",snap);
+  $("kick-return").addEventListener("click",beginKickReturn);
   $("pass").addEventListener("click",pass);
   $("sprint").addEventListener("pointerdown",()=>{if(game)game.sprint=true;});
   ["pointerup","pointerleave","pointercancel"].forEach(e=>$("sprint").addEventListener(e,()=>{if(game)game.sprint=false;}));
@@ -321,7 +335,13 @@
     game.aim={x:Math.max(game.player.x+50,Math.min(900,(e.clientX-r.left)*sx)),y:Math.max(45,Math.min(345,(e.clientY-r.top)*sy))};
     $("play-status").textContent="Target set. Tap THROW.";
   });
-  $("play-game").addEventListener("click",startGame);\n  $("standard-mode").addEventListener("click",()=>setMode("standard"));\n  $("league-mode").addEventListener("click",()=>setMode("league"));\n  $("make-pick").addEventListener("click",()=>{if(!draft||!selectedDraftId||draftTeamAt(draft.pick)!==draft.userTeam)return;makeDraftSelection(selectedDraftId,draft.userTeam);selectedDraftId=null;runCpuDraft();});\n  $("draft-search").addEventListener("input",renderDraft);\n  $("draft-position").addEventListener("change",renderDraft);\n  $("draft-exit").addEventListener("click",()=>{if(confirm("Leave this draft? Its unsaved progress will be lost.")){draft=null;show("home");}});
+  $("play-game").addEventListener("click",startGame);
+  $("standard-mode").addEventListener("click",()=>setMode("standard"));
+  $("league-mode").addEventListener("click",()=>setMode("league"));
+  $("make-pick").addEventListener("click",()=>{if(!draft||!selectedDraftId||draftTeamAt(draft.pick)!==draft.userTeam)return;makeDraftSelection(selectedDraftId,draft.userTeam);selectedDraftId=null;runCpuDraft();});
+  $("draft-search").addEventListener("input",renderDraft);
+  $("draft-position").addEventListener("change",renderDraft);
+  $("draft-exit").addEventListener("click",()=>{if(confirm("Leave this draft? Its unsaved progress will be lost.")){draft=null;show("home");}});
   $("exit-game").addEventListener("click",()=>{cancelAnimationFrame(raf);renderFranchise();show("franchise");});
   $("continue-franchise").addEventListener("click",()=>{renderFranchise();show("franchise");});
   $("rematch").addEventListener("click",startGame);
