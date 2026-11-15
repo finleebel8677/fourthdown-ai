@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="72" fill="#101b16"/>
+<path d="M66 128h380v256H66z" fill="#1e5b3b" stroke="#e7d7a0" stroke-width="18"/>
+<path d="M128 128v256M192 128v256M256 128v256M320 128v256M384 128v256" stroke="#c8ddb4" stroke-width="8" opacity=".7"/>
+<path d="M172 255c45-74 125-110 168-80 42 29 15 111-30 161-46 50-119 78-157 48-38-30-18-83 19-129z" fill="#a85e32" stroke="#f5d7a1" stroke-width="13"/>
+<path d="M228 196l78 119M207 222l18-12m-1 48 18-12m-1 48 18-12m-1 48 18-12" stroke="#f8e8c6" stroke-width="12" fill="none"/>
+<text x="256" y="444" fill="#f3c969" font-family="monospace" font-size="52" font-weight="bold" text-anchor="middle">G99</text>
+</svg>
