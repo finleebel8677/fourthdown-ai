@@ -30,6 +30,10 @@ Important limitations:
 - The displayed overall ratings are prototype gameplay estimates calculated from statistical production. They are not official ratings.
 - Real player names are used as requested; official NFL/team logos, uniforms, photos, and player likenesses are not included.
 
+## GitHub Pages
+
+The `retro-football-game` branch includes a GitHub Actions workflow that publishes only this game as a standalone Pages site, plus the required `data/nfl-players.json` file. Once GitHub Pages is enabled with **Build and deployment → Source: GitHub Actions**, the game will be available at `https://finleebel8677.github.io/fourthdown-ai/` after the workflow completes. The original GRIDIRON IQ app files are not included in the Pages artifact.
+
 ## Run locally
 
 From the repository root:
