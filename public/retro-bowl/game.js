@@ -175,6 +175,7 @@
     game.down=1;game.toGo=10;game.plays++;
     updateHud();
     $("snap").textContent="START OFFENSE";
+    if(touchdown && game.plays<20) setTimeout(beginKickReturn,550);
     if(game.plays>=20){endGame();}
   }
   function snap() {
@@ -263,7 +264,7 @@
     ctx.fillStyle=jersey;ctx.fillRect(px-14,py-5,29,21);
     ctx.fillStyle="#f0c59a";ctx.fillRect(px-10,py-20,20,16);
     ctx.fillStyle="#18221a";ctx.fillRect(px-13,py-23,25,7);ctx.fillRect(px-15,py-20,4,11);
-    ctx.fillStyle="#fff";ctx.font="bold 10px monospace";ctx.fillText(controlled?"QB":"",px-7,py+9);
+    ctx.fillStyle="#fff";ctx.font="bold 10px monospace";ctx.fillText(controlled?(game&&game.mode==="kickReturn"?"KR":"QB"):"",px-7,py+9);
     if(controlled){ctx.strokeStyle="#fff3b0";ctx.lineWidth=2;ctx.strokeRect(px-18,py-27,36,65);}
   }
   function loop(ts){
@@ -271,6 +272,7 @@
     const dt=Math.min(.04,(ts-(lastFrame||ts))/1000);lastFrame=ts;
     if(game.active){
       const p=game.player;
+      if(game.mode==="kickReturn"&&game.ball){game.ball.x=p.x;game.ball.y=p.y-24;}
       if(game.mode==="pass"&&game.ball){
         const b=game.ball;b.x+=(b.tx-b.x)*Math.min(1,dt*4.5);b.y+=(b.ty-b.y)*Math.min(1,dt*4.5);
         if(Math.hypot(b.tx-b.x,b.ty-b.y)<10){
